@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>JuriQuest – Cruzadinhas de Direito</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="app">
+    <header class="app__header">
+      <div class="logo">
+        <span class="logo__icon">⚖</span>
+        <h1 class="logo__title">JuriQuest</h1>
+      </div>
+      <p class="app__subtitle">Cruzadinhas Jurídicas</p>
+    </header>
+
+    <section class="controls">
+      <div class="controls__group">
+        <label class="controls__label" for="subject">Matéria</label>
+        <div class="controls__row">
+          <select id="subject" class="controls__select" aria-label="Escolha a matéria jurídica">
+            <option value="direito-civil">Direito Civil</option>
+            <option value="direito-penal">Direito Penal</option>
+            <option value="direito-constitucional">Direito Constitucional</option>
+            <option value="direito-do-trabalho">Direito do Trabalho</option>
+            <option value="direito-tributario">Direito Tributário</option>
+          </select>
+        </div>
+      </div>
+      <div class="controls__group">
+        <label class="controls__label">Status</label>
+        <div class="status-display">
+          <p>Nível: <span id="level-display">1</span></p>
+          <p>Pontos: <span id="score-display">0</span></p>
+        </div>
+      </div>
+      <div class="controls__group">
+        <label class="controls__label">Ações</label>
+        <div class="controls__row">
+            <button id="generate-btn" class="btn btn--primary" aria-live="polite">
+              <span class="btn__text">Iniciar Nível 1</span>
+              <span class="btn__icon" aria-hidden="true">→</span>
+            </button>
+            <button id="next-level-btn" class="btn btn--primary hidden" aria-live="polite">
+                <span class="btn__text">Próximo Nível</span>
+                <span class="btn__icon" aria-hidden="true">→</span>
+            </button>
+            <button id="reset-btn" class="btn btn--danger">Resetar Progresso</button>
+        </div>
+      </div>
+    </section>
+
+    <div id="loading" class="loading hidden" role="status" aria-live="polite">
+      <div class="loading__spinner" aria-hidden="true"></div>
+      <span>Gerando cruzadinha…</span>
+    </div>
+
+    <div id="feedback" class="feedback hidden" role="alert" aria-live="assertive"></div>
+
+    <main id="crossword-container" class="crossword hidden" aria-label="Cruzadinha">
+      <div class="crossword__board">
+        <div id="grid-container" class="grid" role="grid" aria-label="Grade da cruzadinha"></div>
+        <div class="crossword__actions">
+          <button id="hint-btn" class="btn btn--secondary" aria-label="Pedir uma dica">Dica</button>
+          <button id="reveal-btn" class="btn btn--ghost" aria-label="Revelar todas as respostas">Revelar</button>
+          <button id="clear-btn" class="btn btn--ghost" aria-label="Limpar todas as células">Limpar</button>
+        </div>
+      </div>
+
+      <aside class="clues" aria-label="Dicas da cruzadinha">
+        <section class="clues__section" aria-labelledby="across-heading">
+          <h2 id="across-heading" class="clues__heading">
+            <span class="clues__heading-icon" aria-hidden="true">→</span> Horizontais
+          </h2>
+          <ol id="across-clues-list" class="clues__list"></ol>
+        </section>
+        <section class="clues__section" aria-labelledby="down-heading">
+          <h2 id="down-heading" class="clues__heading">
+            <span class="clues__heading-icon" aria-hidden="true">↓</span> Verticais
+          </h2>
+          <ol id="down-clues-list" class="clues__list"></ol>
+        </section>
+      </aside>
+    </main>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>

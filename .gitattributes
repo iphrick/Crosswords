@@ -1,2 +1,10 @@
-# Auto detect text files and perform LF normalization
-* text=auto
+# Auto detect text files and perform LF normalization.
+# Enforce LF (Unix-style) line endings for consistency across all OS.
+* text=auto eol=lf
+
+# Explicitly mark binary files to prevent Git from changing their line endings.
+*.png      binary
+*.jpg      binary
+*.jpeg     binary
+*.ico      binary
+*.pdf      binary
