@@ -3,9 +3,8 @@
 /* =============================================
    CONSTANTS
    ============================================= */
-const GRID_SIZE    = 20;
+const GRID_SIZE = 20;
 const MAX_ATTEMPTS = 150;
-const STORAGE_KEY  = 'juriQuestProgress';
 
 // Centraliza nomes de classes CSS para evitar "magic strings" e facilitar a manutenção.
 const UI_CLASSES = {
@@ -24,83 +23,91 @@ const UI_CLASSES = {
    GAME STATE MODULE
    ============================================= */
 const GameState = {
-  state: {},
+  _db: null,
+  _user: null,
+  _state: {}, // Cache local do estado do usuário
 
-  init() {
-    const savedState = localStorage.getItem(STORAGE_KEY);
-    if (savedState) {
-      this.state = JSON.parse(savedState);
+  async loadForUser(user) {
+    this._user = user;
+    this._db = firebase.firestore();
+    const userDocRef = this._db.collection('users').doc(user.uid);
+    const doc = await userDocRef.get();
+
+    if (doc.exists) {
+      this._state = doc.data();
     } else {
-      this.state = {};
+      // Cria um documento inicial para um novo usuário
+      this._state = { email: user.email, subjects: {} };
+      await userDocRef.set(this._state);
     }
   },
 
-  _save() {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(this.state));
+  unload() {
+    this._user = null;
+    this._state = {};
+  },
+
+  async _save() {
+    if (!this._user) return;
+    const userDocRef = this._db.collection('users').doc(this._user.uid);
+    await userDocRef.set(this._state);
   },
 
   _getSubjectState(subject) {
-    if (!this.state[subject]) {
-      this.state[subject] = { level: 1, usedWords: [], score: 0 };
+    if (!this._state.subjects) {
+      this._state.subjects = {};
     }
-    // Garante que usedWords exista para estados salvos mais antigos
-    if (!this.state[subject].usedWords) {
-      this.state[subject].usedWords = [];
+    if (!this._state.subjects[subject]) {
+      this._state.subjects[subject] = { level: 1, usedWords: [], score: 0, isLevelCompleted: false };
     }
-    // Garante que score exista para estados salvos mais antigos
-    if (this.state[subject].score === undefined) {
-      this.state[subject].score = 0;
-    }
-    // Garante que o estado de conclusão do nível exista
-    if (this.state[subject].isLevelCompleted === undefined) {
-      this.state[subject].isLevelCompleted = false;
-    }
-    return this.state[subject];
+    return this._state.subjects[subject];
   },
 
   getCurrentLevel(subject) {
     return this._getSubjectState(subject).level;
   },
 
-  getUsedWords(subject) {
+  getUsedWords(subject) { // Não precisa de 'async' pois lê do cache
     return this._getSubjectState(subject).usedWords || [];
   },
 
-  addUsedWords(subject, newWords) {
+  async addUsedWords(subject, newWords) {
     const subjectState = this._getSubjectState(subject);
     const updatedWords = [...new Set([...subjectState.usedWords, ...newWords.map(w => w.toUpperCase())])];
     subjectState.usedWords = updatedWords;
-    this._save();
+    await this._save();
   },
 
-  unlockNextLevel(subject) {
+  async unlockNextLevel(subject) {
     const subjectState = this._getSubjectState(subject);
     subjectState.level += 1;
-    this._save();
+    await this._save();
   },
 
   getCurrentScore(subject) {
     return this._getSubjectState(subject).score;
   },
 
-  addScore(subject, points) {
+  async addScore(subject, points) {
     const subjectState = this._getSubjectState(subject);
     subjectState.score += points;
-    this._save();
+    await this._save();
   },
 
-  resetProgress(subject) {
-    this.state[subject] = { level: 1, usedWords: [], score: 0 };
-    this._save();
+  async resetProgress(subject) {
+    if (this._state.subjects) {
+      this._state.subjects[subject] = { level: 1, usedWords: [], score: 0, isLevelCompleted: false };
+    }
+    await this._save();
   },
 
   isLevelCompleted(subject) {
     return this._getSubjectState(subject).isLevelCompleted;
   },
 
-  setLevelCompleted(subject, isCompleted) {
+  async setLevelCompleted(subject, isCompleted) {
     this._getSubjectState(subject).isLevelCompleted = isCompleted;
-    this._save();
+    await this._save();
   },
 };
 
@@ -110,7 +117,7 @@ const GameState = {
 const API = {
   async generateCrossword(subject, level, previousWords = []) {
     // Usar URL relativa para funcionar tanto localmente quanto na Vercel
-    const response = await fetch('/api/generate', {
+    const response = await fetch('/api/get-questions', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ subject, level, previous_words: previousWords }),
@@ -118,7 +125,7 @@ const API = {
 
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({}));
-      throw new Error(errorData.error || 'Erro ao gerar cruzadinha.');
+      throw new Error(errorData.error || 'Erro ao buscar perguntas da cruzadinha.');
     }
 
     return response.json();
@@ -383,7 +390,10 @@ const CrosswordUI = {
 
     for (let i = 0; i < answer.length; i++) {
       const { col, row } = this._getCoordsForIndex(this.activeWord, i);
-      const input = this._cellAt(col, row)?.querySelector('input');      if (input && !input.readOnly && input.value.toUpperCase() !== answer[i]) {        input.value = answer[i];        input.classList.add(UI_CLASSES.HINT_INPUT);
+      const input = this._cellAt(col, row)?.querySelector('input');
+      if (input && !input.readOnly && input.value.toUpperCase() !== answer[i]) {
+        input.value = answer[i];
+        input.classList.add(UI_CLASSES.HINT_INPUT);
         this._checkInput(input);
         this._updateClueStates();
         return;
@@ -663,21 +673,46 @@ const app = {
 
   init() {
     this.elements = {
-      generateBtn:       document.getElementById('generate-btn'),
-      nextLevelBtn:      document.getElementById('next-level-btn'),
-      subjectSelect:     document.getElementById('subject'),
-      levelDisplay:      document.getElementById('level-display'),
-      loading:           document.getElementById('loading'),
-      crosswordContainer:document.getElementById('crossword-container'),
-      crosswordActions:  document.querySelector('.crossword__actions'),
-      revealBtn:         document.getElementById('reveal-btn'),
-      resetBtn:          document.getElementById('reset-btn'),
-      clearBtn:          document.getElementById('clear-btn'),
-      hintBtn:           document.getElementById('hint-btn'),
-      scoreDisplay:      document.getElementById('score-display'),
+      // Auth elements
+      userStatus: document.getElementById('user-status'),
+      userDisplay: document.getElementById('user-display'),
+      loginModalBtn: document.getElementById('login-modal-btn'),
+      registerModalBtn: document.getElementById('register-modal-btn'),
+      logoutBtn: document.getElementById('logout-btn'),
+      loginModal: document.getElementById('login-modal'),
+      registerModal: document.getElementById('register-modal'),
+      loginForm: document.getElementById('login-form'),
+      registerForm: document.getElementById('register-form'),
+      loginError: document.getElementById('login-error'),
+      registerError: document.getElementById('register-error'),
+      authRequiredMessage: document.getElementById('auth-required-message'),
+      gameContent: document.getElementById('game-content'),
+
+      // Game elements
+      generateBtn: document.getElementById('generate-btn'),
+      nextLevelBtn: document.getElementById('next-level-btn'),
+      subjectSelect: document.getElementById('subject'),
+      levelDisplay: document.getElementById('level-display'),
+      loading: document.getElementById('loading'),
+      crosswordContainer: document.getElementById('crossword-container'),
+      crosswordActions: document.querySelector('.crossword__actions'),
+      revealBtn: document.getElementById('reveal-btn'),
+      resetBtn: document.getElementById('reset-btn'),
+      clearBtn: document.getElementById('clear-btn'),
+      hintBtn: document.getElementById('hint-btn'),
+      scoreDisplay: document.getElementById('score-display'),
     };
 
-    GameState.init();
+    // Aguarda o SDK do Firebase carregar
+    const firebaseAppCheck = setInterval(() => {
+      if (window.firebase && firebase.app) {
+        clearInterval(firebaseAppCheck);
+        this._initializeApp();
+      }
+    }, 100);
+  },
+
+  _initializeApp() {
     CrosswordUI.init();
     Feedback.init();
     this._bindEvents();
@@ -685,7 +720,9 @@ const app = {
   },
 
   _bindEvents() {
-    const { generateBtn, nextLevelBtn, subjectSelect, revealBtn, clearBtn, hintBtn, resetBtn } = this.elements;
+    const { generateBtn, nextLevelBtn, subjectSelect, revealBtn, clearBtn, hintBtn, resetBtn, loginModalBtn, registerModalBtn, logoutBtn, loginForm, registerForm } = this.elements;
+
+    // Game events
     generateBtn.addEventListener('click', () => this._onGenerate());
     nextLevelBtn.addEventListener('click', () => this._onNextLevel());
     subjectSelect.addEventListener('change', () => this._updateLevelDisplay());
@@ -694,11 +731,108 @@ const app = {
     resetBtn.addEventListener('click', () => this._onReset());
     hintBtn.addEventListener('click', () => CrosswordUI.revealHint());
     CrosswordUI.gridEl.addEventListener('crossword-solved', () => this.onLevelComplete());
+
+    // Auth events
+    loginModalBtn.addEventListener('click', () => this._showModal('login-modal'));
+    registerModalBtn.addEventListener('click', () => this._showModal('register-modal'));
+    logoutBtn.addEventListener('click', () => firebase.auth().signOut());
+
+    loginForm.addEventListener('submit', e => this._handleLogin(e));
+    registerForm.addEventListener('submit', e => this._handleRegister(e));
+
+    // Modal close buttons
+    document.querySelectorAll('.modal .close-btn').forEach(btn => {
+      btn.addEventListener('click', () => this._hideModal(btn.dataset.modalId));
+    });
+    window.addEventListener('click', e => {
+      if (e.target.classList.contains('modal')) {
+        this._hideModal(e.target.id);
+      }
+    });
+
+    // Firebase Auth state listener
+    firebase.auth().onAuthStateChanged(user => {
+      if (user) {
+        this._handleUserLoggedIn(user);
+      } else {
+        this._handleUserLoggedOut();
+      }
+    });
+  },
+
+  async _handleUserLoggedIn(user) {
+    await GameState.loadForUser(user);
+    this.elements.userDisplay.textContent = `Olá, ${user.email}`;
+    this.elements.userDisplay.classList.remove(UI_CLASSES.HIDDEN);
+    this.elements.loginModalBtn.classList.add(UI_CLASSES.HIDDEN);
+    this.elements.registerModalBtn.classList.add(UI_CLASSES.HIDDEN);
+    this.elements.logoutBtn.classList.remove(UI_CLASSES.HIDDEN);
+    this.elements.authRequiredMessage.classList.add(UI_CLASSES.HIDDEN);
+    this.elements.gameContent.classList.remove(UI_CLASSES.HIDDEN);
+    this._updateLevelDisplay();
+  },
+
+  _handleUserLoggedOut() {
+    GameState.unload();
+    this.elements.userDisplay.classList.add(UI_CLASSES.HIDDEN);
+    this.elements.loginModalBtn.classList.remove(UI_CLASSES.HIDDEN);
+    this.elements.registerModalBtn.classList.remove(UI_CLASSES.HIDDEN);
+    this.elements.logoutBtn.classList.add(UI_CLASSES.HIDDEN);
+    this.elements.authRequiredMessage.classList.remove(UI_CLASSES.HIDDEN);
+    this.elements.gameContent.classList.add(UI_CLASSES.HIDDEN);
+  },
+
+  async _handleLogin(e) {
+    e.preventDefault();
+    const email = this.elements.loginForm.querySelector('#login-email').value;
+    const password = this.elements.loginForm.querySelector('#login-password').value;
+    this.elements.loginError.textContent = '';
+    try {
+      await firebase.auth().signInWithEmailAndPassword(email, password);
+      this._hideModal('login-modal');
+      this.elements.loginForm.reset();
+    } catch (error) {
+      this.elements.loginError.textContent = 'E-mail ou senha inválidos.';
+      console.error("Erro de login:", error);
+    }
+  },
+
+  async _handleRegister(e) {
+    e.preventDefault();
+    const email = this.elements.registerForm.querySelector('#register-email').value;
+    const password = this.elements.registerForm.querySelector('#register-password').value;
+    this.elements.registerError.textContent = '';
+    try {
+      await firebase.auth().createUserWithEmailAndPassword(email, password);
+      this._hideModal('register-modal');
+      this.elements.registerForm.reset();
+    } catch (error) {
+      if (error.code === 'auth/weak-password') {
+        this.elements.registerError.textContent = 'A senha deve ter pelo menos 6 caracteres.';
+      } else if (error.code === 'auth/email-already-in-use') {
+        this.elements.registerError.textContent = 'Este e-mail já está em uso.';
+      } else {
+        this.elements.registerError.textContent = 'Ocorreu um erro ao cadastrar.';
+      }
+      console.error("Erro de cadastro:", error);
+    }
+  },
+
+  _showModal(modalId) {
+    document.getElementById(modalId).classList.remove(UI_CLASSES.HIDDEN);
+  },
+
+  _hideModal(modalId) {
+    const modal = document.getElementById(modalId);
+    if (modal) {
+      modal.classList.add(UI_CLASSES.HIDDEN);
+      modal.querySelector('.error-message').textContent = '';
+    }
   },
 
   async _onGenerate() {
     const subject = this.elements.subjectSelect.value;
-    GameState.setLevelCompleted(subject, false); // Reseta o estado de "completo" para a nova fase
+    await GameState.setLevelCompleted(subject, false); // Reseta o estado de "completo" para a nova fase
     const level = GameState.getCurrentLevel(subject);
     const previousWords = GameState.getUsedWords(subject);
     this._setLoading(true);
@@ -724,40 +858,41 @@ const app = {
     }
   },
 
-  onLevelComplete() {
+  async onLevelComplete() {
     const subject = this.elements.subjectSelect.value;
     if (GameState.isLevelCompleted(subject)) return; // Previne que a função seja executada múltiplas vezes
     
-    GameState.setLevelCompleted(subject, true);
+    await GameState.setLevelCompleted(subject, true);
 
-    Feedback.show('🎉 Parabéns! Você completou a fase!', 'success', 0);
+    Feedback.show('🎉 Parabéns! Você completou a fase!', 'success', 5000);
 
     // Adiciona as palavras resolvidas ao estado do jogo para não serem repetidas
     const solvedWords = CrosswordUI.placedWords.map(word => word.answer);
-    GameState.addUsedWords(subject, solvedWords);
+    await GameState.addUsedWords(subject, solvedWords);
 
     // Adiciona 100 pontos e atualiza o placar
-    GameState.addScore(subject, 100);
+    await GameState.addScore(subject, 100);
     this._updateScoreDisplay();
 
-    GameState.unlockNextLevel(subject);
+    await GameState.unlockNextLevel(subject);
     this.elements.nextLevelBtn.classList.remove(UI_CLASSES.HIDDEN);
     this.elements.crosswordActions.classList.add(UI_CLASSES.HIDDEN);
   },
 
   _onNextLevel() {
+    this.elements.crosswordActions.classList.add(UI_CLASSES.HIDDEN);
     this._updateLevelDisplay();
     this.elements.nextLevelBtn.classList.add(UI_CLASSES.HIDDEN);
     this._onGenerate();
   },
 
-  _onReset() {
+  async _onReset() {
     const subject = this.elements.subjectSelect.value;
     const subjectText = this.elements.subjectSelect.options[this.elements.subjectSelect.selectedIndex].text;
     if (confirm(`Você tem certeza que deseja resetar todo o progresso de "${subjectText}"? Você voltará para o nível 1 e sua pontuação será zerada.`)) {
-        GameState.resetProgress(subject);
-        this._updateLevelDisplay();
-        Feedback.show('Progresso resetado com sucesso!', 'info');
+      await GameState.resetProgress(subject);
+      this._updateLevelDisplay();
+      Feedback.show('Progresso resetado com sucesso!', 'info');
     }
   },
 
@@ -778,6 +913,7 @@ const app = {
     
     this.elements.generateBtn.classList.remove(UI_CLASSES.HIDDEN);
     this.elements.crosswordContainer.classList.add(UI_CLASSES.HIDDEN);
+    this.elements.crosswordActions.classList.add(UI_CLASSES.HIDDEN);
     Feedback.hide();
   },
 
@@ -788,4 +924,4 @@ const app = {
   },
 };
 
-document.addEventListener('DOMContentLoaded', () => app.init());
+app.init();

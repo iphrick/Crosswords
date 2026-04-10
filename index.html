@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JuriQuest - Cruzadinhas de Direito</title>
+    <link rel="stylesheet" href="/style.css">
+    <!-- Firebase SDKs (versão de compatibilidade para usar o `firebase.auth()`, etc.) -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
+
+    <!-- Inicialização do Firebase -->
+    <script>
+      // Suas chaves de configuração do Firebase para o app da web
+      // ATENÇÃO: Estas chaves são seguras para serem expostas no frontend.
+      const firebaseConfig = {
+        apiKey: "SUA_API_KEY",
+        authDomain: "SEU_PROJETO.firebaseapp.com",
+        projectId: "SEU_PROJECT_ID",
+        storageBucket: "SEU_PROJETO.appspot.com",
+        messagingSenderId: "SEU_SENDER_ID",
+        appId: "SEU_APP_ID"
+      };
+
+      // Inicializa o Firebase
+      firebase.initializeApp(firebaseConfig);
+    </script>
+</head>
+<body>
+<div class="app">
+    <header class="app__header">
+        <div class="logo">
+            <span class="logo__icon">⚖</span>
+            <h1 class="logo__title">JuriQuest</h1>
+        </div>
+        <div id="user-status">
+            <span id="user-display" class="hidden"></span>
+            <button id="login-modal-btn" class="btn btn--secondary">Entrar</button>
+            <button id="register-modal-btn" class="btn btn--secondary">Cadastrar</button>
+            <button id="logout-btn" class="btn btn--danger hidden">Sair</button>
+        </div>
+    </header>
+
+    <div id="auth-required-message">
+        <h2>Bem-vindo!</h2>
+        <p>Por favor, entre ou cadastre-se para começar a jogar e salvar seu progresso.</p>
+    </div>
+
+    <div id="game-content" class="hidden">
+        <section class="controls">
+            <div class="controls__group">
+                <label class="controls__label" for="subject">Matéria</label>
+                <div class="controls__row">
+                    <select id="subject" class="controls__select" aria-label="Escolha a matéria jurídica">
+                        <option value="Direito Constitucional">Direito Constitucional</option>
+                        <option value="Direito Penal">Direito Penal</option>
+                        <option value="Direito Civil">Direito Civil</option>
+                        <option value="Direito do Trabalho">Direito do Trabalho</option>
+                        <option value="Direito Administrativo">Direito Administrativo</option>
+                        <option value="Direito Tributário">Direito Tributário</option>
+                    </select>
+                </div>
+            </div>
+            <div class="controls__group">
+                <label class="controls__label">Status</label>
+                <div class="status-display">
+                    <p>Nível: <span id="level-display">1</span></p>
+                    <p>Pontos: <span id="score-display">0</span></p>
+                </div>
+            </div>
+            <div class="controls__group">
+                <label class="controls__label">Ações</label>
+                <div class="controls__row">
+                    <button id="generate-btn" class="btn btn--primary" aria-live="polite">
+                        <span class="btn__text">Iniciar Nível 1</span>
+                    </button>
+                    <button id="next-level-btn" class="btn btn--primary hidden" aria-live="polite">
+                        <span class="btn__text">Próximo Nível</span>
+                    </button>
+                    <button id="reset-btn" class="btn btn--secondary" title="Resetar progresso do tema">Resetar</button>
+                </div>
+            </div>
+        </section>
+
+        <div id="loading" class="loading hidden" role="status" aria-live="polite">
+            <div class="loading__spinner" aria-hidden="true"></div>
+            <span>Gerando cruzadinha…</span>
+        </div>
+
+        <div id="feedback" class="feedback hidden" role="alert" aria-live="assertive"></div>
+
+        <main id="crossword-container" class="crossword hidden" aria-label="Cruzadinha">
+            <div class="crossword__board">
+                <div id="grid-container" class="grid" role="grid" aria-label="Grade da cruzadinha"></div>
+                <div class="crossword__actions">
+                    <button id="hint-btn" class="btn btn--secondary">Dica</button>
+                    <button id="clear-btn" class="btn btn--secondary">Limpar</button>
+                    <button id="reveal-btn" class="btn btn--danger">Revelar Tudo</button>
+                </div>
+            </div>
+
+            <aside class="clues" aria-label="Dicas da cruzadinha">
+                <section class="clues__section" aria-labelledby="across-heading">
+                    <h2 id="across-heading" class="clues__heading">
+                        <span class="clues__heading-icon" aria-hidden="true">→</span> Horizontais
+                    </h2>
+                    <ol id="across-clues-list" class="clues__list"></ol>
+                </section>
+                <section class="clues__section" aria-labelledby="down-heading">
+                    <h2 id="down-heading" class="clues__heading">
+                        <span class="clues__heading-icon" aria-hidden="true">↓</span> Verticais
+                    </h2>
+                    <ol id="down-clues-list" class="clues__list"></ol>
+                </section>
+            </aside>
+        </main>
+    </div>
+
+    <!-- Modals -->
+    <div id="login-modal" class="modal hidden">
+        <div class="modal-content">
+            <span class="close-btn" data-modal-id="login-modal">&times;</span>
+            <h2>Entrar</h2>
+            <form id="login-form">
+                <input type="email" id="login-email" placeholder="Seu e-mail" required>
+                <input type="password" id="login-password" placeholder="Sua senha" required>
+                <button type="submit" class="btn btn--primary">Login</button>
+                <p id="login-error" class="error-message"></p>
+            </form>
+        </div>
+    </div>
+
+    <div id="register-modal" class="modal hidden">
+        <div class="modal-content">
+            <span class="close-btn" data-modal-id="register-modal">&times;</span>
+            <h2>Criar Conta</h2>
+            <form id="register-form">
+                <input type="email" id="register-email" placeholder="Seu e-mail" required>
+                <input type="password" id="register-password" placeholder="Crie uma senha (mín. 6 caracteres)" required>
+                <button type="submit" class="btn btn--primary">Cadastrar</button>
+                <p id="register-error" class="error-message"></p>
+            </form>
+        </div>
+    </div>
+</div>
+<script src="/script.js"></script>
+</body>
+</html>
