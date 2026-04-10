@@ -38,6 +38,7 @@
             <span id="user-display" class="hidden"></span>
             <button id="login-modal-btn" class="btn btn--secondary">Entrar</button>
             <button id="register-modal-btn" class="btn btn--secondary">Cadastrar</button>
+            <button id="ranking-modal-btn" class="btn btn--secondary">Ranking</button>
             <button id="logout-btn" class="btn btn--danger hidden">Sair</button>
         </div>
     </header>
@@ -122,12 +123,35 @@
         <div class="modal-content">
             <span class="close-btn" data-modal-id="login-modal">&times;</span>
             <h2>Entrar</h2>
-            <form id="login-form">
-                <input type="email" id="login-email" placeholder="Seu e-mail" required>
-                <input type="password" id="login-password" placeholder="Sua senha" required>
-                <button type="submit" class="btn btn--primary">Login</button>
-                <p id="login-error" class="error-message"></p>
-            </form>
+            <div class="modal-tabs">
+                <button class="modal-tab-btn active" data-modal="login-modal" data-tab="email-login-tab">Email</button>
+                <button class="modal-tab-btn" data-modal="login-modal" data-tab="phone-login-tab">Celular</button>
+            </div>
+
+            <div id="email-login-tab" class="modal-tab-content active">
+                <form id="login-form">
+                    <input type="email" id="login-email" placeholder="Seu e-mail" required>
+                    <input type="password" id="login-password" placeholder="Sua senha" required>
+                    <button type="submit" class="btn btn--primary">Login</button>
+                    <p id="login-error" class="error-message"></p>
+                </form>
+            </div>
+
+            <div id="phone-login-tab" class="modal-tab-content">
+                <form id="phone-login-form">
+                    <p class="info-message">Insira seu número com código do país (ex: +55 11 987654321).</p>
+                    <input type="tel" id="phone-number-input" placeholder="+55 11 99999-9999" required>
+                    <button type="submit" id="send-code-btn" class="btn btn--primary">Enviar Código</button>
+                    <div id="recaptcha-container" class="recaptcha-container"></div>
+                    <p id="phone-login-error" class="error-message"></p>
+                </form>
+                <form id="verify-code-form" class="hidden">
+                    <p class="info-message">Enviamos um código de 6 dígitos para o seu celular.</p>
+                    <input type="text" id="verification-code-input" placeholder="Código de 6 dígitos" required autocomplete="one-time-code">
+                    <button type="submit" id="verify-code-btn" class="btn btn--primary">Verificar e Entrar</button>
+                    <p id="verify-code-error" class="error-message"></p>
+                </form>
+            </div>
         </div>
     </div>
 
@@ -135,12 +159,37 @@
         <div class="modal-content">
             <span class="close-btn" data-modal-id="register-modal">&times;</span>
             <h2>Criar Conta</h2>
-            <form id="register-form">
-                <input type="email" id="register-email" placeholder="Seu e-mail" required>
-                <input type="password" id="register-password" placeholder="Crie uma senha (mín. 6 caracteres)" required>
-                <button type="submit" class="btn btn--primary">Cadastrar</button>
-                <p id="register-error" class="error-message"></p>
-            </form>
+            <div class="modal-tabs">
+                <button class="modal-tab-btn active" data-modal="register-modal" data-tab="email-register-tab">Email</button>
+                <button class="modal-tab-btn" data-modal="register-modal" data-tab="phone-register-tab">Celular</button>
+            </div>
+
+            <div id="email-register-tab" class="modal-tab-content active">
+                <form id="register-form">
+                    <input type="email" id="register-email" placeholder="Seu e-mail" required>
+                    <input type="password" id="register-password" placeholder="Crie uma senha (mín. 6 caracteres)" required>
+                    <button type="submit" class="btn btn--primary">Cadastrar</button>
+                    <p id="register-error" class="error-message"></p>
+                </form>
+            </div>
+
+            <div id="phone-register-tab" class="modal-tab-content">
+                <p class="info-message">A autenticação por celular é feita na tela de "Entrar". Se for seu primeiro acesso, uma conta será criada automaticamente.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Ranking Modal -->
+    <div id="ranking-modal" class="modal hidden">
+        <div class="modal-content">
+            <span class="close-btn" data-modal-id="ranking-modal">&times;</span>
+            <h2>🏆 Ranking Geral 🏆</h2>
+            <div id="ranking-loading" class="loading hidden">
+                <div class="loading__spinner"></div>
+                <span>Carregando ranking...</span>
+            </div>
+            <ol id="ranking-list" class="ranking-list hidden"></ol>
+            <p id="ranking-error" class="error-message"></p>
         </div>
     </div>
 </div>

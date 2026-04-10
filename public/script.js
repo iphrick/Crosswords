@@ -130,6 +130,15 @@ const API = {
 
     return response.json();
   },
+
+  async getRanking() {
+    const response = await fetch('/api/get-ranking'); // GET request
+    if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.error || 'Erro ao carregar o ranking.');
+    }
+    return response.json();
+  },
 };
 
 /* =============================================
@@ -670,6 +679,7 @@ const Feedback = {
    ============================================= */
 const app = {
   elements: {},
+  confirmationResult: null,
 
   init() {
     this.elements = {
@@ -679,12 +689,26 @@ const app = {
       loginModalBtn: document.getElementById('login-modal-btn'),
       registerModalBtn: document.getElementById('register-modal-btn'),
       logoutBtn: document.getElementById('logout-btn'),
+      rankingModalBtn: document.getElementById('ranking-modal-btn'),
+      rankingModal: document.getElementById('ranking-modal'),
+      rankingList: document.getElementById('ranking-list'),
+      rankingLoading: document.getElementById('ranking-loading'),
+      rankingError: document.getElementById('ranking-error'),
       loginModal: document.getElementById('login-modal'),
       registerModal: document.getElementById('register-modal'),
       loginForm: document.getElementById('login-form'),
       registerForm: document.getElementById('register-form'),
       loginError: document.getElementById('login-error'),
       registerError: document.getElementById('register-error'),
+      phoneLoginForm: document.getElementById('phone-login-form'),
+      phoneNumberInput: document.getElementById('phone-number-input'),
+      sendCodeBtn: document.getElementById('send-code-btn'),
+      recaptchaContainer: document.getElementById('recaptcha-container'),
+      phoneLoginError: document.getElementById('phone-login-error'),
+      verifyCodeForm: document.getElementById('verify-code-form'),
+      verificationCodeInput: document.getElementById('verification-code-input'),
+      verifyCodeBtn: document.getElementById('verify-code-btn'),
+      verifyCodeError: document.getElementById('verify-code-error'),
       authRequiredMessage: document.getElementById('auth-required-message'),
       gameContent: document.getElementById('game-content'),
 
@@ -713,6 +737,14 @@ const app = {
   },
 
   _initializeApp() {
+    // Configura o reCAPTCHA para verificação por telefone.
+    // Ele fica invisível até ser chamado.
+    window.recaptchaVerifier = new firebase.auth.RecaptchaVerifier('recaptcha-container', {
+      'size': 'invisible',
+      'callback': (response) => {
+        // reCAPTCHA resolvido, pode prosseguir com o envio do código.
+      }
+    });
     CrosswordUI.init();
     Feedback.init();
     this._bindEvents();
@@ -720,7 +752,7 @@ const app = {
   },
 
   _bindEvents() {
-    const { generateBtn, nextLevelBtn, subjectSelect, revealBtn, clearBtn, hintBtn, resetBtn, loginModalBtn, registerModalBtn, logoutBtn, loginForm, registerForm } = this.elements;
+    const { generateBtn, nextLevelBtn, subjectSelect, revealBtn, clearBtn, hintBtn, resetBtn, loginModalBtn, registerModalBtn, logoutBtn, loginForm, registerForm, phoneLoginForm, verifyCodeForm, rankingModalBtn } = this.elements;
 
     // Game events
     generateBtn.addEventListener('click', () => this._onGenerate());
@@ -735,10 +767,19 @@ const app = {
     // Auth events
     loginModalBtn.addEventListener('click', () => this._showModal('login-modal'));
     registerModalBtn.addEventListener('click', () => this._showModal('register-modal'));
+    rankingModalBtn.addEventListener('click', () => this._showRanking());
     logoutBtn.addEventListener('click', () => firebase.auth().signOut());
 
     loginForm.addEventListener('submit', e => this._handleLogin(e));
     registerForm.addEventListener('submit', e => this._handleRegister(e));
+    phoneLoginForm.addEventListener('submit', e => this._handlePhoneAuth(e));
+    verifyCodeForm.addEventListener('submit', e => this._handleVerifyCode(e));
+
+    // Auth tab switching
+    document.querySelectorAll('.modal-tab-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => this._handleTabSwitch(e));
+    });
+
 
     // Modal close buttons
     document.querySelectorAll('.modal .close-btn').forEach(btn => {
@@ -762,7 +803,12 @@ const app = {
 
   async _handleUserLoggedIn(user) {
     await GameState.loadForUser(user);
-    this.elements.userDisplay.textContent = `Olá, ${user.email}`;
+    // Mostra um nome mais amigável (parte do email antes do @ ou o número de telefone)
+    const displayName = user.email 
+      ? user.email.split('@')[0] 
+      : user.phoneNumber;
+
+    this.elements.userDisplay.textContent = `Olá, ${displayName}`;
     this.elements.userDisplay.classList.remove(UI_CLASSES.HIDDEN);
     this.elements.loginModalBtn.classList.add(UI_CLASSES.HIDDEN);
     this.elements.registerModalBtn.classList.add(UI_CLASSES.HIDDEN);
@@ -818,6 +864,73 @@ const app = {
     }
   },
 
+  _handleTabSwitch(e) {
+    const button = e.currentTarget;
+    const modalId = button.dataset.modal;
+    const tabId = button.dataset.tab;
+
+    const modal = document.getElementById(modalId);
+    if (!modal) return;
+
+    // Desativa todos os botões e abas dentro do modal
+    modal.querySelectorAll('.modal-tab-btn').forEach(btn => btn.classList.remove('active'));
+    modal.querySelectorAll('.modal-tab-content').forEach(tab => tab.classList.remove('active'));
+
+    // Ativa o botão e a aba clicados
+    button.classList.add('active');
+    document.getElementById(tabId)?.classList.add('active');
+  },
+
+  async _handlePhoneAuth(e) {
+    e.preventDefault();
+    this.elements.phoneLoginError.textContent = '';
+    this.elements.sendCodeBtn.disabled = true;
+    this.elements.sendCodeBtn.textContent = 'Enviando...';
+
+    const phoneNumber = this.elements.phoneNumberInput.value;
+    const appVerifier = window.recaptchaVerifier;
+
+    try {
+      this.confirmationResult = await firebase.auth().signInWithPhoneNumber(phoneNumber, appVerifier);
+      // Mostra o formulário de verificação de código
+      this.elements.phoneLoginForm.classList.add(UI_CLASSES.HIDDEN);
+      this.elements.verifyCodeForm.classList.remove(UI_CLASSES.HIDDEN);
+    } catch (error) {
+      console.error("Erro ao enviar código do celular:", error);
+      if (error.code === 'auth/invalid-phone-number') {
+        this.elements.phoneLoginError.textContent = 'Número de celular inválido. Inclua o código do país (ex: +55).';
+      } else {
+        this.elements.phoneLoginError.textContent = 'Falha ao enviar o código. Tente novamente.';
+      }
+      // Renderiza o reCAPTCHA novamente se falhar
+      window.recaptchaVerifier.render().catch(err => console.error("Falha ao renderizar reCAPTCHA", err));
+    } finally {
+      this.elements.sendCodeBtn.disabled = false;
+      this.elements.sendCodeBtn.textContent = 'Enviar Código';
+    }
+  },
+
+  async _handleVerifyCode(e) {
+    e.preventDefault();
+    this.elements.verifyCodeError.textContent = '';
+    this.elements.verifyCodeBtn.disabled = true;
+    this.elements.verifyCodeBtn.textContent = 'Verificando...';
+
+    const code = this.elements.verificationCodeInput.value;
+
+    try {
+      await this.confirmationResult.confirm(code);
+      // O onAuthStateChanged vai lidar com o login bem-sucedido.
+      this._hideModal('login-modal');
+    } catch (error) {
+      console.error("Erro ao verificar código:", error);
+      this.elements.verifyCodeError.textContent = 'Código inválido. Tente novamente.';
+    } finally {
+      this.elements.verifyCodeBtn.disabled = false;
+      this.elements.verifyCodeBtn.textContent = 'Verificar e Entrar';
+    }
+  },
+
   _showModal(modalId) {
     document.getElementById(modalId).classList.remove(UI_CLASSES.HIDDEN);
   },
@@ -827,7 +940,67 @@ const app = {
     if (modal) {
       modal.classList.add(UI_CLASSES.HIDDEN);
       modal.querySelector('.error-message').textContent = '';
+
+      // Reseta os formulários de celular ao fechar o modal
+      if (modalId === 'login-modal') {
+        this.elements.phoneLoginForm.classList.remove(UI_CLASSES.HIDDEN);
+        this.elements.verifyCodeForm.classList.add(UI_CLASSES.HIDDEN);
+        this.elements.phoneLoginForm.reset();
+        this.elements.verifyCodeForm.reset();
+        this.elements.phoneLoginError.textContent = '';
+        this.elements.verifyCodeError.textContent = '';
+      }
     }
+  },
+
+  async _showRanking() {
+    this._showModal('ranking-modal');
+    this.elements.rankingLoading.classList.remove(UI_CLASSES.HIDDEN);
+    this.elements.rankingList.classList.add(UI_CLASSES.HIDDEN);
+    this.elements.rankingError.textContent = '';
+
+    try {
+      const data = await API.getRanking();
+      this._renderRanking(data.ranking);
+    } catch (error) {
+      this.elements.rankingError.textContent = error.message;
+    } finally {
+      this.elements.rankingLoading.classList.add(UI_CLASSES.HIDDEN);
+    }
+  },
+
+  _renderRanking(players) {
+    this.elements.rankingList.innerHTML = '';
+    if (players.length === 0) {
+      this.elements.rankingError.textContent = 'O ranking ainda está vazio. Jogue para aparecer aqui!';
+      return;
+    }
+
+    const medals = ['🥇', '🥈', '🥉'];
+
+    players.forEach((player, index) => {
+      const rank = index + 1;
+      const li = document.createElement('li');
+      li.className = 'ranking-item';
+      if (rank <= 3) {
+        li.classList.add(`ranking-item--${rank}`);
+      }
+
+      const medal = medals[index] || `${rank}.`;
+
+      li.innerHTML = `
+        <div class="ranking-item__info">
+          <span class="ranking-item__rank">${medal}</span>
+          <span class="ranking-item__name">${player.name}</span>
+        </div>
+        <div class="ranking-item__stats">
+          <span>${player.totalScore}</span> pts / Nível <span>${player.highestLevel}</span>
+        </div>
+      `;
+      this.elements.rankingList.appendChild(li);
+    });
+
+    this.elements.rankingList.classList.remove(UI_CLASSES.HIDDEN);
   },
 
   async _onGenerate() {
