@@ -1,0 +1,11 @@
+# Arquivos de ambiente local - NUNCA ENVIE PARA O GIT
+.env*.local
+
+# Dependências do Node
+node_modules
+
+# Logs
+npm-debug.log*
+
+# Arquivos de build da Vercel
+.vercel
