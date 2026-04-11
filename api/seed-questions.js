@@ -159,8 +159,8 @@ export default async function handler(req, res) {
 
     crossword_data.forEach(item => {
         // Cria um ID de documento baseado no tema, nível e resposta para evitar duplicatas fáceis.
-        // Ex: direito_penal-1-CULPA
-        const docId = `${subject.replace(/\s+/g, '_').toLowerCase()}-${parsedLevel}-${item.answer}`;
+        // Ex: direito_penal_1_CULPA (substituindo hífens por underscores para conformidade)
+        const docId = `${subject.replace(/\s+/g, '_').toLowerCase()}_${parsedLevel}_${item.answer}`;
         const docRef = questionsCollection.doc(docId);
         
         batch.set(docRef, {

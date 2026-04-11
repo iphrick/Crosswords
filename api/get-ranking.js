@@ -1,9 +1,13 @@
 import { db } from './lib/firebase';
 
-// Helper para extrair um nome amigável do e-mail do usuário.
-function getNameFromEmail(email) {
-    if (!email) return 'Anônimo';
-    return email.split('@')[0];
+// Helper para criar um nome de jogador limpo a partir de email ou telefone.
+function sanitizePlayerName(identifier) {
+    if (!identifier) return 'Anônimo';
+    // Se for um email, pega a parte antes do @. Se for telefone, usa o número.
+    const nameBase = identifier.includes('@') ? identifier.split('@')[0] : identifier;
+    // Remove todos os caracteres que não são letras ou números.
+    // Isso remove '.', '+', '-' etc., deixando um nome limpo para exibição.
+    return nameBase.replace(/[^a-zA-Z0-9]/g, '');
 }
 
 export default async function handler(req, res) {
@@ -42,7 +46,7 @@ export default async function handler(req, res) {
             // Adiciona ao ranking apenas jogadores que já pontuaram.
             if (totalScore > 0) {
                 players.push({
-                    name: getNameFromEmail(userData.email || userData.phoneNumber),
+                    name: sanitizePlayerName(userData.email || userData.phoneNumber),
                     totalScore,
                     highestLevel,
                 });
