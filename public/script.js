@@ -47,7 +47,7 @@ const GameState = {
     this._state = {};
   },
 
-  async _save() {
+  async save() {
     if (!this._user) return;
     const userDocRef = this._db.collection('users').doc(this._user.uid);
     await userDocRef.set(this._state);
@@ -71,43 +71,39 @@ const GameState = {
     return this._getSubjectState(subject).usedWords || [];
   },
 
-  async addUsedWords(subject, newWords) {
+  addUsedWords(subject, newWords) {
     const subjectState = this._getSubjectState(subject);
     const updatedWords = [...new Set([...subjectState.usedWords, ...newWords.map(w => w.toUpperCase())])];
     subjectState.usedWords = updatedWords;
-    await this._save();
   },
 
-  async unlockNextLevel(subject) {
+  unlockNextLevel(subject) {
     const subjectState = this._getSubjectState(subject);
     subjectState.level += 1;
-    await this._save();
   },
 
   getCurrentScore(subject) {
     return this._getSubjectState(subject).score;
   },
 
-  async addScore(subject, points) {
+  addScore(subject, points) {
     const subjectState = this._getSubjectState(subject);
     subjectState.score += points;
-    await this._save();
   },
 
   async resetProgress(subject) {
     if (this._state.subjects) {
       this._state.subjects[subject] = { level: 1, usedWords: [], score: 0, isLevelCompleted: false };
     }
-    await this._save();
+    await this.save();
   },
 
   isLevelCompleted(subject) {
     return this._getSubjectState(subject).isLevelCompleted;
   },
 
-  async setLevelCompleted(subject, isCompleted) {
+  setLevelCompleted(subject, isCompleted) {
     this._getSubjectState(subject).isLevelCompleted = isCompleted;
-    await this._save();
   },
 };
 
@@ -267,15 +263,20 @@ const CrosswordGrid = {
         return false; // Conflito de letras na interseção
       }
 
-      // Verifica células adjacentes para evitar palavras coladas
-      if (direction === 'across') {
-        if ((y > 0 && grid[y - 1][x] !== null) || (y < GRID_SIZE - 1 && grid[y + 1][x] !== null)) {
-            // Se a célula adjacente não for a da própria interseção
-            if(grid[y][x] !== word[i]) return false;
-        }
-      } else { // direction === 'down'
-        if ((x > 0 && grid[y][x - 1] !== null) || (x < GRID_SIZE - 1 && grid[y][x + 1] !== null)) {
-             if(grid[y][x] !== word[i]) return false;
+      // Se a célula atual estiver vazia (não for uma interseção), verifica se as células
+      // adjacentes (na direção perpendicular) também estão vazias. Isso evita que
+      // palavras fiquem coladas lado a lado.
+      if (gridLetter === null) {
+        if (direction === 'across') {
+          // Verifica acima e abaixo
+          if ((y > 0 && grid[y - 1][x] !== null) || (y < GRID_SIZE - 1 && grid[y + 1][x] !== null)) {
+            return false;
+          }
+        } else { // direction === 'down'
+          // Verifica à esquerda e à direita
+          if ((x > 0 && grid[y][x - 1] !== null) || (x < GRID_SIZE - 1 && grid[y][x + 1] !== null)) {
+            return false;
+          }
         }
       }
     }
@@ -1005,7 +1006,8 @@ const app = {
 
   async _onGenerate() {
     const subject = this.elements.subjectSelect.value;
-    await GameState.setLevelCompleted(subject, false); // Reseta o estado de "completo" para a nova fase
+    GameState.setLevelCompleted(subject, false); // Reseta o estado de "completo" para a nova fase
+    await GameState.save();
     const level = GameState.getCurrentLevel(subject);
     const previousWords = GameState.getUsedWords(subject);
     this._setLoading(true);
@@ -1034,20 +1036,21 @@ const app = {
   async onLevelComplete() {
     const subject = this.elements.subjectSelect.value;
     if (GameState.isLevelCompleted(subject)) return; // Previne que a função seja executada múltiplas vezes
-    
-    await GameState.setLevelCompleted(subject, true);
 
+    GameState.setLevelCompleted(subject, true);
     Feedback.show('🎉 Parabéns! Você completou a fase!', 'success', 5000);
 
     // Adiciona as palavras resolvidas ao estado do jogo para não serem repetidas
     const solvedWords = CrosswordUI.placedWords.map(word => word.answer);
-    await GameState.addUsedWords(subject, solvedWords);
+    GameState.addUsedWords(subject, solvedWords);
 
     // Adiciona 100 pontos e atualiza o placar
-    await GameState.addScore(subject, 100);
+    GameState.addScore(subject, 100);
     this._updateScoreDisplay();
 
-    await GameState.unlockNextLevel(subject);
+    GameState.unlockNextLevel(subject);
+
+    await GameState.save(); // Salva todas as alterações de uma só vez!
     this.elements.nextLevelBtn.classList.remove(UI_CLASSES.HIDDEN);
     this.elements.crosswordActions.classList.add(UI_CLASSES.HIDDEN);
   },

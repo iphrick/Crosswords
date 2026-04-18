@@ -7,7 +7,8 @@ function sanitizePlayerName(identifier) {
     const nameBase = identifier.includes('@') ? identifier.split('@')[0] : identifier;
     // Remove todos os caracteres que não são letras ou números.
     // Isso remove '.', '+', '-' etc., deixando um nome limpo para exibição.
-    return nameBase.replace(/[^a-zA-Z0-9]/g, '');
+    const cleanName = nameBase.replace(/[^a-zA-Z0-9]/g, '');
+    return cleanName.length > 0 ? cleanName : 'Jogador';
 }
 
 export default async function handler(req, res) {

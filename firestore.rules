@@ -1,0 +1,13 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Permite que cada usuário leia e escreva apenas em seu próprio documento.
+    match /users/{userId} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+    }
+    // Permite que qualquer usuário autenticado leia as perguntas.
+    match /questions/{questionId} {
+      allow read: if request.auth != null;
+    }
+  }
+}
