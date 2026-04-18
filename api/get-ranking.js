@@ -1,4 +1,4 @@
-import { db } from './lib/firebase.js';
+const { db } = require('./lib/firebase.js');
 
 // Helper para criar um nome de jogador limpo a partir de email ou telefone.
 function sanitizePlayerName(identifier) {
@@ -11,7 +11,7 @@ function sanitizePlayerName(identifier) {
     return cleanName.length > 0 ? cleanName : 'Jogador';
 }
 
-export default async function handler(req, res) {
+module.exports = async function handler(req, res) {
     if (req.method !== 'GET') {
         return res.status(405).json({ error: 'Method Not Allowed' });
     }

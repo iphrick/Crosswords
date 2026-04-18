@@ -1,4 +1,4 @@
-import { db } from './lib/firebase.js';
+const { db } = require('./lib/firebase.js');
 
 // Função para embaralhar um array (Fisher-Yates shuffle)
 function shuffleArray(array) {
@@ -9,7 +9,7 @@ function shuffleArray(array) {
   return array;
 }
 
-export default async function handler(req, res) {
+module.exports = async function handler(req, res) {
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method Not Allowed' });
   }
