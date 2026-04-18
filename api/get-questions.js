@@ -1,4 +1,4 @@
-import { db } from './lib/firebase';
+import { db } from './lib/firebase.js';
 
 // Função para embaralhar um array (Fisher-Yates shuffle)
 function shuffleArray(array) {

@@ -1,4 +1,4 @@
-import { db } from './lib/firebase';
+import { db } from './lib/firebase.js';
 
 // Helper para criar um nome de jogador limpo a partir de email ou telefone.
 function sanitizePlayerName(identifier) {

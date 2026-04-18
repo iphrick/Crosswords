@@ -1,12 +1,12 @@
 import { GoogleGenerativeAI } from '@google/generative-ai';
-import { db } from './lib/firebase'; // Importa a conexão com o Firestore
+import { db } from './lib/firebase.js'; // Importa a conexão com o Firestore
 
 // 1. Carregar a chave da API do ambiente
 // No Next.js, variáveis de ambiente prefixadas com NEXT_PUBLIC_ são expostas ao cliente.
 // Variáveis sem esse prefixo são apenas para o servidor (como é o caso aqui).
 const API_KEY = process.env.GEMINI_API_KEY;
 const SEED_SECRET = process.env.SEED_SECRET; // Chave secreta para proteger o endpoint
-const MODEL_NAME = 'gemini-1.5-flash';
+const MODEL_NAME = 'gemini-2.5-flash';
 
 // Instanciar o cliente da IA fora do handler para reutilização em "warm functions".
 const genAI = API_KEY ? new GoogleGenerativeAI(API_KEY) : null;
