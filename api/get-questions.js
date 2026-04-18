@@ -1,4 +1,4 @@
-const { db } = require('./lib/firebase.js');
+const { db } = require('../lib/firebase.js');
 
 // Função para embaralhar um array (Fisher-Yates shuffle)
 function shuffleArray(array) {
