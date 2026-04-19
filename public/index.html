@@ -26,6 +26,56 @@
       // Inicializa o Firebase
       firebase.initializeApp(firebaseConfig);
     </script>
+
+    <style>
+        /* --- Responsividade e Ajustes Mobile --- */
+        /* As regras fora do @media afetam apenas o scroll seguro da grade */
+        .crossword__board {
+            width: 100%;
+            overflow-x: auto;
+            padding-bottom: 15px;
+        }
+        #grid-container {
+            width: max-content;
+            margin: 0 auto;
+        }
+        
+        /* As regras dentro do @media afetam APENAS celulares (telas menores que 768px) */
+        @media (max-width: 768px) {
+            .crossword {
+                flex-direction: column !important;
+                align-items: center;
+            }
+            .clues {
+                width: 100% !important;
+                margin-left: 0 !important;
+                margin-top: 25px;
+            }
+            .controls__row {
+                flex-direction: column;
+                gap: 12px;
+            }
+            .controls__row > * {
+                width: 100%;
+                margin-left: 0 !important;
+            }
+            .crossword__actions {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 8px;
+                justify-content: center;
+            }
+            .crossword__actions .btn {
+                flex: 1 1 auto;
+            }
+            #game-avatar-display {
+                display: none !important;
+            }
+            .grid__cell__input {
+                font-size: 16px !important; 
+            }
+        }
+    </style>
 </head>
 <body>
 <div class="app">
@@ -60,6 +110,8 @@
                         <option value="Direito do Trabalho">Direito do Trabalho</option>
                         <option value="Direito Administrativo">Direito Administrativo</option>
                         <option value="Direito Tributário">Direito Tributário</option>
+                        <option value="Direito Previdenciário - Custeio">Direito Previdenciário - Custeio</option>
+                        <option value="Direito Previdenciário - Benefícios">Direito Previdenciário - Benefícios</option>
                     </select>
                 </div>
             </div>

@@ -51,6 +51,14 @@ function buildPrompt(subject, level, num_words, previous_words) {
     'Direito Tributário': {
       name: 'Código Tributário Nacional - CTN (Lei nº 5.172/1966)',
       url: 'https://www.planalto.gov.br/ccivil_03/leis/l5172compilado.htm'
+    },
+    'Direito Previdenciário - Custeio': {
+      name: 'Lei da Organização da Seguridade Social (Lei nº 8.212/1991)',
+      url: 'https://www.planalto.gov.br/ccivil_03/leis/l8212cons.htm'
+    },
+    'Direito Previdenciário - Benefícios': {
+      name: 'Planos de Benefícios da Previdência Social (Lei nº 8.213/1991)',
+      url: 'https://www.planalto.gov.br/ccivil_03/leis/l8213cons.htm'
     }
   };
 

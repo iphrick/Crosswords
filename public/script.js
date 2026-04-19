@@ -447,7 +447,8 @@ const CrosswordUI = {
   },
 
   _setupGrid() {
-    this.gridEl.style.gridTemplateColumns = `repeat(${GRID_SIZE}, 32px)`;
+    this.gridEl.style.gridTemplateColumns = `repeat(${GRID_SIZE}, minmax(28px, 32px))`;
+    this.gridEl.style.gridAutoRows = `minmax(28px, 32px)`;
     for (let i = 0; i < GRID_SIZE * GRID_SIZE; i++) {
       const cell = document.createElement('div');
       cell.classList.add('grid__cell', UI_CLASSES.BLOCKED_CELL);
