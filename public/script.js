@@ -735,8 +735,8 @@ const CharacterCreator = {
         <p style="margin-bottom: 20px; color: #666;">Crie o seu visual de advogado(a) para começar a jogar!</p>
         
         <!-- Visualizador do Avatar -->
-        <div id="avatar-preview" style="width: 120px; height: 120px; margin: 0 auto 20px auto; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 4px solid #1e3a8a; box-shadow: 0 4px 6px rgba(0,0,0,0.1); overflow: hidden; background-color: #f3f4f6;">
-          <img id="avatar-img" src="" alt="Meu Personagem" style="width: 100%; height: 100%; object-fit: cover; transition: opacity 0.2s;">
+        <div id="avatar-preview" style="width: 150px; height: 150px; margin: 0 auto 20px auto; display: flex; align-items: center; justify-content: center; filter: drop-shadow(0 10px 15px rgba(0,0,0,0.2));">
+          <img id="avatar-img" src="" alt="Meu Personagem" style="width: 100%; height: 100%; object-fit: contain; transition: transform 0.2s ease-in-out;">
         </div>
 
         <!-- Controles Visuais -->
