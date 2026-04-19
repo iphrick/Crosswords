@@ -728,6 +728,17 @@ const app = {
       scoreDisplay: document.getElementById('score-display'),
     };
 
+    // Cria um botão de painel Admin visível apenas para você
+    const adminBtn = document.createElement('button');
+    adminBtn.className = 'btn hidden';
+    adminBtn.style.backgroundColor = '#dc2626'; // Vermelho para destacar
+    adminBtn.style.marginTop = '15px';
+    adminBtn.innerHTML = '<span class="btn__text">⚙️ Painel Admin: Gerar Fase na IA</span>';
+    if (this.elements.generateBtn && this.elements.generateBtn.parentNode) {
+      this.elements.generateBtn.parentNode.insertBefore(adminBtn, this.elements.generateBtn.nextSibling);
+    }
+    this.elements.adminBtn = adminBtn;
+
     // Aguarda o SDK do Firebase carregar
     const firebaseAppCheck = setInterval(() => {
       if (window.firebase && firebase.app) {
@@ -764,6 +775,9 @@ const app = {
     resetBtn.addEventListener('click', () => this._onReset());
     hintBtn.addEventListener('click', () => CrosswordUI.revealHint());
     CrosswordUI.gridEl.addEventListener('crossword-solved', () => this.onLevelComplete());
+
+    // Evento do botão Admin visível
+    this.elements.adminBtn.addEventListener('click', () => this._triggerAdminSeed());
 
     // Auth events
     loginModalBtn.addEventListener('click', () => this._showModal('login-modal'));
@@ -832,6 +846,16 @@ const app = {
     this.elements.logoutBtn.classList.remove(UI_CLASSES.HIDDEN);
     this.elements.authRequiredMessage.classList.add(UI_CLASSES.HIDDEN);
     this.elements.gameContent.classList.remove(UI_CLASSES.HIDDEN);
+
+    // --- CONTROLE DE ACESSO ADMIN ---
+    // ATENÇÃO: Troque o e-mail abaixo pelo SEU e-mail pessoal que usará para acessar o jogo!
+    const MEU_EMAIL_ADMIN = 'pedrohenriqueinsec281@gmail.com'; 
+    if (user.email === MEU_EMAIL_ADMIN) {
+      this.elements.adminBtn.classList.remove(UI_CLASSES.HIDDEN);
+    } else {
+      this.elements.adminBtn.classList.add(UI_CLASSES.HIDDEN);
+    }
+
     this._updateLevelDisplay();
   },
 
@@ -1042,7 +1066,12 @@ const app = {
       this.elements.crosswordContainer.classList.remove(UI_CLASSES.HIDDEN);
       this.elements.crosswordActions.classList.remove(UI_CLASSES.HIDDEN);
     } catch (error) {
-      Feedback.show(error.message, 'error');
+      // Se for o erro do banco de dados vazio, mostra mensagem amigável para usuários normais
+      if (error.message && error.message.includes('Nenhuma pergunta encontrada')) {
+        Feedback.show('🚧 Fase em construção! Em breve adicionaremos novas perguntas aqui.', 'info', 5000);
+      } else {
+        Feedback.show(error.message, 'error');
+      }
       this.elements.generateBtn.classList.remove(UI_CLASSES.HIDDEN);
     } finally {
       this._setLoading(false);
