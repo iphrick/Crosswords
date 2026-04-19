@@ -693,36 +693,7 @@ const Feedback = {
    ============================================= */
 const CharacterCreator = {
   el: null,
-  state: { skin: 0, hair: 0, clothes: 0, accessory: 0 },
-  assets: {
-    skin: [
-      { label: 'Tom 1 (Claro)', value: 'ffdbb4', color: 'ffdbb4' },
-      { label: 'Tom 2', value: 'edb98a', color: 'edb98a' },
-      { label: 'Tom 3', value: 'd08b5b', color: 'd08b5b' },
-      { label: 'Tom 4', value: 'ae5d29', color: 'ae5d29' },
-      { label: 'Tom 5 (Escuro)', value: '614335', color: '614335' }
-    ],
-    hair: [
-      { label: 'Careca', value: 'noHair' },
-      { label: 'Curto Liso', value: 'shortHairShortFlat' },
-      { label: 'Longo Liso', value: 'longHairStraight' },
-      { label: 'Crespo', value: 'shortHairTheCaesar' },
-      { label: 'Cacheado', value: 'longHairCurly' },
-      { label: 'Dreads', value: 'shortHairDreads01' }
-    ],
-    clothes: [
-      { label: 'Terno e Gravata', value: 'blazerAndShirt' },
-      { label: 'Terno Casual', value: 'blazerAndSweater' },
-      { label: 'Camisa Casual', value: 'shirtCrewNeck' },
-      { label: 'Roupa Social', value: 'overall' }
-    ],
-    accessory: [
-      { label: 'Nenhum', value: 'blank' },
-      { label: 'Óculos de Grau', value: 'prescription01' },
-      { label: 'Óculos Escuros', value: 'sunglasses' },
-      { label: 'Óculos Redondos', value: 'round' }
-    ]
-  },
+  state: { username: 'Steve' }, // Padrão: Skin original do Minecraft
 
   init() {
     this.el = document.createElement('div');
@@ -732,15 +703,28 @@ const CharacterCreator = {
     this.el.innerHTML = `
       <div class="modal-content" style="max-width: 500px; width: 90%; background: #ffffff; padding: 30px; border-radius: 15px; margin: 10vh auto; text-align: center; box-shadow: 0 10px 40px rgba(0,0,0,0.4); position: relative;">
         <h2>Crie seu Personagem</h2>
-        <p style="margin-bottom: 20px; color: #666;">Crie o seu visual de advogado(a) para começar a jogar!</p>
+        <p style="margin-bottom: 20px; color: #666;">Digite um nome de usuário do Minecraft para carregar sua Skin!</p>
         
         <!-- Visualizador do Avatar -->
         <div id="avatar-preview" style="width: 150px; height: 150px; margin: 0 auto 20px auto; display: flex; align-items: center; justify-content: center; filter: drop-shadow(0 10px 15px rgba(0,0,0,0.2));">
           <img id="avatar-img" src="" alt="Meu Personagem" style="width: 100%; height: 100%; object-fit: contain; transition: transform 0.2s ease-in-out;">
         </div>
 
-        <!-- Controles Visuais -->
-        <div id="avatar-options-container" style="text-align: left; margin-bottom: 25px; max-height: 45vh; overflow-y: auto; overflow-x: hidden; padding-right: 5px;">
+        <!-- Controle de Usuário Minecraft -->
+        <div style="text-align: left; margin-bottom: 15px;">
+          <label style="display: block; font-weight: bold; margin-bottom: 10px; color: #1f2937;">Nome do Jogador:</label>
+          <input type="text" id="avatar-mc-username" class="form__input" placeholder="Ex: Notch, Dream, Steve" style="width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #d1d5db; font-size: 1rem;" autocomplete="off" spellcheck="false">
+          <p style="font-size: 0.8rem; color: #6b7280; margin-top: 8px;">A imagem atualiza enquanto você digita.</p>
+        </div>
+
+        <div style="text-align: left; margin-bottom: 25px;">
+          <label style="display: block; font-weight: bold; margin-bottom: 10px; color: #1f2937;">Sugestões com Terno:</label>
+          <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+            <button type="button" class="mc-preset-btn btn" style="padding: 5px 10px; font-size: 0.8rem; background: #1e3a8a;" data-name="Suit">Terno Preto</button>
+            <button type="button" class="mc-preset-btn btn" style="padding: 5px 10px; font-size: 0.8rem; background: #1e3a8a;" data-name="Lawyer">Advogado</button>
+            <button type="button" class="mc-preset-btn btn" style="padding: 5px 10px; font-size: 0.8rem; background: #1e3a8a;" data-name="Judge">Juiz</button>
+            <button type="button" class="mc-preset-btn btn" style="padding: 5px 10px; font-size: 0.8rem; background: #1e3a8a;" data-name="Business">Executivo</button>
+          </div>
         </div>
 
         <div style="display: flex; gap: 10px;">
@@ -751,70 +735,6 @@ const CharacterCreator = {
     `;
     document.body.appendChild(this.el);
     this._bindEvents();
-  },
-
-  _renderOptions() {
-    const container = this.el.querySelector('#avatar-options-container');
-    let html = '';
-
-    const groups = [
-      { key: 'skin', label: 'Cor da Pele' },
-      { key: 'hair', label: 'Cabelo' },
-      { key: 'clothes', label: 'Roupas' },
-      { key: 'accessory', label: 'Acessórios' }
-    ];
-
-    groups.forEach(({ key, label }) => {
-      let optionsHtml = '';
-      this.assets[key].forEach((item, index) => {
-        const isSelected = this.state[key] === index;
-        const borderStyle = isSelected ? 'border: 3px solid #1e3a8a; background-color: #e0f2fe;' : 'border: 3px solid transparent; background-color: #f3f4f6;';
-
-        let content = '';
-        if (key === 'skin') {
-          content = `<div style="width: 40px; height: 40px; border-radius: 50%; background-color: #${item.color}; margin: auto; border: 1px solid #ccc;"></div>`;
-        } else {
-          // Gera imagens em miniatura focadas no item específico para o botão
-          let previewUrl = `https://api.dicebear.com/9.x/avataaars/svg?seed=preview&v=1`;
-          if (key === 'hair') previewUrl += `&top=${item.value}&clothing=blazerAndShirt`;
-          if (key === 'clothes') previewUrl += `&clothing=${item.value}&top=noHair`;
-          if (key === 'accessory') {
-            previewUrl += `&top=noHair&clothing=blazerAndShirt`;
-            if (item.value !== 'blank') previewUrl += `&accessories=${item.value}&accessoriesProbability=100`;
-          }
-          content = `<img src="${previewUrl}" style="width: 50px; height: 50px; object-fit: contain; margin: auto; display: block;">`;
-        }
-
-        optionsHtml += `
-          <div class="avatar-option" data-key="${key}" data-index="${index}" style="cursor: pointer; padding: 8px 5px; border-radius: 10px; text-align: center; min-width: 80px; transition: all 0.2s; ${borderStyle}">
-            ${content}
-            <div style="font-size: 0.75rem; margin-top: 6px; color: #374151; font-weight: 600;">${item.label}</div>
-          </div>
-        `;
-      });
-
-      html += `
-        <div style="margin-bottom: 20px;">
-          <label style="display: block; font-weight: bold; margin-bottom: 10px; color: #1f2937;">${label}</label>
-          <div style="display: flex; gap: 10px; overflow-x: auto; padding-bottom: 10px; scrollbar-width: thin;">
-            ${optionsHtml}
-          </div>
-        </div>
-      `;
-    });
-
-    container.innerHTML = html;
-
-    // Adiciona evento de clique para cada opção visual
-    container.querySelectorAll('.avatar-option').forEach(el => {
-      el.addEventListener('click', (e) => {
-        const key = e.currentTarget.dataset.key;
-        const index = parseInt(e.currentTarget.dataset.index, 10);
-        this.state[key] = index;
-        this._renderOptions(); // Re-renderiza para mudar a borda azul
-        this.updatePreview();
-      });
-    });
   },
 
   _bindEvents() {
@@ -839,20 +759,9 @@ const CharacterCreator = {
     });
   },
 
-  // Constrói a URL da imagem usando a API do DiceBear
+  // Constrói a URL da imagem usando a API do Minotar (corpo 2D de Minecraft)
   getAvatarUrl(stateData) {
-    const skin = this.assets.skin[stateData.skin].value;
-    const hair = this.assets.hair[stateData.hair].value;
-    const clothes = this.assets.clothes[stateData.clothes].value;
-    const accessory = this.assets.accessory[stateData.accessory].value;
-    
-    // Omitir o parâmetro backgroundColor pois por padrão já é transparente
-    let url = `https://api.dicebear.com/9.x/avataaars/svg?seed=Advogado&v=1&skinColor=${skin}&top=${hair}&clothing=${clothes}`;
-    
-    if (accessory !== 'blank') {
-      url += `&accessories=${accessory}&accessoriesProbability=100`;
-    }
-    return url;
+    return `https://minotar.net/armor/body/${stateData.username || 'Steve'}/150.png`;
   },
 
   updatePreview() {
@@ -865,7 +774,8 @@ const CharacterCreator = {
 
   show() {
     this.el.classList.remove(UI_CLASSES.HIDDEN);
-    this._renderOptions(); // Renderiza as opções sempre que o menu é aberto
+    const inputEl = this.el.querySelector('#avatar-mc-username');
+    if (inputEl) inputEl.value = this.state.username === 'Steve' ? '' : this.state.username;
     this.updatePreview();
   },
 
@@ -873,10 +783,11 @@ const CharacterCreator = {
     this.el.classList.add(UI_CLASSES.HIDDEN);
   },
 
+  // Gera a miniatura que fica no topo do menu usando apenas a "cabeça" do Minecraft
   getMiniatureHtml(avatarData) {
     if (!avatarData) return '<span style="font-size: 1.5rem;">🧑‍⚖️</span>';
-    const url = this.getAvatarUrl(avatarData);
-    return `<img src="${url}" alt="Avatar" style="width: 32px; height: 32px; border-radius: 50%; vertical-align: middle; border: 2px solid white; box-shadow: 0 1px 3px rgba(0,0,0,0.2); background-color: #b6e3f4;">`;
+    const headUrl = `https://minotar.net/helm/${avatarData.username || 'Steve'}/32.png`;
+    return `<img src="${headUrl}" alt="Avatar" style="width: 32px; height: 32px; border-radius: 5px; vertical-align: middle; border: 2px solid white; box-shadow: 0 1px 3px rgba(0,0,0,0.2); background-color: #e5e7eb;">`;
   }
 };
 
@@ -1117,7 +1028,7 @@ const app = {
 
     this.elements.createAvatarBtn.addEventListener('click', () => {
       this.elements.avatarDropdown.style.display = 'none';
-      CharacterCreator.state = { skin: 0, hair: 0, clothes: 0, accessory: 0 };
+      CharacterCreator.state = { username: 'Steve' };
       CharacterCreator.updatePreview();
       this.elements.gameContent.classList.add(UI_CLASSES.HIDDEN);
       CharacterCreator.show();
