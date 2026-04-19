@@ -1,7 +1,11 @@
 const { db } = require('./firebase.js');
 
 // Helper para criar um nome de jogador limpo a partir de email ou telefone.
-function sanitizePlayerName(identifier) {
+function sanitizePlayerName(identifier, nickname) {
+    if (nickname && nickname.trim().length > 0) {
+        // Retorna o apelido escolhido pelo usuário (limitado a 15 caracteres)
+        return nickname.trim().substring(0, 15);
+    }
     if (!identifier) return 'Anônimo';
     // Se for um email, pega a parte antes do @. Se for telefone, usa o número.
     const nameBase = identifier.includes('@') ? identifier.split('@')[0] : identifier;
@@ -47,7 +51,7 @@ module.exports = async function handler(req, res) {
             // Adiciona ao ranking apenas jogadores que já pontuaram.
             if (totalScore > 0) {
                 players.push({
-                    name: sanitizePlayerName(userData.email || userData.phoneNumber),
+                    name: sanitizePlayerName(userData.email || userData.phoneNumber, userData.nickname),
                     totalScore,
                     highestLevel,
                 });

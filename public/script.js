@@ -36,9 +36,8 @@ const GameState = {
     if (doc.exists) {
       this._state = doc.data();
     } else {
-      // Cria um documento inicial para um novo usuário
-      this._state = { email: user.email, subjects: {} };
-      this._state = { email: user.email, subjects: {}, avatar: null };
+      // Cria um documento inicial para um novo usuário com os campos necessários
+      this._state = { email: user.email, subjects: {}, avatar: null, nickname: null };
       await userDocRef.set(this._state);
     }
   },
@@ -113,6 +112,14 @@ const GameState = {
 
   setAvatar(avatarData) {
     this._state.avatar = avatarData;
+  },
+
+  getNickname() {
+    return this._state.nickname || null;
+  },
+
+  setNickname(nickname) {
+    this._state.nickname = nickname;
   }
 };
 
@@ -693,7 +700,7 @@ const Feedback = {
    ============================================= */
 const CharacterCreator = {
   el: null,
-  state: { username: 'Steve' }, // Padrão: Skin original do Minecraft
+  state: { username: 'Steve', nickname: '' }, // Padrão: Skin original e apelido vazio
 
   init() {
     this.el = document.createElement('div');
@@ -708,6 +715,12 @@ const CharacterCreator = {
         <!-- Visualizador do Avatar -->
         <div id="avatar-preview" style="width: 150px; height: 150px; margin: 0 auto 20px auto; display: flex; align-items: center; justify-content: center; filter: drop-shadow(0 10px 15px rgba(0,0,0,0.2));">
           <img id="avatar-img" src="" alt="Meu Personagem" style="width: 100%; height: 100%; object-fit: contain; transition: transform 0.2s ease-in-out;">
+        </div>
+
+        <!-- Controle de Apelido (Nickname) -->
+        <div style="text-align: left; margin-bottom: 15px;">
+          <label style="display: block; font-weight: bold; margin-bottom: 10px; color: #1f2937;">Seu Apelido no Jogo:</label>
+          <input type="text" id="avatar-nickname" class="form__input" placeholder="Ex: AdvogadoNinja" style="width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #d1d5db; font-size: 1rem;" autocomplete="off" spellcheck="false" maxlength="15">
         </div>
 
         <!-- Controle de Usuário Minecraft -->
@@ -738,13 +751,43 @@ const CharacterCreator = {
   },
 
   _bindEvents() {
+    // Atualiza o apelido no state enquanto o usuário digita
+    const nicknameInput = this.el.querySelector('#avatar-nickname');
+    nicknameInput.addEventListener('input', (e) => {
+      this.state.nickname = e.target.value;
+    });
+
+    // Atualiza a imagem enquanto o usuário digita
+    const inputEl = this.el.querySelector('#avatar-mc-username');
+    inputEl.addEventListener('input', (e) => {
+      this.state.username = e.target.value.trim() || 'Steve';
+      this.updatePreview();
+    });
+
+    // Evento para os botões de Sugestão de Advogados
+    this.el.querySelectorAll('.mc-preset-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        const name = e.currentTarget.dataset.name;
+        this.state.username = name;
+        inputEl.value = name;
+        this.updatePreview();
+      });
+    });
+
     this.el.querySelector('#save-avatar-btn').addEventListener('click', async () => {
       const btn = this.el.querySelector('#save-avatar-btn');
       const originalText = btn.textContent;
+      
+      if (!this.state.nickname || this.state.nickname.trim() === '') {
+        Feedback.show('Por favor, digite um apelido para o seu personagem!', 'error');
+        return;
+      }
+
       btn.disabled = true;
       btn.textContent = 'Salvando...';
       
-      GameState.setAvatar(this.state);
+      GameState.setAvatar({ username: this.state.username });
+      GameState.setNickname(this.state.nickname.trim());
       await GameState.save();
       
       btn.disabled = false;
@@ -776,6 +819,10 @@ const CharacterCreator = {
     this.el.classList.remove(UI_CLASSES.HIDDEN);
     const inputEl = this.el.querySelector('#avatar-mc-username');
     if (inputEl) inputEl.value = this.state.username === 'Steve' ? '' : this.state.username;
+    
+    const nicknameInput = this.el.querySelector('#avatar-nickname');
+    if (nicknameInput) nicknameInput.value = this.state.nickname || '';
+    
     this.updatePreview();
   },
 
@@ -1028,7 +1075,10 @@ const app = {
 
     this.elements.createAvatarBtn.addEventListener('click', () => {
       this.elements.avatarDropdown.style.display = 'none';
-      CharacterCreator.state = { username: 'Steve' };
+      CharacterCreator.state = { 
+        username: 'Steve',
+        nickname: GameState.getNickname() || ''
+      };
       CharacterCreator.updatePreview();
       this.elements.gameContent.classList.add(UI_CLASSES.HIDDEN);
       CharacterCreator.show();
@@ -1038,7 +1088,10 @@ const app = {
       this.elements.avatarDropdown.style.display = 'none';
       const currentAvatar = GameState.getAvatar();
       if (currentAvatar) {
-        CharacterCreator.state = { ...currentAvatar };
+        CharacterCreator.state = { 
+          username: currentAvatar.username,
+          nickname: GameState.getNickname() || ''
+        };
       }
       CharacterCreator.updatePreview();
       this.elements.gameContent.classList.add(UI_CLASSES.HIDDEN);
@@ -1050,7 +1103,7 @@ const app = {
       if (confirm("Tem certeza que deseja excluir seu avatar?")) {
         GameState.setAvatar(null);
         await GameState.save();
-        this.continueToGame(null);
+        this.continueToGame();
         Feedback.show('Avatar excluído com sucesso.', 'info');
       }
     });
@@ -1110,31 +1163,26 @@ const app = {
 
   async _handleUserLoggedIn(user) {
     await GameState.loadForUser(user);
-    // Mostra um nome mais amigável (parte do email antes do @ ou o número de telefone)
-    const displayName = user.email 
-      ? user.email.split('@')[0] 
-      : user.phoneNumber;
 
-    this.elements.userDisplay.textContent = `Olá, ${displayName}`;
-    this.elements.userDisplay.innerHTML = '';
-    this.elements.userDisplay.appendChild(this.elements.userAvatarThumb);
-    this.elements.userDisplay.appendChild(document.createTextNode(`Olá, ${displayName}`));
     this.elements.userDisplay.classList.remove(UI_CLASSES.HIDDEN);
     this.elements.avatarMenuContainer.style.display = 'inline-block';
     this.elements.loginModalBtn.classList.add(UI_CLASSES.HIDDEN);
     this.elements.registerModalBtn.classList.add(UI_CLASSES.HIDDEN);
     this.elements.logoutBtn.classList.remove(UI_CLASSES.HIDDEN);
     this.elements.authRequiredMessage.classList.add(UI_CLASSES.HIDDEN);
-    this.elements.gameContent.classList.remove(UI_CLASSES.HIDDEN);
 
-    // Verifica se o usuário já criou um avatar
+    // Verifica se o usuário já criou um avatar e um apelido
     const avatar = GameState.getAvatar();
-    if (!avatar) {
+    const nickname = GameState.getNickname();
+    
+    if (!avatar || !nickname) {
       // Esconde o jogo e mostra o criador
       this.elements.gameContent.classList.add(UI_CLASSES.HIDDEN);
+      CharacterCreator.state.nickname = nickname || '';
+      if (avatar) CharacterCreator.state.username = avatar.username;
       CharacterCreator.show();
     } else {
-      this.continueToGame(avatar);
+      this.continueToGame();
     }
 
     // --- CONTROLE DE ACESSO ADMIN ---
@@ -1162,10 +1210,24 @@ const app = {
     this._updateLevelDisplay();
   },
 
-  continueToGame(avatarData = null) {
-    const avatar = avatarData || GameState.getAvatar();
+  continueToGame() {
+    const avatar = GameState.getAvatar();
+    const nickname = GameState.getNickname();
+    const fallbackName = GameState._user.email ? GameState._user.email.split('@')[0] : GameState._user.phoneNumber;
+    const displayName = nickname || fallbackName;
+
+    this.elements.userDisplay.innerHTML = '';
+    this.elements.userDisplay.appendChild(this.elements.userAvatarThumb);
+    this.elements.userDisplay.appendChild(document.createTextNode(`Olá, ${displayName}`));
+
     this.elements.gameContent.classList.remove(UI_CLASSES.HIDDEN);
     this.elements.userAvatarThumb.innerHTML = CharacterCreator.getMiniatureHtml(avatar);
+    
+    // Atualiza também o avatar flutuante na tela do jogo
+    if (avatar && this.elements.gameAvatarImg) {
+      this.elements.gameAvatarImg.src = CharacterCreator.getAvatarUrl(avatar);
+    }
+
     Feedback.show('Bem-vindo ao jogo!', 'success', 3000);
   },
 
