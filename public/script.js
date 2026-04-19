@@ -696,11 +696,11 @@ const CharacterCreator = {
   state: { skin: 0, hair: 0, clothes: 0, accessory: 0 },
   assets: {
     skin: [
-      { label: 'Tom 1 (Claro)', value: 'pale', color: 'ffdbb4' },
-      { label: 'Tom 2', value: 'light', color: 'edb98a' },
-      { label: 'Tom 3', value: 'tanned', color: 'd08b5b' },
-      { label: 'Tom 4', value: 'brown', color: 'ae5d29' },
-      { label: 'Tom 5 (Escuro)', value: 'darkBrown', color: '614335' }
+      { label: 'Tom 1 (Claro)', value: 'ffdbb4', color: 'ffdbb4' },
+      { label: 'Tom 2', value: 'edb98a', color: 'edb98a' },
+      { label: 'Tom 3', value: 'd08b5b', color: 'd08b5b' },
+      { label: 'Tom 4', value: 'ae5d29', color: 'ae5d29' },
+      { label: 'Tom 5 (Escuro)', value: '614335', color: '614335' }
     ],
     hair: [
       { label: 'Careca', value: 'noHair' },
@@ -711,15 +711,15 @@ const CharacterCreator = {
       { label: 'Dreads', value: 'shortHairDreads01' }
     ],
     clothes: [
-      { label: 'Terno e Gravata', value: 'blazerShirt' },
-      { label: 'Terno Casual', value: 'blazerSweater' },
+      { label: 'Terno e Gravata', value: 'blazerAndShirt' },
+      { label: 'Terno Casual', value: 'blazerAndSweater' },
       { label: 'Camisa Casual', value: 'shirtCrewNeck' },
       { label: 'Roupa Social', value: 'overall' }
     ],
     accessory: [
       { label: 'Nenhum', value: 'blank' },
       { label: 'Óculos de Grau', value: 'prescription01' },
-      { label: 'Óculos Escuros', value: 'kurt' },
+      { label: 'Óculos Escuros', value: 'sunglasses' },
       { label: 'Óculos Redondos', value: 'round' }
     ]
   },
@@ -775,11 +775,11 @@ const CharacterCreator = {
           content = `<div style="width: 40px; height: 40px; border-radius: 50%; background-color: #${item.color}; margin: auto; border: 1px solid #ccc;"></div>`;
         } else {
           // Gera imagens em miniatura focadas no item específico para o botão
-          let previewUrl = `https://api.dicebear.com/7.x/avataaars/svg?seed=preview`;
-          if (key === 'hair') previewUrl += `&top=${item.value}&clothing=blazerShirt`;
+          let previewUrl = `https://api.dicebear.com/9.x/avataaars/svg?seed=preview&v=1`;
+          if (key === 'hair') previewUrl += `&top=${item.value}&clothing=blazerAndShirt`;
           if (key === 'clothes') previewUrl += `&clothing=${item.value}&top=noHair`;
           if (key === 'accessory') {
-            previewUrl += `&top=noHair&clothing=blazerShirt`;
+            previewUrl += `&top=noHair&clothing=blazerAndShirt`;
             if (item.value !== 'blank') previewUrl += `&accessories=${item.value}&accessoriesProbability=100`;
           }
           content = `<img src="${previewUrl}" style="width: 50px; height: 50px; object-fit: contain; margin: auto; display: block;">`;
@@ -847,7 +847,7 @@ const CharacterCreator = {
     const accessory = this.assets.accessory[stateData.accessory].value;
     
     // Omitir o parâmetro backgroundColor pois por padrão já é transparente
-    let url = `https://api.dicebear.com/7.x/avataaars/svg?seed=Advogado&skinColor=${skin}&top=${hair}&clothing=${clothes}`;
+    let url = `https://api.dicebear.com/9.x/avataaars/svg?seed=Advogado&v=1&skinColor=${skin}&top=${hair}&clothing=${clothes}`;
     
     if (accessory !== 'blank') {
       url += `&accessories=${accessory}&accessoriesProbability=100`;
