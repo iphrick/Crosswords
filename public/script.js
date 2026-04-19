@@ -775,12 +775,12 @@ const CharacterCreator = {
           content = `<div style="width: 40px; height: 40px; border-radius: 50%; background-color: #${item.color}; margin: auto; border: 1px solid #ccc;"></div>`;
         } else {
           // Gera imagens em miniatura focadas no item específico para o botão
-          let previewUrl = `https://api.dicebear.com/9.x/avataaars/svg?seed=preview`;
+          let previewUrl = `https://api.dicebear.com/7.x/avataaars/svg?seed=preview`;
           if (key === 'hair') previewUrl += `&top=${item.value}&clothing=blazerShirt`;
           if (key === 'clothes') previewUrl += `&clothing=${item.value}&top=noHair`;
           if (key === 'accessory') {
             previewUrl += `&top=noHair&clothing=blazerShirt`;
-            if (item.value !== 'blank') previewUrl += `&accessories=${item.value}`;
+            if (item.value !== 'blank') previewUrl += `&accessories=${item.value}&accessoriesProbability=100`;
           }
           content = `<img src="${previewUrl}" style="width: 50px; height: 50px; object-fit: contain; margin: auto; display: block;">`;
         }
@@ -847,10 +847,10 @@ const CharacterCreator = {
     const accessory = this.assets.accessory[stateData.accessory].value;
     
     // Omitir o parâmetro backgroundColor pois por padrão já é transparente
-    let url = `https://api.dicebear.com/9.x/avataaars/svg?seed=Advogado&skinColor=${skin}&top=${hair}&clothing=${clothes}`;
+    let url = `https://api.dicebear.com/7.x/avataaars/svg?seed=Advogado&skinColor=${skin}&top=${hair}&clothing=${clothes}`;
     
     if (accessory !== 'blank') {
-      url += `&accessories=${accessory}`;
+      url += `&accessories=${accessory}&accessoriesProbability=100`;
     }
     return url;
   },
