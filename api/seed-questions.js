@@ -84,23 +84,28 @@ function buildPrompt(subject, level, num_words, previous_words) {
 
 // Função para analisar a resposta da IA e transformá-la em dados estruturados.
 function parseGeminiResponse(text_content) {
-  const lines = text_content.split("\n").filter(line => line.trim() !== '');
+  const lines = text_content
+    .split("\n")
+    .map(l => l.trim())
+    .filter(l => l.includes("|"));
+
   const crossword_data = [];
 
   for (const line of lines) {
-    if (line.includes("|")) {
-      const parts = line.split("|", 2);
-      if (parts.length === 2) {
-        const question = parts[0].trim();
-        const answer = sanitizeAnswer(parts[1]);
+    const [question, rawAnswer] = line.split("|");
 
-        // Validação mais estrita da resposta
-        if (answer.length >= 2 && answer.length <= 10 && /^[A-Z]+$/.test(answer)) {
-          crossword_data.push({ question, answer });
-        }
-      }
+    if (!question || !rawAnswer) continue;
+
+    const answer = sanitizeAnswer(rawAnswer);
+
+    if (answer.length >= 2 && answer.length <= 10 && /^[A-Z]+$/.test(answer)) {
+      crossword_data.push({
+        question: question.trim(),
+        answer
+      });
     }
   }
+
   return crossword_data;
 }
 
