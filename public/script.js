@@ -730,6 +730,7 @@ const app = {
 
     // Cria um botão de painel Admin visível apenas para você
     const adminBtn = document.createElement('button');
+    adminBtn.id = 'btn-admin';
     adminBtn.className = 'btn hidden';
     adminBtn.style.backgroundColor = '#dc2626'; // Vermelho para destacar
     adminBtn.style.marginTop = '15px';
@@ -848,12 +849,25 @@ const app = {
     this.elements.gameContent.classList.remove(UI_CLASSES.HIDDEN);
 
     // --- CONTROLE DE ACESSO ADMIN ---
-    // ATENÇÃO: Troque o e-mail abaixo pelo SEU e-mail pessoal que usará para acessar o jogo!
     const MEU_EMAIL_ADMIN = 'pedrohenriqueinsec281@gmail.com'; 
-    if (user.email === MEU_EMAIL_ADMIN) {
+    
+    // Se você costuma testar usando o login por celular, coloque seu número aqui:
+    const MEU_CELULAR_ADMIN = '+5584991101624'; 
+
+    // Log no console para ajudar a identificar como o sistema está lendo sua conta
+    console.log("DEBUG ADMIN -> Email:", user.email, "| Telefone:", user.phoneNumber);
+
+    // Checa se o e-mail bate (ignorando letras maiúsculas) ou se o telefone bate
+    const isAdminEmail = user.email && user.email.toLowerCase() === MEU_EMAIL_ADMIN.toLowerCase();
+    const isAdminPhone = user.phoneNumber && user.phoneNumber === MEU_CELULAR_ADMIN;
+
+    if (isAdminEmail || isAdminPhone) {
       this.elements.adminBtn.classList.remove(UI_CLASSES.HIDDEN);
+      this.elements.adminBtn.style.display = 'block'; // Força a exibição caso o CSS bloqueie
+      console.log("DEBUG ADMIN -> Acesso de Administrador Concedido! O botão vermelho deve aparecer.");
     } else {
       this.elements.adminBtn.classList.add(UI_CLASSES.HIDDEN);
+      this.elements.adminBtn.style.display = 'none';
     }
 
     this._updateLevelDisplay();
