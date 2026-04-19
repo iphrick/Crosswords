@@ -746,7 +746,10 @@ const CharacterCreator = {
           ${this._createSelectGroup('Acessório', 'accessory')}
         </div>
 
-        <button id="save-avatar-btn" class="btn" style="width: 100%; font-size: 1.1rem;">Confirmar Visual</button>
+        <div style="display: flex; gap: 10px;">
+          <button id="cancel-avatar-btn" class="btn" style="flex: 1; font-size: 1.1rem; background-color: #6b7280;">Cancelar</button>
+          <button id="save-avatar-btn" class="btn" style="flex: 1; font-size: 1.1rem;">Confirmar</button>
+        </div>
       </div>
     `;
     document.body.appendChild(this.el);
@@ -781,12 +784,20 @@ const CharacterCreator = {
 
     this.el.querySelector('#save-avatar-btn').addEventListener('click', async () => {
       const btn = this.el.querySelector('#save-avatar-btn');
+      const originalText = btn.textContent;
       btn.disabled = true;
       btn.textContent = 'Salvando...';
       
       GameState.setAvatar(this.state);
       await GameState.save();
       
+      btn.disabled = false;
+      btn.textContent = originalText;
+      this.hide();
+      app.continueToGame();
+    });
+
+    this.el.querySelector('#cancel-avatar-btn').addEventListener('click', () => {
       this.hide();
       app.continueToGame();
     });
@@ -916,6 +927,72 @@ const app = {
     this.elements.userAvatarThumb.style.marginRight = '8px';
     this.elements.userDisplay.prepend(this.elements.userAvatarThumb);
 
+    // Cria o Menu Suspenso (Dropdown) de Avatar com 3 opções
+    const avatarMenuContainer = document.createElement('div');
+    avatarMenuContainer.style.position = 'relative';
+    avatarMenuContainer.style.display = 'none';
+    avatarMenuContainer.style.marginLeft = '15px';
+    avatarMenuContainer.style.verticalAlign = 'middle';
+
+    const avatarMenuBtn = document.createElement('button');
+    avatarMenuBtn.className = 'btn';
+    avatarMenuBtn.style.padding = '5px 12px';
+    avatarMenuBtn.style.fontSize = '0.9rem';
+    avatarMenuBtn.innerHTML = '👤 Avatar ▾';
+
+    const avatarDropdown = document.createElement('div');
+    avatarDropdown.style.display = 'none';
+    avatarDropdown.style.position = 'absolute';
+    avatarDropdown.style.top = '100%';
+    avatarDropdown.style.left = '0';
+    avatarDropdown.style.marginTop = '8px';
+    avatarDropdown.style.backgroundColor = '#ffffff';
+    avatarDropdown.style.border = '1px solid #d1d5db';
+    avatarDropdown.style.borderRadius = '5px';
+    avatarDropdown.style.padding = '8px';
+    avatarDropdown.style.zIndex = '100';
+    avatarDropdown.style.flexDirection = 'column';
+    avatarDropdown.style.gap = '8px';
+    avatarDropdown.style.minWidth = '180px';
+    avatarDropdown.style.boxShadow = '0 4px 6px rgba(0,0,0,0.1)';
+
+    const createAvatarBtn = document.createElement('button');
+    createAvatarBtn.className = 'btn';
+    createAvatarBtn.style.padding = '8px';
+    createAvatarBtn.style.width = '100%';
+    createAvatarBtn.style.fontSize = '0.9rem';
+    createAvatarBtn.textContent = 'Criar Avatar';
+
+    const editAvatarBtn = document.createElement('button');
+    editAvatarBtn.className = 'btn';
+    editAvatarBtn.style.padding = '8px';
+    editAvatarBtn.style.width = '100%';
+    editAvatarBtn.style.fontSize = '0.9rem';
+    editAvatarBtn.textContent = 'Modificar Avatar';
+
+    const deleteAvatarBtn = document.createElement('button');
+    deleteAvatarBtn.className = 'btn';
+    deleteAvatarBtn.style.padding = '8px';
+    deleteAvatarBtn.style.width = '100%';
+    deleteAvatarBtn.style.fontSize = '0.9rem';
+    deleteAvatarBtn.style.backgroundColor = '#ef4444';
+    deleteAvatarBtn.textContent = 'Excluir Avatar';
+
+    avatarDropdown.appendChild(createAvatarBtn);
+    avatarDropdown.appendChild(editAvatarBtn);
+    avatarDropdown.appendChild(deleteAvatarBtn);
+    avatarMenuContainer.appendChild(avatarMenuBtn);
+    avatarMenuContainer.appendChild(avatarDropdown);
+    
+    this.elements.userDisplay.parentNode.insertBefore(avatarMenuContainer, this.elements.userDisplay.nextSibling);
+    
+    this.elements.avatarMenuContainer = avatarMenuContainer;
+    this.elements.avatarMenuBtn = avatarMenuBtn;
+    this.elements.avatarDropdown = avatarDropdown;
+    this.elements.createAvatarBtn = createAvatarBtn;
+    this.elements.editAvatarBtn = editAvatarBtn;
+    this.elements.deleteAvatarBtn = deleteAvatarBtn;
+
     // Aguarda o SDK do Firebase carregar
     const firebaseAppCheck = setInterval(() => {
       if (window.firebase && firebase.app) {
@@ -956,6 +1033,54 @@ const app = {
 
     // Evento do botão Admin visível
     this.elements.adminBtn.addEventListener('click', () => this._triggerAdminSeed());
+
+    // Eventos do Menu de Avatar
+    this.elements.avatarMenuBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const isClosed = this.elements.avatarDropdown.style.display === 'none';
+      this.elements.avatarDropdown.style.display = isClosed ? 'flex' : 'none';
+      
+      // Atualiza os botões visíveis no dropdown conforme a existência de um avatar salvo
+      const hasAvatar = !!GameState.getAvatar();
+      this.elements.createAvatarBtn.style.display = hasAvatar ? 'none' : 'block';
+      this.elements.editAvatarBtn.style.display = hasAvatar ? 'block' : 'none';
+      this.elements.deleteAvatarBtn.style.display = hasAvatar ? 'block' : 'none';
+    });
+
+    window.addEventListener('click', (e) => {
+      if (this.elements.avatarMenuContainer && !this.elements.avatarMenuContainer.contains(e.target)) {
+        this.elements.avatarDropdown.style.display = 'none';
+      }
+    });
+
+    this.elements.createAvatarBtn.addEventListener('click', () => {
+      this.elements.avatarDropdown.style.display = 'none';
+      CharacterCreator.state = { skin: 0, hair: 0, clothes: 0, accessory: 0 };
+      CharacterCreator.updatePreview();
+      this.elements.gameContent.classList.add(UI_CLASSES.HIDDEN);
+      CharacterCreator.show();
+    });
+
+    this.elements.editAvatarBtn.addEventListener('click', () => {
+      this.elements.avatarDropdown.style.display = 'none';
+      const currentAvatar = GameState.getAvatar();
+      if (currentAvatar) {
+        CharacterCreator.state = { ...currentAvatar };
+      }
+      CharacterCreator.updatePreview();
+      this.elements.gameContent.classList.add(UI_CLASSES.HIDDEN);
+      CharacterCreator.show();
+    });
+
+    this.elements.deleteAvatarBtn.addEventListener('click', async () => {
+      this.elements.avatarDropdown.style.display = 'none';
+      if (confirm("Tem certeza que deseja excluir seu avatar?")) {
+        GameState.setAvatar(null);
+        await GameState.save();
+        this.continueToGame(null);
+        Feedback.show('Avatar excluído com sucesso.', 'info');
+      }
+    });
 
     // Auth events
     loginModalBtn.addEventListener('click', () => this._showModal('login-modal'));
@@ -1022,6 +1147,7 @@ const app = {
     this.elements.userDisplay.appendChild(this.elements.userAvatarThumb);
     this.elements.userDisplay.appendChild(document.createTextNode(`Olá, ${displayName}`));
     this.elements.userDisplay.classList.remove(UI_CLASSES.HIDDEN);
+    this.elements.avatarMenuContainer.style.display = 'inline-block';
     this.elements.loginModalBtn.classList.add(UI_CLASSES.HIDDEN);
     this.elements.registerModalBtn.classList.add(UI_CLASSES.HIDDEN);
     this.elements.logoutBtn.classList.remove(UI_CLASSES.HIDDEN);
@@ -1073,6 +1199,7 @@ const app = {
   _handleUserLoggedOut() {
     GameState.unload();
     this.elements.userDisplay.classList.add(UI_CLASSES.HIDDEN);
+    this.elements.avatarMenuContainer.style.display = 'none';
     this.elements.loginModalBtn.classList.remove(UI_CLASSES.HIDDEN);
     this.elements.registerModalBtn.classList.remove(UI_CLASSES.HIDDEN);
     this.elements.logoutBtn.classList.add(UI_CLASSES.HIDDEN);
