@@ -728,8 +728,9 @@ const CharacterCreator = {
     this.el = document.createElement('div');
     this.el.id = 'character-creator-modal';
     this.el.className = 'modal hidden';
+    this.el.style.zIndex = '9999'; // Força o modal a ficar por cima de tudo
     this.el.innerHTML = `
-      <div class="modal-content" style="max-width: 500px; text-align: center;">
+      <div class="modal-content" style="max-width: 500px; width: 90%; background: #ffffff; padding: 30px; border-radius: 15px; margin: 10vh auto; text-align: center; box-shadow: 0 10px 40px rgba(0,0,0,0.4); position: relative;">
         <h2>Crie seu Personagem</h2>
         <p style="margin-bottom: 20px; color: #666;">Crie o seu visual de advogado(a) para começar a jogar!</p>
         
@@ -920,6 +921,33 @@ const app = {
       this.elements.crosswordContainer.parentNode.insertBefore(hintsDisplay, this.elements.crosswordContainer);
     }
     this.elements.hintsDisplay = hintsDisplay;
+
+    // Avatar flutuante no canto direito da tela de jogo
+    const gameAvatarDisplay = document.createElement('div');
+    gameAvatarDisplay.id = 'game-avatar-display';
+    gameAvatarDisplay.className = UI_CLASSES.HIDDEN;
+    gameAvatarDisplay.style.position = 'fixed';
+    gameAvatarDisplay.style.right = '20px';
+    gameAvatarDisplay.style.bottom = '20px';
+    gameAvatarDisplay.style.width = 'clamp(80px, 15vw, 150px)';
+    gameAvatarDisplay.style.height = 'clamp(80px, 15vw, 150px)';
+    gameAvatarDisplay.style.borderRadius = '50%';
+    gameAvatarDisplay.style.border = '5px solid #1e3a8a';
+    gameAvatarDisplay.style.backgroundColor = '#b6e3f4';
+    gameAvatarDisplay.style.boxShadow = '0 8px 25px rgba(0,0,0,0.3)';
+    gameAvatarDisplay.style.overflow = 'hidden';
+    gameAvatarDisplay.style.zIndex = '50';
+    
+    const gameAvatarImg = document.createElement('img');
+    gameAvatarImg.style.width = '100%';
+    gameAvatarImg.style.height = '100%';
+    gameAvatarImg.style.objectFit = 'cover';
+    
+    gameAvatarDisplay.appendChild(gameAvatarImg);
+    document.body.appendChild(gameAvatarDisplay);
+    
+    this.elements.gameAvatarDisplay = gameAvatarDisplay;
+    this.elements.gameAvatarImg = gameAvatarImg;
 
     // Espaço para mostrar a miniatura do Avatar ao lado do nome do usuário
     this.elements.userAvatarThumb = document.createElement('span');
@@ -1205,6 +1233,7 @@ const app = {
     this.elements.logoutBtn.classList.add(UI_CLASSES.HIDDEN);
     this.elements.authRequiredMessage.classList.remove(UI_CLASSES.HIDDEN);
     this.elements.gameContent.classList.add(UI_CLASSES.HIDDEN);
+    if (this.elements.gameAvatarDisplay) this.elements.gameAvatarDisplay.classList.add(UI_CLASSES.HIDDEN);
   },
 
   async _handleLogin(e) {
@@ -1408,6 +1437,13 @@ const app = {
       this.elements.crosswordContainer.classList.remove(UI_CLASSES.HIDDEN);
       this.elements.crosswordActions.classList.remove(UI_CLASSES.HIDDEN);
       this.elements.hintsDisplay.classList.remove(UI_CLASSES.HIDDEN);
+      
+      // Exibe o avatar na tela do jogo se ele existir
+      const avatar = GameState.getAvatar();
+      if (avatar) {
+        this.elements.gameAvatarImg.src = CharacterCreator.getAvatarUrl(avatar);
+        this.elements.gameAvatarDisplay.classList.remove(UI_CLASSES.HIDDEN);
+      }
     } catch (error) {
       // Se for o erro do banco de dados vazio, mostra mensagem amigável para usuários normais
       if (error.message && error.message.includes('Nenhuma pergunta encontrada')) {
@@ -1497,6 +1533,7 @@ const app = {
     this.elements.crosswordContainer.classList.add(UI_CLASSES.HIDDEN);
     this.elements.crosswordActions.classList.add(UI_CLASSES.HIDDEN);
     if (this.elements.hintsDisplay) this.elements.hintsDisplay.classList.add(UI_CLASSES.HIDDEN);
+    if (this.elements.gameAvatarDisplay) this.elements.gameAvatarDisplay.classList.add(UI_CLASSES.HIDDEN);
     Feedback.hide();
   },
 
