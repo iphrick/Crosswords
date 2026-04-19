@@ -770,15 +770,6 @@ const CharacterCreator = {
   },
 
   _bindEvents() {
-    ['skin', 'hair', 'clothes', 'accessory'].forEach(key => {
-      const select = this.el.querySelector(`#avatar-${key}`);
-      // Usar 'input' garante que a mudança seja feita no exato momento da escolha
-      select.addEventListener('input', (e) => {
-        this.state[key] = parseInt(e.target.value, 10);
-        this.updatePreview();
-      });
-    });
-
     this.el.querySelector('#save-avatar-btn').addEventListener('click', async () => {
       const btn = this.el.querySelector('#save-avatar-btn');
       const originalText = btn.textContent;
