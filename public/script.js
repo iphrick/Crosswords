@@ -763,12 +763,12 @@ const CharacterCreator = {
       const isSelected = this.state.username === c.u;
       const borderStyle = isSelected ? 'border-color: #1e3a8a; background-color: #e0f2fe;' : 'border-color: transparent; background-color: #f3f4f6;';
       
-      return \`
-        <div class="mc-character-card" data-username="\${c.u}" style="cursor: pointer; padding: 8px 4px; border: 2px solid transparent; border-radius: 8px; text-align: center; transition: all 0.2s; \${borderStyle}">
-          <img src="https://minotar.net/armor/body/\${c.u}/100.png" style="width: 45px; height: 90px; object-fit: contain; margin-bottom: 8px; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.2));">
-          <div style="font-size: 0.7rem; font-weight: bold; color: #374151; word-wrap: break-word; line-height: 1.1;">\${c.l}</div>
+      return `
+        <div class="mc-character-card" data-username="${c.u}" style="cursor: pointer; padding: 8px 4px; border: 2px solid transparent; border-radius: 8px; text-align: center; transition: all 0.2s; ${borderStyle}">
+          <img src="https://minotar.net/armor/body/${c.u}/100.png" style="width: 45px; height: 90px; object-fit: contain; margin-bottom: 8px; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.2));">
+          <div style="font-size: 0.7rem; font-weight: bold; color: #374151; word-wrap: break-word; line-height: 1.1;">${c.l}</div>
         </div>
-      \`;
+      `;
     }).join('');
 
     container.querySelectorAll('.mc-character-card').forEach(card => {
