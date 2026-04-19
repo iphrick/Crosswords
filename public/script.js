@@ -739,12 +739,8 @@ const CharacterCreator = {
           <img id="avatar-img" src="" alt="Meu Personagem" style="width: 100%; height: 100%; object-fit: cover; transition: opacity 0.2s;">
         </div>
 
-        <!-- Controles -->
-        <div style="display: grid; grid-template-columns: 1fr; gap: 15px; text-align: left; margin-bottom: 25px;">
-          ${this._createSelectGroup('Pele', 'skin')}
-          ${this._createSelectGroup('Cabelo', 'hair')}
-          ${this._createSelectGroup('Roupas', 'clothes')}
-          ${this._createSelectGroup('Acessório', 'accessory')}
+        <!-- Controles Visuais -->
+        <div id="avatar-options-container" style="text-align: left; margin-bottom: 25px; max-height: 45vh; overflow-y: auto; overflow-x: hidden; padding-right: 5px;">
         </div>
 
         <div style="display: flex; gap: 10px;">
@@ -812,7 +808,7 @@ const CharacterCreator = {
     const accessory = this.assets.accessory[stateData.accessory].value;
     
     // Usar a versão mais recente (9.x) e omitir o parâmetro de acessórios caso seja "Nenhum" para não quebrar a URL
-    let url = `https://api.dicebear.com/9.x/avataaars/svg?seed=Advogado&backgroundColor=b6e3f4&skinColor=${skin}&top=${hair}&clothing=${clothes}`;
+    let url = `https://api.dicebear.com/9.x/avataaars/svg?seed=Advogado&backgroundColor=transparent&skinColor=${skin}&top=${hair}&clothing=${clothes}`;
     
     if (accessory !== 'blank') {
       url += `&accessories=${accessory}`;
@@ -830,6 +826,7 @@ const CharacterCreator = {
 
   show() {
     this.el.classList.remove(UI_CLASSES.HIDDEN);
+    this._renderOptions(); // Renderiza as opções sempre que o menu é aberto
     this.updatePreview();
   },
 
@@ -840,7 +837,7 @@ const CharacterCreator = {
   getMiniatureHtml(avatarData) {
     if (!avatarData) return '<span style="font-size: 1.5rem;">🧑‍⚖️</span>';
     const url = this.getAvatarUrl(avatarData);
-    return `<img src="${url}" alt="Avatar" style="width: 32px; height: 32px; border-radius: 50%; vertical-align: middle; border: 2px solid white; box-shadow: 0 1px 3px rgba(0,0,0,0.2);">`;
+    return `<img src="${url}" alt="Avatar" style="width: 32px; height: 32px; border-radius: 50%; vertical-align: middle; border: 2px solid white; box-shadow: 0 1px 3px rgba(0,0,0,0.2); background-color: #b6e3f4;">`;
   }
 };
 
@@ -927,21 +924,19 @@ const app = {
     gameAvatarDisplay.id = 'game-avatar-display';
     gameAvatarDisplay.className = UI_CLASSES.HIDDEN;
     gameAvatarDisplay.style.position = 'fixed';
-    gameAvatarDisplay.style.right = '20px';
-    gameAvatarDisplay.style.bottom = '20px';
-    gameAvatarDisplay.style.width = 'clamp(80px, 15vw, 150px)';
-    gameAvatarDisplay.style.height = 'clamp(80px, 15vw, 150px)';
-    gameAvatarDisplay.style.borderRadius = '50%';
-    gameAvatarDisplay.style.border = '5px solid #1e3a8a';
-    gameAvatarDisplay.style.backgroundColor = '#b6e3f4';
-    gameAvatarDisplay.style.boxShadow = '0 8px 25px rgba(0,0,0,0.3)';
-    gameAvatarDisplay.style.overflow = 'hidden';
+    gameAvatarDisplay.style.right = '5vw';
+    gameAvatarDisplay.style.top = '50%';
+    gameAvatarDisplay.style.transform = 'translateY(-50%)';
+    gameAvatarDisplay.style.width = 'clamp(120px, 20vw, 180px)';
+    gameAvatarDisplay.style.height = 'clamp(120px, 20vw, 180px)';
     gameAvatarDisplay.style.zIndex = '50';
+    gameAvatarDisplay.style.pointerEvents = 'none';
+    gameAvatarDisplay.style.filter = 'drop-shadow(0 10px 15px rgba(0,0,0,0.3))';
     
     const gameAvatarImg = document.createElement('img');
     gameAvatarImg.style.width = '100%';
     gameAvatarImg.style.height = '100%';
-    gameAvatarImg.style.objectFit = 'cover';
+    gameAvatarImg.style.objectFit = 'contain';
     
     gameAvatarDisplay.appendChild(gameAvatarImg);
     document.body.appendChild(gameAvatarDisplay);
