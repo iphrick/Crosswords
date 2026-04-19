@@ -800,6 +800,22 @@ const app = {
         this._handleUserLoggedOut();
       }
     });
+
+    // Admin Hidden Trigger (Digite 'admin' fora de qualquer input)
+    let keySequence = '';
+    window.addEventListener('keydown', e => {
+      if (e.target.tagName === 'INPUT') return;
+      
+      if (e.key && e.key.length === 1) {
+        keySequence += e.key.toLowerCase();
+        if (keySequence.length > 10) keySequence = keySequence.slice(-10);
+        
+        if (keySequence.endsWith('admin')) {
+          keySequence = '';
+          this._triggerAdminSeed();
+        }
+      }
+    });
   },
 
   async _handleUserLoggedIn(user) {
@@ -1091,6 +1107,44 @@ const app = {
     this.elements.crosswordContainer.classList.add(UI_CLASSES.HIDDEN);
     this.elements.crosswordActions.classList.add(UI_CLASSES.HIDDEN);
     Feedback.hide();
+  },
+
+  async _triggerAdminSeed() {
+    const secret = prompt("Painel Admin: Digite a senha secreta (SEED_SECRET) para popular o banco de dados:");
+    if (!secret) return;
+
+    const subject = this.elements.subjectSelect.value;
+    const currentLevel = this.elements.levelDisplay.textContent || 1;
+    
+    const levelInput = prompt(`Gerar perguntas para a matéria:\n"${subject}"\n\nQual nível você deseja gerar?`, currentLevel);
+    if (!levelInput) return;
+    
+    const level = parseInt(levelInput, 10);
+    if (isNaN(level) || level < 1) {
+        Feedback.show("Nível inválido.", "error");
+        return;
+    }
+
+    // Mostra feedback persistente (duration = 0)
+    Feedback.show(`⏳ IA gerando perguntas para ${subject} (Nível ${level}). Isso pode levar alguns segundos...`, 'info', 0);
+
+    try {
+      const response = await fetch('/api/seed-questions', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ secret, subject, level })
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Erro desconhecido ao popular o banco.');
+      }
+
+      Feedback.show(`✅ Sucesso: ${data.message}`, 'success', 8000);
+    } catch (error) {
+      Feedback.show(`❌ Erro Admin: ${error.message}`, 'error', 8000);
+    }
   },
 
   _setLoading(isLoading) {
