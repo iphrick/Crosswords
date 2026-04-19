@@ -753,20 +753,68 @@ const CharacterCreator = {
     this._bindEvents();
   },
 
-  _createSelectGroup(label, key) {
-    let optionsHtml = '';
-    this.assets[key].forEach((item, index) => {
-      const text = item.label;
-      optionsHtml += `<option value="${index}">${text}</option>`;
+  _renderOptions() {
+    const container = this.el.querySelector('#avatar-options-container');
+    let html = '';
+
+    const groups = [
+      { key: 'skin', label: 'Cor da Pele' },
+      { key: 'hair', label: 'Cabelo' },
+      { key: 'clothes', label: 'Roupas' },
+      { key: 'accessory', label: 'Acessórios' }
+    ];
+
+    groups.forEach(({ key, label }) => {
+      let optionsHtml = '';
+      this.assets[key].forEach((item, index) => {
+        const isSelected = this.state[key] === index;
+        const borderStyle = isSelected ? 'border: 3px solid #1e3a8a; background-color: #e0f2fe;' : 'border: 3px solid transparent; background-color: #f3f4f6;';
+
+        let content = '';
+        if (key === 'skin') {
+          content = `<div style="width: 40px; height: 40px; border-radius: 50%; background-color: #${item.value}; margin: auto; border: 1px solid #ccc;"></div>`;
+        } else {
+          // Gera imagens em miniatura focadas no item específico para o botão
+          let previewUrl = `https://api.dicebear.com/9.x/avataaars/svg?seed=preview&backgroundColor=transparent`;
+          if (key === 'hair') previewUrl += `&top=${item.value}&clothing=blazerShirt`;
+          if (key === 'clothes') previewUrl += `&clothing=${item.value}&top=noHair`;
+          if (key === 'accessory') {
+            previewUrl += `&top=noHair&clothing=blazerShirt`;
+            if (item.value !== 'blank') previewUrl += `&accessories=${item.value}`;
+          }
+          content = `<img src="${previewUrl}" style="width: 50px; height: 50px; object-fit: contain; margin: auto; display: block;">`;
+        }
+
+        optionsHtml += `
+          <div class="avatar-option" data-key="${key}" data-index="${index}" style="cursor: pointer; padding: 8px 5px; border-radius: 10px; text-align: center; min-width: 80px; transition: all 0.2s; ${borderStyle}">
+            ${content}
+            <div style="font-size: 0.75rem; margin-top: 6px; color: #374151; font-weight: 600;">${item.label}</div>
+          </div>
+        `;
+      });
+
+      html += `
+        <div style="margin-bottom: 20px;">
+          <label style="display: block; font-weight: bold; margin-bottom: 10px; color: #1f2937;">${label}</label>
+          <div style="display: flex; gap: 10px; overflow-x: auto; padding-bottom: 10px; scrollbar-width: thin;">
+            ${optionsHtml}
+          </div>
+        </div>
+      `;
     });
-    return `
-      <div>
-        <label style="display: block; font-weight: bold; margin-bottom: 5px;">${label}</label>
-        <select id="avatar-${key}" data-key="${key}" style="width: 100%; padding: 10px; border-radius: 5px; border: 1px solid #ccc;">
-          ${optionsHtml}
-        </select>
-      </div>
-    `;
+
+    container.innerHTML = html;
+
+    // Adiciona evento de clique para cada opção visual
+    container.querySelectorAll('.avatar-option').forEach(el => {
+      el.addEventListener('click', (e) => {
+        const key = e.currentTarget.dataset.key;
+        const index = parseInt(e.currentTarget.dataset.index, 10);
+        this.state[key] = index;
+        this._renderOptions(); // Re-renderiza para mudar a borda azul
+        this.updatePreview();
+      });
+    });
   },
 
   _bindEvents() {
