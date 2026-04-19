@@ -700,7 +700,21 @@ const Feedback = {
    ============================================= */
 const CharacterCreator = {
   el: null,
-  state: { username: 'Steve', nickname: '' }, // Padrão: Skin original e apelido vazio
+  state: { username: 'Lawyer', nickname: '' }, // Padrão: Advogado
+  characters: [
+    // Alta afinidade com Direito (Advogados, Juízes, Ternos)
+    { u: 'Lawyer', l: 'Advogado' },
+    { u: 'LawyerGirl', l: 'Advogada' },
+    { u: 'Judge', l: 'Juiz' },
+    { u: 'JudgeGirl', l: 'Juíza' },
+    { u: 'Suit', l: 'Terno Preto' },
+    { u: 'SuitGirl', l: 'Terno Fem.' },
+    { u: 'Business', l: 'Executivo' },
+    { u: 'BusinessWoman', l: 'Executiva' },
+    // Mais casuais
+    { u: 'Steve', l: 'Steve' },
+    { u: 'Alex', l: 'Alex' }
+  ],
 
   init() {
     this.el = document.createElement('div');
@@ -710,7 +724,7 @@ const CharacterCreator = {
     this.el.innerHTML = `
       <div class="modal-content" style="max-width: 500px; width: 90%; background: #ffffff; padding: 30px; border-radius: 15px; margin: 10vh auto; text-align: center; box-shadow: 0 10px 40px rgba(0,0,0,0.4); position: relative;">
         <h2>Crie seu Personagem</h2>
-        <p style="margin-bottom: 20px; color: #666;">Digite um nome de usuário do Minecraft para carregar sua Skin!</p>
+        <p style="margin-bottom: 20px; color: #666;">Escolha um visual e um apelido para começar a jogar!</p>
         
         <!-- Visualizador do Avatar -->
         <div id="avatar-preview" style="width: 150px; height: 150px; margin: 0 auto 20px auto; display: flex; align-items: center; justify-content: center; filter: drop-shadow(0 10px 15px rgba(0,0,0,0.2));">
@@ -723,20 +737,11 @@ const CharacterCreator = {
           <input type="text" id="avatar-nickname" class="form__input" placeholder="Ex: AdvogadoNinja" style="width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #d1d5db; font-size: 1rem;" autocomplete="off" spellcheck="false" maxlength="15">
         </div>
 
-        <!-- Controle de Usuário Minecraft -->
-        <div style="text-align: left; margin-bottom: 15px;">
-          <label style="display: block; font-weight: bold; margin-bottom: 10px; color: #1f2937;">Nome do Jogador:</label>
-          <input type="text" id="avatar-mc-username" class="form__input" placeholder="Ex: Notch, Dream, Steve" style="width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #d1d5db; font-size: 1rem;" autocomplete="off" spellcheck="false">
-          <p style="font-size: 0.8rem; color: #6b7280; margin-top: 8px;">A imagem atualiza enquanto você digita.</p>
-        </div>
-
+        <!-- Galeria de Personagens -->
         <div style="text-align: left; margin-bottom: 25px;">
-          <label style="display: block; font-weight: bold; margin-bottom: 10px; color: #1f2937;">Sugestões com Terno:</label>
-          <div style="display: flex; gap: 8px; flex-wrap: wrap;">
-            <button type="button" class="mc-preset-btn btn" style="padding: 5px 10px; font-size: 0.8rem; background: #1e3a8a;" data-name="Suit">Terno Preto</button>
-            <button type="button" class="mc-preset-btn btn" style="padding: 5px 10px; font-size: 0.8rem; background: #1e3a8a;" data-name="Lawyer">Advogado</button>
-            <button type="button" class="mc-preset-btn btn" style="padding: 5px 10px; font-size: 0.8rem; background: #1e3a8a;" data-name="Judge">Juiz</button>
-            <button type="button" class="mc-preset-btn btn" style="padding: 5px 10px; font-size: 0.8rem; background: #1e3a8a;" data-name="Business">Executivo</button>
+          <label style="display: block; font-weight: bold; margin-bottom: 10px; color: #1f2937;">Escolha o Visual:</label>
+          <div id="character-list" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(85px, 1fr)); gap: 10px; max-height: 240px; overflow-y: auto; padding: 5px; scrollbar-width: thin;">
+            <!-- Preenchido via JavaScript -->
           </div>
         </div>
 
@@ -750,28 +755,36 @@ const CharacterCreator = {
     this._bindEvents();
   },
 
+  _renderCharacterList() {
+    const container = this.el.querySelector('#character-list');
+    if (!container) return;
+    
+    container.innerHTML = this.characters.map(c => {
+      const isSelected = this.state.username === c.u;
+      const borderStyle = isSelected ? 'border-color: #1e3a8a; background-color: #e0f2fe;' : 'border-color: transparent; background-color: #f3f4f6;';
+      
+      return \`
+        <div class="mc-character-card" data-username="\${c.u}" style="cursor: pointer; padding: 8px 4px; border: 2px solid transparent; border-radius: 8px; text-align: center; transition: all 0.2s; \${borderStyle}">
+          <img src="https://minotar.net/armor/body/\${c.u}/100.png" style="width: 45px; height: 90px; object-fit: contain; margin-bottom: 8px; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.2));">
+          <div style="font-size: 0.7rem; font-weight: bold; color: #374151; word-wrap: break-word; line-height: 1.1;">\${c.l}</div>
+        </div>
+      \`;
+    }).join('');
+
+    container.querySelectorAll('.mc-character-card').forEach(card => {
+      card.addEventListener('click', (e) => {
+        this.state.username = e.currentTarget.dataset.username;
+        this._renderCharacterList(); // Re-renderiza para mudar a borda azul do item selecionado
+        this.updatePreview();
+      });
+    });
+  },
+
   _bindEvents() {
     // Atualiza o apelido no state enquanto o usuário digita
     const nicknameInput = this.el.querySelector('#avatar-nickname');
     nicknameInput.addEventListener('input', (e) => {
       this.state.nickname = e.target.value;
-    });
-
-    // Atualiza a imagem enquanto o usuário digita
-    const inputEl = this.el.querySelector('#avatar-mc-username');
-    inputEl.addEventListener('input', (e) => {
-      this.state.username = e.target.value.trim() || 'Steve';
-      this.updatePreview();
-    });
-
-    // Evento para os botões de Sugestão de Advogados
-    this.el.querySelectorAll('.mc-preset-btn').forEach(btn => {
-      btn.addEventListener('click', (e) => {
-        const name = e.currentTarget.dataset.name;
-        this.state.username = name;
-        inputEl.value = name;
-        this.updatePreview();
-      });
     });
 
     this.el.querySelector('#save-avatar-btn').addEventListener('click', async () => {
@@ -804,7 +817,7 @@ const CharacterCreator = {
 
   // Constrói a URL da imagem usando a API do Minotar (corpo 2D de Minecraft)
   getAvatarUrl(stateData) {
-    return `https://minotar.net/armor/body/${stateData.username || 'Steve'}/150.png`;
+    return `https://minotar.net/armor/body/${stateData.username || 'Lawyer'}/150.png`;
   },
 
   updatePreview() {
@@ -817,12 +830,10 @@ const CharacterCreator = {
 
   show() {
     this.el.classList.remove(UI_CLASSES.HIDDEN);
-    const inputEl = this.el.querySelector('#avatar-mc-username');
-    if (inputEl) inputEl.value = this.state.username === 'Steve' ? '' : this.state.username;
-    
     const nicknameInput = this.el.querySelector('#avatar-nickname');
     if (nicknameInput) nicknameInput.value = this.state.nickname || '';
     
+    this._renderCharacterList();
     this.updatePreview();
   },
 
@@ -833,7 +844,7 @@ const CharacterCreator = {
   // Gera a miniatura que fica no topo do menu usando apenas a "cabeça" do Minecraft
   getMiniatureHtml(avatarData) {
     if (!avatarData) return '<span style="font-size: 1.5rem;">🧑‍⚖️</span>';
-    const headUrl = `https://minotar.net/helm/${avatarData.username || 'Steve'}/32.png`;
+    const headUrl = `https://minotar.net/helm/${avatarData.username || 'Lawyer'}/32.png`;
     return `<img src="${headUrl}" alt="Avatar" style="width: 32px; height: 32px; border-radius: 5px; vertical-align: middle; border: 2px solid white; box-shadow: 0 1px 3px rgba(0,0,0,0.2); background-color: #e5e7eb;">`;
   }
 };
@@ -1076,7 +1087,7 @@ const app = {
     this.elements.createAvatarBtn.addEventListener('click', () => {
       this.elements.avatarDropdown.style.display = 'none';
       CharacterCreator.state = { 
-        username: 'Steve',
+        username: 'Lawyer',
         nickname: GameState.getNickname() || ''
       };
       CharacterCreator.updatePreview();
