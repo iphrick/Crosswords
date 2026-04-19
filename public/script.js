@@ -735,6 +735,7 @@ const CharacterCreator = {
         
         <!-- Visualizador do Avatar -->
         <div id="avatar-preview" style="width: 120px; height: 120px; margin: 0 auto 20px auto; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 4px solid #1e3a8a; box-shadow: 0 4px 6px rgba(0,0,0,0.1); overflow: hidden; background-color: #f3f4f6;">
+          <img id="avatar-img" src="" alt="Meu Personagem" style="width: 100%; height: 100%; object-fit: cover; transition: opacity 0.2s;">
         </div>
 
         <!-- Controles -->
@@ -771,7 +772,8 @@ const CharacterCreator = {
   _bindEvents() {
     ['skin', 'hair', 'clothes', 'accessory'].forEach(key => {
       const select = this.el.querySelector(`#avatar-${key}`);
-      select.addEventListener('change', (e) => {
+      // Usar 'input' garante que a mudança seja feita no exato momento da escolha
+      select.addEventListener('input', (e) => {
         this.state[key] = parseInt(e.target.value, 10);
         this.updatePreview();
       });
@@ -797,15 +799,21 @@ const CharacterCreator = {
     const clothes = this.assets.clothes[stateData.clothes].value;
     const accessory = this.assets.accessory[stateData.accessory].value;
     
-    // Gera uma imagem vetorizada (SVG) baseada nas escolhas
-    return `https://api.dicebear.com/7.x/avataaars/svg?seed=Advogado&backgroundColor=b6e3f4&skinColor=${skin}&top=${hair}&clothing=${clothes}&accessories=${accessory}`;
+    // Usar a versão mais recente (9.x) e omitir o parâmetro de acessórios caso seja "Nenhum" para não quebrar a URL
+    let url = `https://api.dicebear.com/9.x/avataaars/svg?seed=Advogado&backgroundColor=b6e3f4&skinColor=${skin}&top=${hair}&clothing=${clothes}`;
+    
+    if (accessory !== 'blank') {
+      url += `&accessories=${accessory}`;
+    }
+    return url;
   },
 
   updatePreview() {
-    const previewEl = this.el.querySelector('#avatar-preview');
     const url = this.getAvatarUrl(this.state);
-    // Atualiza a imagem renderizada
-    previewEl.innerHTML = `<img src="${url}" alt="Meu Personagem" style="width: 100%; height: 100%; object-fit: cover;">`;
+    const imgEl = this.el.querySelector('#avatar-img');
+    if (imgEl) {
+      imgEl.src = url; // Troca a imagem em tempo real e sem piscar
+    }
   },
 
   show() {
