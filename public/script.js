@@ -38,6 +38,7 @@ const GameState = {
     } else {
       // Cria um documento inicial para um novo usuário
       this._state = { email: user.email, subjects: {} };
+      this._state = { email: user.email, subjects: {}, avatar: null };
       await userDocRef.set(this._state);
     }
   },
@@ -105,6 +106,14 @@ const GameState = {
   setLevelCompleted(subject, isCompleted) {
     this._getSubjectState(subject).isLevelCompleted = isCompleted;
   },
+
+  getAvatar() {
+    return this._state.avatar || null;
+  },
+
+  setAvatar(avatarData) {
+    this._state.avatar = avatarData;
+  }
 };
 
 /* =============================================
@@ -680,6 +689,142 @@ const Feedback = {
 };
 
 /* =============================================
+   CHARACTER CREATOR MODULE
+   ============================================= */
+const CharacterCreator = {
+  el: null,
+  state: { skin: 0, hair: 0, clothes: 0, accessory: 0 },
+  assets: {
+    skin: [
+      { label: 'Tom 1 (Claro)', value: 'ffdbb4' },
+      { label: 'Tom 2', value: 'edb98a' },
+      { label: 'Tom 3', value: 'd08b5b' },
+      { label: 'Tom 4', value: 'ae5d29' },
+      { label: 'Tom 5 (Escuro)', value: '614335' }
+    ],
+    hair: [
+      { label: 'Careca', value: 'noHair' },
+      { label: 'Curto Liso', value: 'shortHairShortFlat' },
+      { label: 'Longo Liso', value: 'longHairStraight' },
+      { label: 'Crespo', value: 'shortHairTheCaesar' },
+      { label: 'Cacheado', value: 'longHairCurly' },
+      { label: 'Dreads', value: 'shortHairDreads01' }
+    ],
+    clothes: [
+      { label: 'Terno e Gravata', value: 'blazerShirt' },
+      { label: 'Terno Casual', value: 'blazerSweater' },
+      { label: 'Camisa Casual', value: 'shirtCrewNeck' },
+      { label: 'Roupa Social', value: 'overall' }
+    ],
+    accessory: [
+      { label: 'Nenhum', value: 'blank' },
+      { label: 'Óculos de Grau', value: 'prescription01' },
+      { label: 'Óculos Escuros', value: 'kurt' },
+      { label: 'Óculos Redondos', value: 'round' }
+    ]
+  },
+
+  init() {
+    this.el = document.createElement('div');
+    this.el.id = 'character-creator-modal';
+    this.el.className = 'modal hidden';
+    this.el.innerHTML = `
+      <div class="modal-content" style="max-width: 500px; text-align: center;">
+        <h2>Crie seu Personagem</h2>
+        <p style="margin-bottom: 20px; color: #666;">Crie o seu visual de advogado(a) para começar a jogar!</p>
+        
+        <!-- Visualizador do Avatar -->
+        <div id="avatar-preview" style="width: 120px; height: 120px; margin: 0 auto 20px auto; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 4px solid #1e3a8a; box-shadow: 0 4px 6px rgba(0,0,0,0.1); overflow: hidden; background-color: #f3f4f6;">
+        </div>
+
+        <!-- Controles -->
+        <div style="display: grid; grid-template-columns: 1fr; gap: 15px; text-align: left; margin-bottom: 25px;">
+          ${this._createSelectGroup('Pele', 'skin')}
+          ${this._createSelectGroup('Cabelo', 'hair')}
+          ${this._createSelectGroup('Roupas', 'clothes')}
+          ${this._createSelectGroup('Acessório', 'accessory')}
+        </div>
+
+        <button id="save-avatar-btn" class="btn" style="width: 100%; font-size: 1.1rem;">Confirmar Visual</button>
+      </div>
+    `;
+    document.body.appendChild(this.el);
+    this._bindEvents();
+  },
+
+  _createSelectGroup(label, key) {
+    let optionsHtml = '';
+    this.assets[key].forEach((item, index) => {
+      const text = item.label;
+      optionsHtml += `<option value="${index}">${text}</option>`;
+    });
+    return `
+      <div>
+        <label style="display: block; font-weight: bold; margin-bottom: 5px;">${label}</label>
+        <select id="avatar-${key}" data-key="${key}" style="width: 100%; padding: 10px; border-radius: 5px; border: 1px solid #ccc;">
+          ${optionsHtml}
+        </select>
+      </div>
+    `;
+  },
+
+  _bindEvents() {
+    ['skin', 'hair', 'clothes', 'accessory'].forEach(key => {
+      const select = this.el.querySelector(`#avatar-${key}`);
+      select.addEventListener('change', (e) => {
+        this.state[key] = parseInt(e.target.value, 10);
+        this.updatePreview();
+      });
+    });
+
+    this.el.querySelector('#save-avatar-btn').addEventListener('click', async () => {
+      const btn = this.el.querySelector('#save-avatar-btn');
+      btn.disabled = true;
+      btn.textContent = 'Salvando...';
+      
+      GameState.setAvatar(this.state);
+      await GameState.save();
+      
+      this.hide();
+      app.continueToGame();
+    });
+  },
+
+  // Constrói a URL da imagem usando a API do DiceBear
+  getAvatarUrl(stateData) {
+    const skin = this.assets.skin[stateData.skin].value;
+    const hair = this.assets.hair[stateData.hair].value;
+    const clothes = this.assets.clothes[stateData.clothes].value;
+    const accessory = this.assets.accessory[stateData.accessory].value;
+    
+    // Gera uma imagem vetorizada (SVG) baseada nas escolhas
+    return `https://api.dicebear.com/7.x/avataaars/svg?seed=Advogado&backgroundColor=b6e3f4&skinColor=${skin}&top=${hair}&clothing=${clothes}&accessories=${accessory}`;
+  },
+
+  updatePreview() {
+    const previewEl = this.el.querySelector('#avatar-preview');
+    const url = this.getAvatarUrl(this.state);
+    // Atualiza a imagem renderizada
+    previewEl.innerHTML = `<img src="${url}" alt="Meu Personagem" style="width: 100%; height: 100%; object-fit: cover;">`;
+  },
+
+  show() {
+    this.el.classList.remove(UI_CLASSES.HIDDEN);
+    this.updatePreview();
+  },
+
+  hide() {
+    this.el.classList.add(UI_CLASSES.HIDDEN);
+  },
+
+  getMiniatureHtml(avatarData) {
+    if (!avatarData) return '<span style="font-size: 1.5rem;">🧑‍⚖️</span>';
+    const url = this.getAvatarUrl(avatarData);
+    return `<img src="${url}" alt="Avatar" style="width: 32px; height: 32px; border-radius: 50%; vertical-align: middle; border: 2px solid white; box-shadow: 0 1px 3px rgba(0,0,0,0.2);">`;
+  }
+};
+
+/* =============================================
    APP – ENTRY POINT
    ============================================= */
 const app = {
@@ -757,6 +902,12 @@ const app = {
     }
     this.elements.hintsDisplay = hintsDisplay;
 
+    // Espaço para mostrar a miniatura do Avatar ao lado do nome do usuário
+    this.elements.userAvatarThumb = document.createElement('span');
+    this.elements.userAvatarThumb.id = 'user-avatar-thumb';
+    this.elements.userAvatarThumb.style.marginRight = '8px';
+    this.elements.userDisplay.prepend(this.elements.userAvatarThumb);
+
     // Aguarda o SDK do Firebase carregar
     const firebaseAppCheck = setInterval(() => {
       if (window.firebase && firebase.app) {
@@ -775,6 +926,7 @@ const app = {
         // reCAPTCHA resolvido, pode prosseguir com o envio do código.
       }
     });
+    CharacterCreator.init();
     CrosswordUI.init();
     Feedback.init();
     this._bindEvents();
@@ -858,12 +1010,25 @@ const app = {
       : user.phoneNumber;
 
     this.elements.userDisplay.textContent = `Olá, ${displayName}`;
+    this.elements.userDisplay.innerHTML = '';
+    this.elements.userDisplay.appendChild(this.elements.userAvatarThumb);
+    this.elements.userDisplay.appendChild(document.createTextNode(`Olá, ${displayName}`));
     this.elements.userDisplay.classList.remove(UI_CLASSES.HIDDEN);
     this.elements.loginModalBtn.classList.add(UI_CLASSES.HIDDEN);
     this.elements.registerModalBtn.classList.add(UI_CLASSES.HIDDEN);
     this.elements.logoutBtn.classList.remove(UI_CLASSES.HIDDEN);
     this.elements.authRequiredMessage.classList.add(UI_CLASSES.HIDDEN);
     this.elements.gameContent.classList.remove(UI_CLASSES.HIDDEN);
+
+    // Verifica se o usuário já criou um avatar
+    const avatar = GameState.getAvatar();
+    if (!avatar) {
+      // Esconde o jogo e mostra o criador
+      this.elements.gameContent.classList.add(UI_CLASSES.HIDDEN);
+      CharacterCreator.show();
+    } else {
+      this.continueToGame(avatar);
+    }
 
     // --- CONTROLE DE ACESSO ADMIN ---
     const MEU_EMAIL_ADMIN = 'pedrohenriqueinsec281@gmail.com'; 
@@ -888,6 +1053,13 @@ const app = {
     }
 
     this._updateLevelDisplay();
+  },
+
+  continueToGame(avatarData = null) {
+    const avatar = avatarData || GameState.getAvatar();
+    this.elements.gameContent.classList.remove(UI_CLASSES.HIDDEN);
+    this.elements.userAvatarThumb.innerHTML = CharacterCreator.getMiniatureHtml(avatar);
+    Feedback.show('Bem-vindo ao jogo!', 'success', 3000);
   },
 
   _handleUserLoggedOut() {
