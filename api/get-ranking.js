@@ -1,4 +1,4 @@
-const { db } = require('./lib/firebase.js');
+const { db } = require('./firebase.js');
 
 // Helper para criar um nome de jogador limpo a partir de email ou telefone.
 function sanitizePlayerName(identifier) {

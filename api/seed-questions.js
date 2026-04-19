@@ -1,5 +1,5 @@
 const { GoogleGenerativeAI } = require('@google/generative-ai');
-const { db } = require('./lib/firebase.js'); // Importa a conexão com o Firestore
+const { db } = require('./firebase.js'); // Importa a conexão com o Firestore
 
 // 1. Carregar a chave da API do ambiente
 // No Next.js, variáveis de ambiente prefixadas com NEXT_PUBLIC_ são expostas ao cliente.
