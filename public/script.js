@@ -392,9 +392,9 @@ const CrosswordUI = {
     const selectedClue = document.querySelector(`.${UI_CLASSES.SELECTED_CLUE}`);
     if (!selectedClue) {
       Feedback.show('Selecione uma dica primeiro.', 'error');
-      return;
+      return false;
     }
-    if (!this.activeWord) return;
+    if (!this.activeWord) return false;
 
     const { answer } = this.activeWord;
 
@@ -406,9 +406,13 @@ const CrosswordUI = {
         input.classList.add(UI_CLASSES.HINT_INPUT);
         this._checkInput(input);
         this._updateClueStates();
-        return;
+        return true;
       }
     }
+
+    // Se chegamos aqui, a palavra já está completa ou não há o que revelar.
+    Feedback.show('Não há mais letras para revelar nesta palavra.', 'info');
+    return false;
   },
 
   clearAll() {
@@ -740,6 +744,19 @@ const app = {
     }
     this.elements.adminBtn = adminBtn;
 
+    // Cria exibição de corações (vidas) para as dicas
+    const hintsDisplay = document.createElement('div');
+    hintsDisplay.id = 'hints-display';
+    hintsDisplay.className = UI_CLASSES.HIDDEN;
+    hintsDisplay.style.marginBottom = '15px';
+    hintsDisplay.style.fontSize = '1.8rem';
+    hintsDisplay.style.textAlign = 'center';
+    hintsDisplay.style.letterSpacing = '5px';
+    if (this.elements.crosswordContainer) {
+      this.elements.crosswordContainer.parentNode.insertBefore(hintsDisplay, this.elements.crosswordContainer);
+    }
+    this.elements.hintsDisplay = hintsDisplay;
+
     // Aguarda o SDK do Firebase carregar
     const firebaseAppCheck = setInterval(() => {
       if (window.firebase && firebase.app) {
@@ -771,10 +788,10 @@ const app = {
     generateBtn.addEventListener('click', () => this._onGenerate());
     nextLevelBtn.addEventListener('click', () => this._onNextLevel());
     subjectSelect.addEventListener('change', () => this._updateLevelDisplay());
-    revealBtn.addEventListener('click', () => CrosswordUI.revealAll());
+    revealBtn.addEventListener('click', () => this._onRevealAll());
     clearBtn.addEventListener('click', () => CrosswordUI.clearAll());
     resetBtn.addEventListener('click', () => this._onReset());
-    hintBtn.addEventListener('click', () => CrosswordUI.revealHint());
+    hintBtn.addEventListener('click', () => this._onHint());
     CrosswordUI.gridEl.addEventListener('crossword-solved', () => this.onLevelComplete());
 
     // Evento do botão Admin visível
@@ -1060,6 +1077,10 @@ const app = {
 
   async _onGenerate() {
     const subject = this.elements.subjectSelect.value;
+    this.hintCounter = 0; // Reseta o contador de dicas para a nova fase
+    this.wasRevealAllUsed = false; // Reseta a flag de "revelar tudo"
+    this._updateHeartsUI(); // Preenche os 3 corações vermelhos
+
     GameState.setLevelCompleted(subject, false); // Reseta o estado de "completo" para a nova fase
     await GameState.save();
     const level = GameState.getCurrentLevel(subject);
@@ -1079,6 +1100,7 @@ const app = {
       CrosswordUI.render(placedWords);
       this.elements.crosswordContainer.classList.remove(UI_CLASSES.HIDDEN);
       this.elements.crosswordActions.classList.remove(UI_CLASSES.HIDDEN);
+      this.elements.hintsDisplay.classList.remove(UI_CLASSES.HIDDEN);
     } catch (error) {
       // Se for o erro do banco de dados vazio, mostra mensagem amigável para usuários normais
       if (error.message && error.message.includes('Nenhuma pergunta encontrada')) {
@@ -1096,22 +1118,40 @@ const app = {
     const subject = this.elements.subjectSelect.value;
     if (GameState.isLevelCompleted(subject)) return; // Previne que a função seja executada múltiplas vezes
 
+    // Se "Revelar Tudo" foi usado, o usuário não conclui a fase de forma justa.
+    if (this.wasRevealAllUsed) {
+      Feedback.show("🚨 Fase revelada! Você não pontuou. Clique em 'Próximo Nível' para continuar.", "error", 0);
+      // Apenas libera o próximo nível, sem salvar progresso de pontos ou palavras.
+      GameState.unlockNextLevel(subject);
+      await GameState.save();
+      this.elements.nextLevelBtn.classList.remove(UI_CLASSES.HIDDEN);
+      this.elements.crosswordActions.classList.add(UI_CLASSES.HIDDEN);
+      if (this.elements.hintsDisplay) this.elements.hintsDisplay.classList.add(UI_CLASSES.HIDDEN);
+      return;
+    }
+
+    // Conclusão justa da fase
     GameState.setLevelCompleted(subject, true);
-    Feedback.show('🎉 Parabéns! Você completou a fase!', 'success', 5000);
+    const MAX_HINTS_FOR_SCORE = 3;
 
-    // Adiciona as palavras resolvidas ao estado do jogo para não serem repetidas
-    const solvedWords = CrosswordUI.placedWords.map(word => word.answer);
+    if (this.hintCounter <= MAX_HINTS_FOR_SCORE) {
+      Feedback.show(`🎉 Parabéns! Você completou a fase com ${this.hintCounter} dicas e ganhou 100 pontos!`, 'success', 8000);
+      GameState.addScore(subject, 100);
+    } else {
+      Feedback.show(`👍 Fase completa! Como você usou mais de ${MAX_HINTS_FOR_SCORE} dicas, não foram adicionados pontos.`, 'info', 8000);
+    }
+
+    // Salva as palavras usadas e atualiza o placar
+    const solvedWords = CrosswordUI.placedWords.map(w => w.answer);
     GameState.addUsedWords(subject, solvedWords);
-
-    // Adiciona 100 pontos e atualiza o placar
-    GameState.addScore(subject, 100);
     this._updateScoreDisplay();
 
     GameState.unlockNextLevel(subject);
-
     await GameState.save(); // Salva todas as alterações de uma só vez!
+
     this.elements.nextLevelBtn.classList.remove(UI_CLASSES.HIDDEN);
     this.elements.crosswordActions.classList.add(UI_CLASSES.HIDDEN);
+    if (this.elements.hintsDisplay) this.elements.hintsDisplay.classList.add(UI_CLASSES.HIDDEN);
   },
 
   _onNextLevel() {
@@ -1149,7 +1189,44 @@ const app = {
     this.elements.generateBtn.classList.remove(UI_CLASSES.HIDDEN);
     this.elements.crosswordContainer.classList.add(UI_CLASSES.HIDDEN);
     this.elements.crosswordActions.classList.add(UI_CLASSES.HIDDEN);
+    if (this.elements.hintsDisplay) this.elements.hintsDisplay.classList.add(UI_CLASSES.HIDDEN);
     Feedback.hide();
+  },
+
+  _updateHeartsUI() {
+    if (!this.elements.hintsDisplay) return;
+    const MAX_HINTS = 3;
+    let hearts = '';
+    for (let i = 0; i < MAX_HINTS; i++) {
+      hearts += i < this.hintCounter ? '🤍' : '❤️';
+    }
+    this.elements.hintsDisplay.innerHTML = `<span style="font-size: 1rem; color: #555; vertical-align: middle; margin-right: 8px; font-weight: bold;">Dicas Restantes:</span> <span style="vertical-align: middle;">${hearts}</span>`;
+  },
+
+  _onHint() {
+    // Chama a função da UI e verifica se uma dica foi realmente dada
+    if (CrosswordUI.revealHint()) {
+      this.hintCounter++;
+      this._updateHeartsUI(); // Apaga um coração
+      const MAX_HINTS_FOR_SCORE = 3;
+
+      // Fornece feedback sobre o uso de dicas
+      if (this.hintCounter <= MAX_HINTS_FOR_SCORE) {
+        Feedback.show(`Você usou um coração! Restam ${MAX_HINTS_FOR_SCORE - this.hintCounter}.`, 'info', 3000);
+      } else {
+        Feedback.show(`Atenção: Você perdeu todos os corações! Esta fase não renderá mais pontos.`, 'error', 4000);
+      }
+    }
+  },
+
+  async _onRevealAll() {
+    if (!confirm("Tem certeza que deseja revelar todas as respostas? Você não pontuará e não poderá usar mais ações nesta fase.")) {
+      return;
+    }
+    this.wasRevealAllUsed = true;
+    // A UI vai preencher as respostas. Isso disparará o evento 'crossword-solved',
+    // que será tratado pela nossa nova lógica em onLevelComplete().
+    await CrosswordUI.revealAll();
   },
 
   async _triggerAdminSeed() {
