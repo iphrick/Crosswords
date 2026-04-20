@@ -1,16 +1,14 @@
 // components/layout/Header.jsx
 import { useState } from 'react';
 import { useAuth } from '@/context/AuthContext';
-import JuridicalAvatar from '../avatar/JuridicalAvatar';
 import styles from './Header.module.css';
 
-export default function Header({ onLoginClick, onRegisterClick, onRankingClick, onAvatarEdit }) {
+export default function Header({ onLoginClick, onRegisterClick, onRankingClick }) {
   const { user, gameState, logout } = useAuth();
   const [menuOpen, setMenuOpen]     = useState(false);
-  const [avatarOpen, setAvatarOpen] = useState(false);
+  const [userMenuOpen, setUserMenuOpen] = useState(false);
 
   const nickname    = gameState?.nickname;
-  const avatarData  = gameState?.avatar;
   const fallback    = user?.email ? user.email.split('@')[0] : user?.phoneNumber;
   const displayName = nickname || fallback || '';
 
@@ -35,30 +33,23 @@ export default function Header({ onLoginClick, onRegisterClick, onRankingClick, 
               🏆 Ranking
             </button>
 
-            {/* Avatar dropdown */}
+            {/* User dropdown */}
             <div className={styles.avatarMenu}>
               <button
                 className={styles.avatarBtn}
-                onClick={() => setAvatarOpen(o => !o)}
-                aria-expanded={avatarOpen}
-                aria-label="Menu de avatar"
+                onClick={() => setUserMenuOpen(o => !o)}
+                aria-expanded={userMenuOpen}
+                aria-label="Menu de usuário"
               >
-                {avatarData
-                  ? <JuridicalAvatar {...avatarData} size={32} />
-                  : <span className={styles.avatarEmoji}>🧑‍⚖️</span>
-                }
+                <span className={styles.avatarEmoji}>🧑‍⚖️</span>
                 <span className={styles.avatarName}>{displayName}</span>
                 <span className={styles.avatarCaret}>▾</span>
               </button>
 
-              {avatarOpen && (
+              {userMenuOpen && (
                 <div className={styles.dropdown}>
-                  <button className="btn btn--ghost" style={{width:'100%', justifyContent:'flex-start'}}
-                    onClick={() => { setAvatarOpen(false); onAvatarEdit?.(); }}>
-                    👤 {avatarData ? 'Modificar Avatar' : 'Criar Avatar'}
-                  </button>
                   <button className="btn btn--danger" style={{width:'100%', justifyContent:'flex-start'}}
-                    onClick={() => { setAvatarOpen(false); logout(); }}>
+                    onClick={() => { setUserMenuOpen(false); logout(); }}>
                     Sair
                   </button>
                 </div>

@@ -1,7 +1,6 @@
 // components/game/RankingModal.jsx
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/context/AuthContext';
-import JuridicalAvatar from '../avatar/JuridicalAvatar';
 import styles from '../auth/Modal.module.css';
 
 export default function RankingModal({ visible, onClose }) {
@@ -58,11 +57,7 @@ export default function RankingModal({ visible, onClose }) {
                         {idx + 1}º
                       </span>
                       <div style={{ margin: '0 15px', display: 'flex', alignItems: 'center' }}>
-                        {user.avatar ? (
-                          <JuridicalAvatar {...user.avatar} size={32} />
-                        ) : (
-                          <span style={{ fontSize: '32px' }}>🧑‍⚖️</span>
-                        )}
+                        <span style={{ fontSize: '32px' }}>🧑‍⚖️</span>
                       </div>
                       <span style={{ flex: 1, fontWeight: isMe ? 'bold' : 'normal' }}>
                         {user.name || 'Anônimo'}

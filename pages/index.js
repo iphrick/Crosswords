@@ -12,7 +12,6 @@ import RegisterModal from '@/components/auth/RegisterModal';
 import FeedbackOverlay from '@/components/notifications/FeedbackOverlay';
 import RankingToast from '@/components/notifications/RankingToast';
 import RankingModal from '@/components/game/RankingModal';
-import CharacterCreator from '@/components/game/CharacterCreator';
 import dynamic from 'next/dynamic';
 import styles from '@/styles/Home.module.css';
 
@@ -30,7 +29,6 @@ export default function Home() {
   const [loginOpen,    setLoginOpen]    = useState(false);
   const [registerOpen, setRegisterOpen] = useState(false);
   const [rankingOpen,  setRankingOpen]  = useState(false);
-  const [avatarOpen,   setAvatarOpen]   = useState(false);
 
   // Game state
   const [subject, setSubject] = useState(SUBJECTS[0]);
@@ -246,7 +244,6 @@ export default function Home() {
         onLoginClick={() => setLoginOpen(true)}
         onRegisterClick={() => setRegisterOpen(true)}
         onRankingClick={() => setRankingOpen(true)}
-        onAvatarEdit={() => setAvatarOpen(true)}
       />
 
       <main className="app">
@@ -254,7 +251,7 @@ export default function Home() {
         {!user && (
           <section className={styles.hero}>
             <div className={styles.heroContent}>
-              <span className={styles.heroBadge}>⚖️ Powered by IA</span>
+
               <h1 className={styles.heroTitle}>Domine o Direito<br /><span>jogando.</span></h1>
               <p className={styles.heroSub}>
                 Cruzadinhas jurídicas geradas por inteligência artificial. Treine para concursos e OAB com um método que gruda.
@@ -388,7 +385,6 @@ export default function Home() {
       <LoginModal    visible={loginOpen}    onClose={() => setLoginOpen(false)} />
       <RegisterModal visible={registerOpen} onClose={() => setRegisterOpen(false)} />
       <RankingModal  visible={rankingOpen}  onClose={() => setRankingOpen(false)} />
-      <CharacterCreator visible={avatarOpen} onClose={() => setAvatarOpen(false)} />
 
       {/* ---- Notifications ---- */}
       <FeedbackOverlay
