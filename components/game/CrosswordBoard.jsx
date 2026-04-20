@@ -70,7 +70,7 @@ export default function CrosswordBoard({ placedWords, onSolved }) {
     const firstInput = grid.querySelector(`.${CLASSES.INPUT}`);
     if (firstInput) {
       const coords = getCoordsFromInput(firstInput, grid);
-      handleCellFocus(firstInput, coords, false, grid, placedWords);
+      handleCellFocus(firstInput, coords, false, grid, placedWords, activeWordRef, directionRef);
     }
   }, [placedWords]);
 
@@ -90,7 +90,7 @@ export default function CrosswordBoard({ placedWords, onSolved }) {
       const inp = e.target.closest(`.${CLASSES.INPUT}`);
       if (!inp) return;
       checkInput(inp);
-      if (inp.value.toUpperCase() === inp.dataset.answer) advanceFocus(inp, grid);
+      if (inp.value.toUpperCase() === inp.dataset.answer) advanceFocus(inp, grid, activeWordRef);
       updateClueStates(grid, placedWords);
       checkAllSolved(grid, placedWords);
     }
@@ -104,7 +104,7 @@ export default function CrosswordBoard({ placedWords, onSolved }) {
         return;
       }
       if (e.key === 'Backspace' && inp.value === '' && activeWordRef.current) {
-        moveFocus(inp, -1, grid);
+        moveFocus(inp, -1, grid, activeWordRef);
       }
     }
 
@@ -112,14 +112,14 @@ export default function CrosswordBoard({ placedWords, onSolved }) {
       const inp = e.target.closest(`.${CLASSES.INPUT}`);
       if (!inp) return;
       const coords = getCoordsFromInput(inp, grid);
-      handleCellFocus(inp, coords, false, grid, placedWords);
+      handleCellFocus(inp, coords, false, grid, placedWords, activeWordRef, directionRef);
     }
 
     function onClick(e) {
       const inp = e.target.closest(`.${CLASSES.INPUT}`);
       if (!inp) return;
       const coords = getCoordsFromInput(inp, grid);
-      handleCellFocus(inp, coords, true, grid, placedWords);
+      handleCellFocus(inp, coords, true, grid, placedWords, activeWordRef, directionRef);
     }
 
     grid.addEventListener('input',   onInput);
@@ -198,7 +198,7 @@ export default function CrosswordBoard({ placedWords, onSolved }) {
     if (!grid) return;
     const word = placedWords.find(w => w.number === number && w.direction === direction);
     if (!word) return;
-    setActiveWord(word, grid, placedWords);
+    setActiveWord(word, grid, activeWordRef, directionRef);
     setActiveNumber(number);
     setActiveDir(direction);
     const inp = cellAt(word.col, word.row, grid)?.querySelector('input');
@@ -258,7 +258,7 @@ function checkInput(inp) {
   inp.classList.toggle(CLASSES.WRONG,   !correct && inp.value !== '');
 }
 
-function setActiveWord(word, grid, placedWords) {
+function setActiveWord(word, grid, activeWordRef, directionRef) {
   activeWordRef.current   = word;
   directionRef.current    = word.direction;
   document.querySelectorAll(`.${CLASSES.SELECTED}`).forEach(el => el.classList.remove(CLASSES.SELECTED));
@@ -277,7 +277,7 @@ function highlightWord(word, grid) {
   }
 }
 
-function handleCellFocus(inp, { col, row }, forceToggle, grid, placedWords) {
+function handleCellFocus(inp, { col, row }, forceToggle, grid, placedWords, activeWordRef, directionRef) {
   const wordsAt   = placedWords.filter(w => isCoordInWord(w, col, row));
   if (!wordsAt.length) return;
   const acrossWord = wordsAt.find(w => w.direction === 'across');
@@ -293,12 +293,12 @@ function handleCellFocus(inp, { col, row }, forceToggle, grid, placedWords) {
   else if (dir === 'down' && downWord) active = downWord;
   else active = acrossWord || downWord;
 
-  setActiveWord(active, grid, placedWords);
+  setActiveWord(active, grid, activeWordRef, directionRef);
 }
 
-function advanceFocus(inp, grid) { moveFocus(inp, 1, grid); }
+function advanceFocus(inp, grid, activeWordRef) { moveFocus(inp, 1, grid, activeWordRef); }
 
-function moveFocus(inp, delta, grid) {
+function moveFocus(inp, delta, grid, activeWordRef) {
   if (!activeWordRef.current) return;
   const { col, row } = getCoordsFromInput(inp, grid);
   const w = activeWordRef.current;
