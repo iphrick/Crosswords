@@ -13,6 +13,7 @@ import FeedbackOverlay from '@/components/notifications/FeedbackOverlay';
 import RankingToast from '@/components/notifications/RankingToast';
 import RankingModal from '@/components/game/RankingModal';
 import ContactModal from '@/components/layout/ContactModal';
+import AvatarSelector from '@/components/avatar/AvatarSelector';
 import dynamic from 'next/dynamic';
 import styles from '@/styles/Home.module.css';
 
@@ -31,6 +32,7 @@ export default function Home() {
   const [registerOpen, setRegisterOpen] = useState(false);
   const [rankingOpen,  setRankingOpen]  = useState(false);
   const [contactOpen,  setContactOpen]  = useState(false);
+  const [avatarOpen,   setAvatarOpen]   = useState(false);
 
   // Game state
   const [subject, setSubject] = useState(SUBJECTS[0]);
@@ -247,6 +249,7 @@ export default function Home() {
         onRegisterClick={() => setRegisterOpen(true)}
         onRankingClick={() => setRankingOpen(true)}
         onContactClick={() => setContactOpen(true)}
+        onAvatarClick={() => setAvatarOpen(true)}
       />
 
       <main className="app">
@@ -389,6 +392,7 @@ export default function Home() {
       <RegisterModal visible={registerOpen} onClose={() => setRegisterOpen(false)} />
       <RankingModal  visible={rankingOpen}  onClose={() => setRankingOpen(false)} />
       <ContactModal  visible={contactOpen}  onClose={() => setContactOpen(false)} />
+      <AvatarSelector visible={avatarOpen}  onClose={() => setAvatarOpen(false)} />
 
       {/* ---- Notifications ---- */}
       <FeedbackOverlay

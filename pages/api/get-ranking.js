@@ -31,6 +31,8 @@ export default async function handler(req, res) {
           name: sanitizePlayerName(data.email || data.phoneNumber, data.nickname),
           totalScore,
           highestLevel,
+          avatarUrl: data.avatarUrl || null,
+          profession: data.profession || null,
         });
       }
     });

@@ -45,28 +45,47 @@ export default function RankingModal({ visible, onClose }) {
                 {ranking.map((user, idx) => {
                   const isMe = gameState?.nickname && user.name?.toLowerCase() === gameState.nickname.toLowerCase();
                   return (
-                    <li key={idx} style={{ 
-                      display: 'flex', 
-                      alignItems: 'center', 
-                      padding: '12px', 
-                      background: isMe ? 'var(--color-surface)' : 'var(--color-surface-2)',
-                      border: isMe ? '1px solid var(--color-accent)' : '1px solid var(--color-border)',
-                      borderRadius: 'var(--radius-md)'
-                    }}>
-                      <span style={{ fontSize: '1.2rem', fontWeight: 'bold', minWidth: '35px', color: idx < 3 ? 'var(--color-accent)' : 'inherit' }}>
-                        {idx + 1}º
-                      </span>
-                      <div style={{ margin: '0 15px', display: 'flex', alignItems: 'center' }}>
-                        <span style={{ fontSize: '32px' }}>🧑‍⚖️</span>
-                      </div>
-                      <span style={{ flex: 1, fontWeight: isMe ? 'bold' : 'normal' }}>
-                        {user.name || 'Anônimo'}
-                      </span>
-                      <strong style={{ color: 'var(--color-accent)' }}>
-                        {user.score} pts
-                      </strong>
-                    </li>
-                  )
+                      <li key={idx} style={{ 
+                        display: 'flex', 
+                        alignItems: 'center', 
+                        padding: '12px', 
+                        background: isMe ? 'rgba(16, 185, 129, 0.05)' : 'rgba(30, 41, 59, 0.5)',
+                        border: isMe ? '1px solid #10b981' : '1px solid #334155',
+                        borderRadius: '12px',
+                        transition: 'transform 0.2s'
+                      }}>
+                        <span style={{ fontSize: '1rem', fontWeight: 'bold', minWidth: '30px', color: idx < 3 ? '#fbbf24' : '#64748b' }}>
+                          {idx + 1}º
+                        </span>
+                        <div style={{ margin: '0 12px', position: 'relative' }}>
+                          {user.avatarUrl ? (
+                            <img 
+                              src={user.avatarUrl} 
+                              alt="Avatar" 
+                              style={{ width: '40px', height: '40px', borderRadius: '50%', border: '2px solid #334155', objectCover: 'cover' }} 
+                            />
+                          ) : (
+                            <span style={{ fontSize: '24px' }}>🧑‍⚖️</span>
+                          )}
+                        </div>
+                        <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
+                          <span style={{ fontWeight: 'bold', color: isMe ? '#fff' : '#cbd5e1', fontSize: '0.95rem' }}>
+                            {user.name || 'Anônimo'}
+                          </span>
+                          {user.profession && (
+                            <span style={{ fontSize: '10px', color: '#64748b', textTransform: 'uppercase', fontWeight: 'bold', letterSpacing: '0.02em' }}>
+                              {user.profession}
+                            </span>
+                          )}
+                        </div>
+                        <div style={{ textAlign: 'right' }}>
+                          <strong style={{ color: '#10b981', display: 'block', fontSize: '1.1rem' }}>
+                            {user.totalScore}
+                          </strong>
+                          <span style={{ fontSize: '9px', color: '#64748b', textTransform: 'uppercase' }}>pts</span>
+                        </div>
+                      </li>
+                    )
                 })}
               </ul>
             )}
