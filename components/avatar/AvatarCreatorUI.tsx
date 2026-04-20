@@ -88,10 +88,10 @@ export default function AvatarCreatorUI({ initialData, maxLevel, onSave, onClose
   };
 
   return (
-    <div className="flex flex-col md:flex-row h-full max-h-[85vh] bg-white dark:bg-slate-900 rounded-lg overflow-hidden border border-slate-200 dark:border-slate-800 font-sans shadow-2xl">
+    <div className="flex flex-col md:flex-row h-full max-h-[85vh] bg-surface rounded-lg overflow-hidden border border-border font-sans shadow-2xl">
       {/* Esquerda: Preview */}
-      <div className="w-full md:w-5/12 bg-slate-50 dark:bg-slate-950 p-6 flex flex-col items-center justify-center border-b md:border-b-0 md:border-r border-slate-200 dark:border-slate-800 relative">
-        <div className="absolute top-4 left-4 bg-amber-500 text-amber-950 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider shadow-sm">
+      <div className="w-full md:w-5/12 bg-surface2 p-6 flex flex-col items-center justify-center border-b md:border-b-0 md:border-r border-border relative">
+        <div className="absolute top-4 left-4 bg-accent text-surface text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider shadow-sm">
           {rank}
         </div>
         
@@ -108,10 +108,10 @@ export default function AvatarCreatorUI({ initialData, maxLevel, onSave, onClose
         </div>
 
         <div className="mt-8 flex gap-3 w-full max-w-xs">
-          <button onClick={randomAvatar} className="flex-1 py-2 px-4 bg-slate-200 dark:bg-slate-800 text-slate-800 dark:text-slate-200 font-semibold rounded-lg hover:bg-slate-300 dark:hover:bg-slate-700 transition">
+          <button onClick={randomAvatar} className="flex-1 py-2 px-4 bg-surface text-text font-semibold rounded-lg border border-border hover:border-accent transition">
             🎲 Aleatório
           </button>
-          <button onClick={handleExport} className="flex-1 py-2 px-4 bg-slate-200 dark:bg-slate-800 text-slate-800 dark:text-slate-200 font-semibold rounded-lg hover:bg-slate-300 dark:hover:bg-slate-700 transition">
+          <button onClick={handleExport} className="flex-1 py-2 px-4 bg-surface text-text font-semibold rounded-lg border border-border hover:border-accent transition">
             📸 Exportar
           </button>
         </div>
@@ -120,15 +120,15 @@ export default function AvatarCreatorUI({ initialData, maxLevel, onSave, onClose
       {/* Direita: Controles */}
       <div className="w-full md:w-7/12 flex flex-col h-[50vh] md:h-auto">
         {/* Abas */}
-        <div className="flex overflow-x-auto border-b border-slate-200 dark:border-slate-800 shrink-0 custom-scrollbar">
+        <div className="flex overflow-x-auto border-b border-border shrink-0 custom-scrollbar">
           {['Face', 'Cabelo', 'Roupa', 'Acessórios', 'Fundo'].map(cat => (
             <button
               key={cat}
               onClick={() => setCategory(cat as any)}
               className={`px-5 py-4 text-sm font-semibold whitespace-nowrap transition-colors ${
                 category === cat 
-                  ? 'text-amber-600 dark:text-amber-500 border-b-2 border-amber-500' 
-                  : 'text-slate-500 hover:text-slate-800 dark:hover:text-slate-300'
+                  ? 'text-accent border-b-2 border-accent' 
+                  : 'text-textMuted hover:text-text'
               }`}
             >
               {cat}
@@ -137,23 +137,23 @@ export default function AvatarCreatorUI({ initialData, maxLevel, onSave, onClose
         </div>
 
         {/* Painel de Opções */}
-        <div className="flex-1 overflow-y-auto p-6 bg-white dark:bg-slate-900 custom-scrollbar">
+        <div className="flex-1 overflow-y-auto p-6 bg-surface custom-scrollbar">
           
           {category === 'Face' && (
             <div className="space-y-6">
               <div>
-                <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Tom de Pele</label>
+                <label className="block text-sm font-medium text-text mb-2">Tom de Pele</label>
                 <div className="grid grid-cols-4 gap-2">
                   {skinColors.map(c => (
-                    <button key={c} onClick={() => setSkinColor(c)} className={`p-2 rounded border ${skinColor === c ? 'border-amber-500 bg-amber-50 dark:bg-amber-900/20' : 'border-slate-200 dark:border-slate-700'}`}>
+                    <button key={c} onClick={() => setSkinColor(c)} className={`p-2 rounded border ${skinColor === c ? 'border-accent bg-accentDim text-accent font-semibold' : 'border-border text-text'}`}>
                       {c}
                     </button>
                   ))}
                 </div>
               </div>
               <div>
-                <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Barba / Bigode</label>
-                <select value={facialHairType} onChange={e => setFacialHairType(e.target.value)} className="w-full p-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-slate-800 dark:text-slate-200 outline-none focus:border-amber-500">
+                <label className="block text-sm font-medium text-text mb-2">Barba / Bigode</label>
+                <select value={facialHairType} onChange={e => setFacialHairType(e.target.value)} className="w-full p-2.5 bg-surface2 border border-border rounded-lg text-text outline-none focus:border-accent">
                   {facialHairTypes.map(h => <option key={h} value={h}>{h}</option>)}
                 </select>
               </div>
@@ -163,16 +163,16 @@ export default function AvatarCreatorUI({ initialData, maxLevel, onSave, onClose
           {category === 'Cabelo' && (
             <div className="space-y-6">
               <div>
-                <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Estilo de Cabelo</label>
-                <select value={topType} onChange={e => setTopType(e.target.value)} className="w-full p-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-slate-800 dark:text-slate-200 outline-none focus:border-amber-500">
+                <label className="block text-sm font-medium text-text mb-2">Estilo de Cabelo</label>
+                <select value={topType} onChange={e => setTopType(e.target.value)} className="w-full p-2.5 bg-surface2 border border-border rounded-lg text-text outline-none focus:border-accent">
                   {topTypes.map(h => <option key={h} value={h}>{h.replace(/([A-Z])/g, ' $1').trim()}</option>)}
                 </select>
               </div>
               <div>
-                <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Cor do Cabelo</label>
+                <label className="block text-sm font-medium text-text mb-2">Cor do Cabelo</label>
                 <div className="grid grid-cols-3 gap-2">
                   {hairColors.map(c => (
-                    <button key={c} onClick={() => setHairColor(c)} className={`p-2 text-sm rounded border ${hairColor === c ? 'border-amber-500 bg-amber-50 dark:bg-amber-900/20 text-amber-700 dark:text-amber-400 font-semibold' : 'border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400'}`}>
+                    <button key={c} onClick={() => setHairColor(c)} className={`p-2 text-sm rounded border ${hairColor === c ? 'border-accent bg-accentDim text-accent font-semibold' : 'border-border text-textMuted'}`}>
                       {c.replace(/([A-Z])/g, ' $1').trim()}
                     </button>
                   ))}
@@ -183,14 +183,14 @@ export default function AvatarCreatorUI({ initialData, maxLevel, onSave, onClose
 
           {category === 'Roupa' && (
             <div className="space-y-4">
-              <p className="text-sm text-slate-500 dark:text-slate-400 mb-4">Roupas são desbloqueadas conforme seu nível (ranking).</p>
+              <p className="text-sm text-textMuted mb-4">Roupas são desbloqueadas conforme seu nível (ranking).</p>
               {availableClothes.map(c => (
                 <button
                   key={c.id}
                   onClick={() => setCustomClothe(c.id)}
-                  className={`w-full text-left p-4 rounded-xl border-2 transition-all ${customClothe === c.id ? 'border-amber-500 bg-amber-50 dark:bg-amber-900/20 shadow-md' : 'border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600'}`}
+                  className={`w-full text-left p-4 rounded-xl border transition-all ${customClothe === c.id ? 'border-accent bg-accentDim shadow-md' : 'border-border hover:border-accent'}`}
                 >
-                  <span className="font-semibold text-slate-800 dark:text-slate-200">{c.label}</span>
+                  <span className="font-semibold text-text">{c.label}</span>
                 </button>
               ))}
             </div>
@@ -202,9 +202,9 @@ export default function AvatarCreatorUI({ initialData, maxLevel, onSave, onClose
                 <button
                   key={a.id}
                   onClick={() => setCustomAccessory(a.id)}
-                  className={`w-full text-left p-4 rounded-xl border-2 transition-all ${customAccessory === a.id ? 'border-amber-500 bg-amber-50 dark:bg-amber-900/20 shadow-md' : 'border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600'}`}
+                  className={`w-full text-left p-4 rounded-xl border transition-all ${customAccessory === a.id ? 'border-accent bg-accentDim shadow-md' : 'border-border hover:border-accent'}`}
                 >
-                  <span className="font-semibold text-slate-800 dark:text-slate-200">{a.label}</span>
+                  <span className="font-semibold text-text">{a.label}</span>
                 </button>
               ))}
             </div>
@@ -216,9 +216,9 @@ export default function AvatarCreatorUI({ initialData, maxLevel, onSave, onClose
                 <button
                   key={b}
                   onClick={() => setBackground(b)}
-                  className={`w-full text-left p-4 rounded-xl border-2 capitalize transition-all ${background === b ? 'border-amber-500 bg-amber-50 dark:bg-amber-900/20 shadow-md' : 'border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600'}`}
+                  className={`w-full text-left p-4 rounded-xl border capitalize transition-all ${background === b ? 'border-accent bg-accentDim shadow-md' : 'border-border hover:border-accent'}`}
                 >
-                  <span className="font-semibold text-slate-800 dark:text-slate-200">{b.replace('lawOffice', 'Escritório').replace('courtroom', 'Tribunal').replace('minimal', 'Minimalista')}</span>
+                  <span className="font-semibold text-text">{b.replace('lawOffice', 'Escritório').replace('courtroom', 'Tribunal').replace('minimal', 'Minimalista')}</span>
                 </button>
               ))}
             </div>
@@ -227,14 +227,14 @@ export default function AvatarCreatorUI({ initialData, maxLevel, onSave, onClose
         </div>
 
         {/* Rodapé: Salvar */}
-        <div className="p-4 border-t border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 flex justify-end shrink-0 gap-3">
-          <button onClick={onClose} className="px-6 py-2.5 font-semibold text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition">
+        <div className="p-4 border-t border-border bg-surface flex justify-end shrink-0 gap-3">
+          <button onClick={onClose} className="px-6 py-2.5 font-semibold text-textMuted hover:text-text hover:bg-surface2 rounded-lg transition">
             Cancelar
           </button>
           <button 
             onClick={handleSave} 
             disabled={loading}
-            className="px-8 py-2.5 font-semibold bg-amber-500 hover:bg-amber-600 text-white rounded-lg shadow-lg shadow-amber-500/30 transition transform active:scale-95 flex items-center justify-center min-w-[120px]"
+            className="px-8 py-2.5 font-semibold bg-accent hover:opacity-90 text-surface rounded-lg shadow-lg shadow-accent/30 transition transform active:scale-95 flex items-center justify-center min-w-[120px]"
           >
             {loading ? 'Salvando...' : 'Salvar Avatar'}
           </button>
