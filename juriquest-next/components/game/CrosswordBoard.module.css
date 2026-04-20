@@ -1,0 +1,41 @@
+/* components/game/CrosswordBoard.module.css */
+
+.board {
+  display: flex;
+  gap: var(--space-xl);
+  align-items: flex-start;
+  animation: fadeIn 0.3s ease;
+}
+
+.gridWrapper {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+  width: 100%;
+  overflow-x: auto;
+  padding-bottom: 15px;
+}
+
+.gridWrapper :global(.grid) {
+  display: grid;
+  border: 2px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  background: var(--color-bg);
+  width: max-content;
+  margin: 0 auto;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+}
+
+.actions {
+  display: flex;
+  gap: var(--space-sm);
+  flex-wrap: wrap;
+  justify-content: flex-start;
+}
+
+@keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+@media (max-width: 768px) {
+  .board { flex-direction: column; align-items: center; }
+}

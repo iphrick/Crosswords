@@ -1240,6 +1240,11 @@ const app = {
       this.elements.gameAvatarImg.src = CharacterCreator.getAvatarUrl(avatar);
     }
 
+    // Inicializa sistema de notificações com o nome do usuário
+    if (window.JuriNotify) {
+      window.JuriNotify.setup(displayName).catch(console.warn);
+    }
+
     Feedback.show('Bem-vindo ao jogo!', 'success', 3000);
   },
 
@@ -1253,6 +1258,8 @@ const app = {
     this.elements.authRequiredMessage.classList.remove(UI_CLASSES.HIDDEN);
     this.elements.gameContent.classList.add(UI_CLASSES.HIDDEN);
     if (this.elements.gameAvatarDisplay) this.elements.gameAvatarDisplay.classList.add(UI_CLASSES.HIDDEN);
+    // Para o polling de ranking ao deslogar
+    if (window.JuriNotify) window.JuriNotify.teardown();
   },
 
   async _handleLogin(e) {
@@ -1478,12 +1485,15 @@ const app = {
 
   async onLevelComplete() {
     const subject = this.elements.subjectSelect.value;
-    if (GameState.isLevelCompleted(subject)) return; // Previne que a função seja executada múltiplas vezes
+    if (GameState.isLevelCompleted(subject)) return;
+
+    const level = GameState.getCurrentLevel(subject);
 
     // Se "Revelar Tudo" foi usado, o usuário não conclui a fase de forma justa.
     if (this.wasRevealAllUsed) {
       Feedback.show("🚨 Fase revelada! Você não pontuou. Clique em 'Próximo Nível' para continuar.", "error", 0);
-      // Apenas libera o próximo nível, sem salvar progresso de pontos ou palavras.
+      // Notifica falha (revelar = desistência)
+      if (window.JuriNotify) window.JuriNotify.onPhaseFail(subject, level);
       GameState.unlockNextLevel(subject);
       await GameState.save();
       this.elements.nextLevelBtn.classList.remove(UI_CLASSES.HIDDEN);
@@ -1496,11 +1506,13 @@ const app = {
     GameState.setLevelCompleted(subject, true);
     const MAX_HINTS_FOR_SCORE = 3;
 
+    // Feedback jurídico de sucesso (overlay premium)
+    if (window.JuriNotify) {
+      window.JuriNotify.onPhaseSuccess(subject, level);
+    }
+
     if (this.hintCounter <= MAX_HINTS_FOR_SCORE) {
-      Feedback.show(`🎉 Parabéns! Você completou a fase com ${this.hintCounter} dicas e ganhou 100 pontos!`, 'success', 8000);
       GameState.addScore(subject, 100);
-    } else {
-      Feedback.show(`👍 Fase completa! Como você usou mais de ${MAX_HINTS_FOR_SCORE} dicas, não foram adicionados pontos.`, 'info', 8000);
     }
 
     // Salva as palavras usadas e atualiza o placar
@@ -1509,7 +1521,16 @@ const app = {
     this._updateScoreDisplay();
 
     GameState.unlockNextLevel(subject);
-    await GameState.save(); // Salva todas as alterações de uma só vez!
+    await GameState.save();
+
+    // Verifica ranking após salvar
+    try {
+      const res = await fetch('/api/get-ranking');
+      if (res.ok) {
+        const data = await res.json();
+        if (window.JuriNotify) window.JuriNotify.onRankingUpdate(data.ranking);
+      }
+    } catch (_) {}
 
     this.elements.nextLevelBtn.classList.remove(UI_CLASSES.HIDDEN);
     this.elements.crosswordActions.classList.add(UI_CLASSES.HIDDEN);

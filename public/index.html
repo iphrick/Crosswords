@@ -40,8 +40,38 @@
             margin: 0 auto;
         }
         
+        /* --- Ajustes do Cabeçalho (Evita sobreposição do Avatar/Nome com a Logo) --- */
+        .app__header {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            gap: 15px;
+        }
+        #user-status {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        #user-display {
+            display: flex;
+            align-items: center;
+        }
+        #user-avatar-thumb {
+            flex-shrink: 0; /* Impede que o avatar seja "espremido" se o nome for longo */
+        }
+        
         /* As regras dentro do @media afetam APENAS celulares (telas menores que 768px) */
         @media (max-width: 768px) {
+            .app__header {
+                flex-direction: column; /* Coloca a logo em cima e o avatar embaixo no celular */
+                text-align: center;
+            }
+            #user-status {
+                justify-content: center;
+                width: 100%;
+            }
             .crossword {
                 flex-direction: column !important;
                 align-items: center;
@@ -246,5 +276,6 @@
     </div>
 </div>
 <script src="/script.js"></script>
+<script src="/notifications.js"></script>
 </body>
 </html>

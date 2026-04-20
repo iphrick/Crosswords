@@ -1,0 +1,45 @@
+/* components/notifications/RankingToast.module.css */
+
+.toast {
+  position: fixed;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%) translateY(-140px);
+  z-index: 9997;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: linear-gradient(135deg, var(--color-surface), var(--color-surface-2));
+  border: 1px solid rgba(201, 169, 110, 0.4);
+  border-radius: 50px;
+  padding: 12px 24px;
+  max-width: 90vw;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+  cursor: pointer;
+  user-select: none;
+  backdrop-filter: blur(10px);
+  transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.toast.visible {
+  transform: translateX(-50%) translateY(0);
+}
+
+.toastIcon { font-size: 1.4rem; }
+
+.toastMsg {
+  font-family: var(--font-body);
+  font-size: 0.9rem;
+  font-weight: 600;
+  line-height: 1.3;
+  color: var(--color-accent);
+}
+
+.success .toastMsg { color: var(--color-correct); }
+.success { border-color: rgba(76, 175, 125, 0.4); }
+
+.error   .toastMsg { color: var(--color-wrong); }
+.error   { border-color: rgba(224, 92, 92, 0.4); }
+
+.warning .toastMsg { color: #f59e0b; }
+.warning { border-color: rgba(245, 158, 11, 0.4); }
