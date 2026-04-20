@@ -170,15 +170,15 @@ export default function ContactModal({ visible, onClose }) {
               Qualquer contribuição via PIX nos ajuda a continuar melhorando e deixando o JuriQuest exatamente como vocês gostam.
             </p>
 
-            <div className="bg-gray-800/50 border border-gray-700 rounded-2xl p-4 mx-auto w-fit mb-6 shadow-inner">
-              <div className="bg-white p-2 rounded-lg shadow-lg flex items-center justify-center">
+            <div className="bg-gray-800/50 border border-gray-700 rounded-2xl p-4 mx-auto w-fit mb-6 shadow-2xl">
+              <div className="bg-white p-2 rounded-lg shadow-inner flex items-center justify-center mx-auto">
                 {PIX_QR_CODE_IMG ? (
-                  <img src={PIX_QR_CODE_IMG} alt="QR Code do PIX" className="w-48 h-48 object-contain" />
+                  <img src={PIX_QR_CODE_IMG} alt="QR Code do PIX" className="w-56 h-56 object-contain" />
                 ) : (
-                  <div className="w-48 h-48 flex items-center justify-center">
+                  <div className="w-56 h-56 flex items-center justify-center">
                     <div className="text-center px-4">
-                      <p className="text-gray-800 text-xs font-bold mb-1">Seu QR Code Aqui</p>
-                      <p className="text-gray-400 text-[9px] leading-tight">
+                      <p className="text-gray-800 text-sm font-bold mb-1">Seu QR Code Aqui</p>
+                      <p className="text-gray-400 text-[10px] leading-tight">
                         Adicione a imagem na pasta public e atualize o código.
                       </p>
                     </div>

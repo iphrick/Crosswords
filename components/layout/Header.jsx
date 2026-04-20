@@ -56,13 +56,13 @@ export default function Header({ onLoginClick, onRegisterClick, onRankingClick, 
                 aria-label="Menu de usuário"
               >
                 {avatarUrl ? (
-                  <img src={avatarUrl} alt="Avatar" className="w-8 h-8 rounded-full border-2 border-emerald-500 object-cover" />
+                  <img src={avatarUrl} alt="Avatar" className="w-10 h-10 rounded-full border-2 border-emerald-500 shadow-lg object-cover" />
                 ) : (
-                  <span className={styles.avatarEmoji}>🧑‍⚖️</span>
+                  <span className="text-2xl">🧑‍⚖️</span>
                 )}
-                <div className="flex flex-col items-start leading-tight">
-                  <span className={styles.avatarName}>{displayName}</span>
-                  {profession && <span className="text-[10px] text-slate-400 uppercase font-bold">{profession}</span>}
+                <div className="flex flex-col items-start leading-tight ml-1">
+                  <span className="text-base font-bold text-white tracking-tight">{displayName}</span>
+                  {profession && <span className="text-[11px] text-emerald-400 uppercase font-extrabold tracking-wider">{profession}</span>}
                 </div>
                 <span className={styles.avatarCaret}>▾</span>
               </button>
