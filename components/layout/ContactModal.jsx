@@ -114,8 +114,8 @@ export default function ContactModal({ visible, onClose }) {
                     type="button"
                     onClick={() => setSentiment('positive')}
                     className={`flex-1 py-2 px-3 rounded-lg border flex items-center justify-center gap-2 transition-colors ${sentiment === 'positive'
-                        ? 'bg-green-600/20 border-green-500 text-green-400'
-                        : 'bg-gray-800 border-gray-700 text-gray-400 hover:bg-gray-700'
+                      ? 'bg-green-600/20 border-green-500 text-green-400'
+                      : 'bg-gray-800 border-gray-700 text-gray-400 hover:bg-gray-700'
                       }`}
                   >
                     <span>🟢</span> Elogio / Ideia
@@ -124,8 +124,8 @@ export default function ContactModal({ visible, onClose }) {
                     type="button"
                     onClick={() => setSentiment('negative')}
                     className={`flex-1 py-2 px-3 rounded-lg border flex items-center justify-center gap-2 transition-colors ${sentiment === 'negative'
-                        ? 'bg-red-600/20 border-red-500 text-red-400'
-                        : 'bg-gray-800 border-gray-700 text-gray-400 hover:bg-gray-700'
+                      ? 'bg-red-600/20 border-red-500 text-red-400'
+                      : 'bg-gray-800 border-gray-700 text-gray-400 hover:bg-gray-700'
                       }`}
                   >
                     <span>🔴</span> Crítica / Erro
@@ -166,23 +166,25 @@ export default function ContactModal({ visible, onClose }) {
             </div>
             <h3 className="text-lg font-bold text-white mb-2">Ajude o JuriQuest a crescer!</h3>
             <p className="text-sm text-gray-400 mb-6 px-4">
-              O projeto é gratuito, mas os custos com inteligência artificial e servidores existem.
-              Qualquer contribuição via PIX nos ajuda a continuar melhorando e adicionando novas questões.
+              O projeto é gratuito, mas requer empenho e tempo dedicados assim como custos com servidores.
+              Qualquer contribuição via PIX nos ajuda a continuar melhorando e deixando o JuriQuest exatamente como vocês gostam.
             </p>
 
-            <div className="bg-gray-800 border border-gray-700 rounded-xl p-6 mx-auto max-w-[280px] mb-6">
-              {PIX_QR_CODE_IMG ? (
-                <img src={PIX_QR_CODE_IMG} alt="QR Code do PIX" className="w-full h-auto rounded-lg" />
-              ) : (
-                <div className="w-full aspect-square bg-white rounded-lg flex items-center justify-center p-4">
-                  <div className="text-center">
-                    <p className="text-gray-800 text-sm font-bold mb-2">Seu QR Code Pix Aqui</p>
-                    <p className="text-gray-500 text-[10px] leading-tight">
-                      Substitua a variável PIX_QR_CODE_IMG com o caminho da imagem do seu QR code no código fonte.
-                    </p>
+            <div className="bg-gray-800/50 border border-gray-700 rounded-2xl p-4 mx-auto w-fit mb-6 shadow-inner">
+              <div className="bg-white p-2 rounded-lg shadow-lg flex items-center justify-center">
+                {PIX_QR_CODE_IMG ? (
+                  <img src={PIX_QR_CODE_IMG} alt="QR Code do PIX" className="w-48 h-48 object-contain" />
+                ) : (
+                  <div className="w-48 h-48 flex items-center justify-center">
+                    <div className="text-center px-4">
+                      <p className="text-gray-800 text-xs font-bold mb-1">Seu QR Code Aqui</p>
+                      <p className="text-gray-400 text-[9px] leading-tight">
+                        Adicione a imagem na pasta public e atualize o código.
+                      </p>
+                    </div>
                   </div>
-                </div>
-              )}
+                )}
+              </div>
             </div>
 
             <p className="text-xs text-gray-400 mb-2 uppercase tracking-wide">Ou use o Pix Copia e Cola:</p>
