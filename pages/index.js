@@ -11,6 +11,8 @@ import LoginModal from '@/components/auth/LoginModal';
 import RegisterModal from '@/components/auth/RegisterModal';
 import FeedbackOverlay from '@/components/notifications/FeedbackOverlay';
 import RankingToast from '@/components/notifications/RankingToast';
+import RankingModal from '@/components/game/RankingModal';
+import CharacterCreator from '@/components/game/CharacterCreator';
 import dynamic from 'next/dynamic';
 import styles from '@/styles/Home.module.css';
 
@@ -27,6 +29,8 @@ export default function Home() {
   // Modals
   const [loginOpen,    setLoginOpen]    = useState(false);
   const [registerOpen, setRegisterOpen] = useState(false);
+  const [rankingOpen,  setRankingOpen]  = useState(false);
+  const [avatarOpen,   setAvatarOpen]   = useState(false);
 
   // Game state
   const [subject, setSubject] = useState(SUBJECTS[0]);
@@ -241,8 +245,8 @@ export default function Home() {
       <Header
         onLoginClick={() => setLoginOpen(true)}
         onRegisterClick={() => setRegisterOpen(true)}
-        onRankingClick={() => {/* TODO: RankingModal */}}
-        onAvatarEdit={() => {/* TODO: CharacterCreator */}}
+        onRankingClick={() => setRankingOpen(true)}
+        onAvatarEdit={() => setAvatarOpen(true)}
       />
 
       <main className="app">
@@ -383,6 +387,8 @@ export default function Home() {
       {/* ---- Modals ---- */}
       <LoginModal    visible={loginOpen}    onClose={() => setLoginOpen(false)} />
       <RegisterModal visible={registerOpen} onClose={() => setRegisterOpen(false)} />
+      <RankingModal  visible={rankingOpen}  onClose={() => setRankingOpen(false)} />
+      <CharacterCreator visible={avatarOpen} onClose={() => setAvatarOpen(false)} />
 
       {/* ---- Notifications ---- */}
       <FeedbackOverlay
