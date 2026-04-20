@@ -11,12 +11,10 @@ const backgrounds = ['minimal', 'courtroom', 'lawOffice'] as const;
 export default function AvatarCreatorUI({ initialData, maxLevel, onSave, onClose }: any) {
   const avatarRef = useRef<HTMLDivElement>(null);
 
-  // Avatar State
   const [topType, setTopType] = useState(initialData?.topType || 'ShortHairShortFlat');
   const [hairColor, setHairColor] = useState(initialData?.hairColor || 'BrownDark');
   const [facialHairType, setFacialHairType] = useState(initialData?.facialHairType || 'Blank');
   const [skinColor, setSkinColor] = useState(initialData?.skinColor || 'Light');
-  
   const [background, setBackground] = useState<any>(initialData?.background || 'minimal');
   const [customClothe, setCustomClothe] = useState<any>(initialData?.customClothe || 'None');
   const [customAccessory, setCustomAccessory] = useState<any>(initialData?.customAccessory || 'None');
@@ -24,7 +22,6 @@ export default function AvatarCreatorUI({ initialData, maxLevel, onSave, onClose
   const [loading, setLoading] = useState(false);
   const [category, setCategory] = useState<'Face' | 'Cabelo' | 'Roupa' | 'Acessórios' | 'Fundo'>('Face');
 
-  // Lógica de Nível
   const rank = useMemo(() => {
     if (maxLevel >= 7) return 'Juiz';
     if (maxLevel >= 5) return 'Promotor';
@@ -56,7 +53,6 @@ export default function AvatarCreatorUI({ initialData, maxLevel, onSave, onClose
     return list;
   }, [maxLevel]);
 
-  // Exportar como PNG
   const handleExport = async () => {
     if (!avatarRef.current) return;
     try {
@@ -90,16 +86,12 @@ export default function AvatarCreatorUI({ initialData, maxLevel, onSave, onClose
   const formatName = (str: string) => str.replace(/([A-Z])/g, ' $1').trim();
 
   return (
-    <div className="w-full bg-gray-900 text-gray-100 rounded-xl overflow-y-auto max-h-[90vh] custom-scrollbar">
-      <div className="max-w-4xl mx-auto px-4 py-6">
+    <div className="min-h-screen bg-gray-900 flex justify-center w-full font-sans text-gray-100">
+      <div className="w-full max-w-4xl px-4 py-6 flex flex-col">
         
-        {/* Avatar (preview) */}
-        <div className="flex justify-center mb-6 relative">
-          <div className="absolute top-0 right-0 md:right-10 bg-blue-600 text-xs px-3 py-1 rounded-full font-bold shadow-md">
-            Rank: {rank}
-          </div>
-          
-          <div ref={avatarRef} className="w-[160px] h-[160px] rounded-xl shadow-lg border border-gray-700 bg-gray-800 flex items-center justify-center">
+        {/* Avatar Centralizado */}
+        <div className="flex justify-center mb-6">
+          <div ref={avatarRef} className="w-[160px] h-[160px] rounded-xl overflow-hidden bg-gray-800 border border-gray-700 shadow-xl flex items-center justify-center relative">
             <JuridicalAvatar
               topType={topType}
               hairColor={hairColor}
@@ -113,16 +105,14 @@ export default function AvatarCreatorUI({ initialData, maxLevel, onSave, onClose
           </div>
         </div>
 
-        {/* Abas (menu) */}
-        <div className="flex gap-2 justify-center flex-wrap mb-6">
+        {/* Menu de Abas */}
+        <div className="flex justify-center gap-2 flex-wrap mb-6">
           {['Face', 'Cabelo', 'Roupa', 'Acessórios', 'Fundo'].map(cat => (
             <button
               key={cat}
               onClick={() => setCategory(cat as any)}
               className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                category === cat 
-                  ? 'bg-blue-600 text-white shadow-md' 
-                  : 'bg-gray-800 hover:bg-gray-700 text-gray-300 border border-gray-700'
+                category === cat ? 'bg-blue-600 text-white' : 'bg-gray-800 text-gray-300 hover:bg-gray-700'
               }`}
             >
               {cat}
@@ -130,20 +120,20 @@ export default function AvatarCreatorUI({ initialData, maxLevel, onSave, onClose
           ))}
         </div>
 
-        {/* Área de opções */}
-        <div className="bg-gray-800 rounded-xl p-4 shadow-inner border border-gray-700">
+        {/* Área de Opções (Grid) */}
+        <div className="bg-gray-800 rounded-xl p-4 md:p-6 mb-6 flex-1 overflow-y-auto custom-scrollbar">
           
           {category === 'Face' && (
-            <div className="space-y-6">
+            <div className="flex flex-col gap-6">
               <div>
-                <p className="text-xs text-gray-400 uppercase tracking-wider mb-3">Tom de Pele</p>
+                <h3 className="text-gray-400 text-xs uppercase mb-3">Tom de Pele</h3>
                 <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
                   {skinColors.map(c => (
                     <button
                       key={c}
                       onClick={() => setSkinColor(c)}
-                      className={`px-3 py-2 rounded-lg text-sm transition-colors border ${
-                        skinColor === c ? 'bg-blue-600 border-blue-500 text-white' : 'bg-gray-700 hover:bg-gray-600 border-gray-600'
+                      className={`px-3 py-2 rounded-lg text-sm transition-colors text-center border ${
+                        skinColor === c ? 'bg-blue-600 border-blue-500 text-white' : 'bg-gray-700 hover:bg-gray-600 border-gray-600 text-gray-200'
                       }`}
                     >
                       {c}
@@ -152,14 +142,14 @@ export default function AvatarCreatorUI({ initialData, maxLevel, onSave, onClose
                 </div>
               </div>
               <div>
-                <p className="text-xs text-gray-400 uppercase tracking-wider mb-3">Barba / Bigode</p>
+                <h3 className="text-gray-400 text-xs uppercase mb-3">Barba / Bigode</h3>
                 <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
                   {facialHairTypes.map(h => (
                     <button
                       key={h}
                       onClick={() => setFacialHairType(h)}
-                      className={`px-3 py-2 rounded-lg text-sm transition-colors border truncate ${
-                        facialHairType === h ? 'bg-blue-600 border-blue-500 text-white' : 'bg-gray-700 hover:bg-gray-600 border-gray-600'
+                      className={`px-3 py-2 rounded-lg text-sm transition-colors text-center border truncate ${
+                        facialHairType === h ? 'bg-blue-600 border-blue-500 text-white' : 'bg-gray-700 hover:bg-gray-600 border-gray-600 text-gray-200'
                       }`}
                     >
                       {h === 'Blank' ? 'Nenhum' : formatName(h).replace('Beard', 'Barba ').replace('Moustache', 'Bigode ')}
@@ -171,16 +161,16 @@ export default function AvatarCreatorUI({ initialData, maxLevel, onSave, onClose
           )}
 
           {category === 'Cabelo' && (
-            <div className="space-y-6">
+            <div className="flex flex-col gap-6">
               <div>
-                <p className="text-xs text-gray-400 uppercase tracking-wider mb-3">Cor do Cabelo</p>
+                <h3 className="text-gray-400 text-xs uppercase mb-3">Cor do Cabelo</h3>
                 <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
                   {hairColors.map(c => (
                     <button
                       key={c}
                       onClick={() => setHairColor(c)}
-                      className={`px-3 py-2 rounded-lg text-sm transition-colors border ${
-                        hairColor === c ? 'bg-blue-600 border-blue-500 text-white' : 'bg-gray-700 hover:bg-gray-600 border-gray-600'
+                      className={`px-3 py-2 rounded-lg text-sm transition-colors text-center border ${
+                        hairColor === c ? 'bg-blue-600 border-blue-500 text-white' : 'bg-gray-700 hover:bg-gray-600 border-gray-600 text-gray-200'
                       }`}
                     >
                       {formatName(c)}
@@ -189,14 +179,14 @@ export default function AvatarCreatorUI({ initialData, maxLevel, onSave, onClose
                 </div>
               </div>
               <div>
-                <p className="text-xs text-gray-400 uppercase tracking-wider mb-3">Estilo de Cabelo</p>
-                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 max-h-64 overflow-y-auto pr-2 custom-scrollbar">
+                <h3 className="text-gray-400 text-xs uppercase mb-3">Estilo de Cabelo</h3>
+                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
                   {topTypes.map(h => (
                     <button
                       key={h}
                       onClick={() => setTopType(h)}
-                      className={`px-3 py-2 rounded-lg text-sm transition-colors border truncate ${
-                        topType === h ? 'bg-blue-600 border-blue-500 text-white' : 'bg-gray-700 hover:bg-gray-600 border-gray-600'
+                      className={`px-3 py-2 rounded-lg text-sm transition-colors text-center border truncate ${
+                        topType === h ? 'bg-blue-600 border-blue-500 text-white' : 'bg-gray-700 hover:bg-gray-600 border-gray-600 text-gray-200'
                       }`}
                       title={formatName(h)}
                     >
@@ -209,97 +199,98 @@ export default function AvatarCreatorUI({ initialData, maxLevel, onSave, onClose
           )}
 
           {category === 'Roupa' && (
-            <div>
-              <p className="text-xs text-gray-400 uppercase tracking-wider mb-3">Trajes Formal (Por Nível)</p>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                {availableClothes.map(c => (
-                  <button
-                    key={c.id}
-                    onClick={() => setCustomClothe(c.id)}
-                    className={`px-3 py-3 flex justify-between items-center rounded-lg text-sm transition-colors border ${
-                      customClothe === c.id ? 'bg-blue-600 border-blue-500 text-white' : 'bg-gray-700 hover:bg-gray-600 border-gray-600'
-                    }`}
-                  >
-                    <span>{c.label}</span>
-                    {customClothe === c.id && <span>✓</span>}
-                  </button>
-                ))}
+            <div className="flex flex-col gap-6">
+              <div>
+                <h3 className="text-gray-400 text-xs uppercase mb-3">Trajes Formal</h3>
+                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
+                  {availableClothes.map(c => (
+                    <button
+                      key={c.id}
+                      onClick={() => setCustomClothe(c.id)}
+                      className={`px-3 py-2 rounded-lg text-sm transition-colors text-center border truncate ${
+                        customClothe === c.id ? 'bg-blue-600 border-blue-500 text-white' : 'bg-gray-700 hover:bg-gray-600 border-gray-600 text-gray-200'
+                      }`}
+                    >
+                      {c.label}
+                    </button>
+                  ))}
+                </div>
               </div>
             </div>
           )}
 
           {category === 'Acessórios' && (
-            <div>
-              <p className="text-xs text-gray-400 uppercase tracking-wider mb-3">Acessórios de Prestígio</p>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                {availableAccessories.map(a => (
-                  <button
-                    key={a.id}
-                    onClick={() => setCustomAccessory(a.id)}
-                    className={`px-3 py-3 flex justify-between items-center rounded-lg text-sm transition-colors border ${
-                      customAccessory === a.id ? 'bg-blue-600 border-blue-500 text-white' : 'bg-gray-700 hover:bg-gray-600 border-gray-600'
-                    }`}
-                  >
-                    <span>{a.label}</span>
-                    {customAccessory === a.id && <span>✓</span>}
-                  </button>
-                ))}
+            <div className="flex flex-col gap-6">
+              <div>
+                <h3 className="text-gray-400 text-xs uppercase mb-3">Acessórios de Prestígio</h3>
+                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
+                  {availableAccessories.map(a => (
+                    <button
+                      key={a.id}
+                      onClick={() => setCustomAccessory(a.id)}
+                      className={`px-3 py-2 rounded-lg text-sm transition-colors text-center border truncate ${
+                        customAccessory === a.id ? 'bg-blue-600 border-blue-500 text-white' : 'bg-gray-700 hover:bg-gray-600 border-gray-600 text-gray-200'
+                      }`}
+                    >
+                      {a.label}
+                    </button>
+                  ))}
+                </div>
               </div>
             </div>
           )}
 
           {category === 'Fundo' && (
-            <div>
-              <p className="text-xs text-gray-400 uppercase tracking-wider mb-3">Cor de Fundo</p>
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-                {backgrounds.map(b => (
-                  <button
-                    key={b}
-                    onClick={() => setBackground(b)}
-                    className={`px-3 py-3 flex flex-col items-center gap-2 rounded-lg text-sm transition-colors border capitalize ${
-                      background === b ? 'bg-blue-600 border-blue-500 text-white' : 'bg-gray-700 hover:bg-gray-600 border-gray-600'
-                    }`}
-                  >
-                    <div className="w-6 h-6 rounded-full border border-gray-500" style={{ 
-                      backgroundColor: b === 'courtroom' ? '#8B5A2B' : b === 'lawOffice' ? '#2F4F4F' : '#F0F0F0' 
-                    }}></div>
-                    <span>{b.replace('lawOffice', 'Escritório').replace('courtroom', 'Tribunal').replace('minimal', 'Minimalista')}</span>
-                  </button>
-                ))}
+            <div className="flex flex-col gap-6">
+              <div>
+                <h3 className="text-gray-400 text-xs uppercase mb-3">Cor de Fundo</h3>
+                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
+                  {backgrounds.map(b => (
+                    <button
+                      key={b}
+                      onClick={() => setBackground(b)}
+                      className={`px-3 py-2 rounded-lg text-sm transition-colors text-center border capitalize ${
+                        background === b ? 'bg-blue-600 border-blue-500 text-white' : 'bg-gray-700 hover:bg-gray-600 border-gray-600 text-gray-200'
+                      }`}
+                    >
+                      {b.replace('lawOffice', 'Escritório').replace('courtroom', 'Tribunal').replace('minimal', 'Minimalista')}
+                    </button>
+                  ))}
+                </div>
               </div>
             </div>
           )}
 
         </div>
 
-        {/* Botões principais */}
-        <div className="flex flex-col sm:flex-row justify-between items-center mt-6 gap-4 border-t border-gray-800 pt-6">
+        {/* Botões Principais / Ações */}
+        <div className="flex flex-col sm:flex-row justify-between items-center mt-6 gap-4">
           <div className="flex gap-4 w-full sm:w-auto">
             <button 
               onClick={randomAvatar} 
-              className="flex-1 sm:flex-none px-4 py-2 rounded-lg bg-gray-700 hover:bg-gray-600 text-sm font-medium border border-gray-600 flex items-center justify-center gap-2"
+              className="px-4 py-2 rounded-lg bg-gray-700 hover:bg-gray-600 text-gray-200 text-sm font-medium border border-gray-600 flex-1 sm:flex-none"
             >
-              <span>🎲</span> Aleatório
+              🎲 Aleatório
             </button>
             <button 
-              onClick={handleExport} 
-              className="flex-1 sm:flex-none px-4 py-2 rounded-lg bg-gray-700 hover:bg-gray-600 text-sm font-medium border border-gray-600 flex items-center justify-center gap-2"
+              onClick={onClose} 
+              className="px-4 py-2 rounded-lg bg-gray-700 hover:bg-gray-600 text-gray-200 text-sm font-medium border border-gray-600 flex-1 sm:flex-none hidden sm:block"
             >
-              <span>📸</span> Exportar
+              Cancelar
             </button>
           </div>
           
-          <div className="flex gap-4 w-full sm:w-auto justify-end">
+          <div className="flex gap-4 w-full sm:w-auto">
             <button 
-              onClick={onClose} 
-              className="px-4 py-2 rounded-lg text-gray-400 hover:text-white text-sm font-medium transition-colors"
+              onClick={handleExport} 
+              className="px-4 py-2 rounded-lg bg-gray-700 hover:bg-gray-600 text-gray-200 text-sm font-medium border border-gray-600 flex-1 sm:flex-none"
             >
-              Cancelar
+              📸 Exportar
             </button>
             <button 
               onClick={handleSave} 
               disabled={loading}
-              className="px-6 py-2 rounded-lg bg-blue-600 hover:bg-blue-500 text-white text-sm font-bold shadow-lg transition-transform active:scale-95"
+              className="px-6 py-2 rounded-lg bg-blue-600 hover:bg-blue-500 text-white font-bold text-sm shadow-md flex-1 sm:flex-none"
             >
               {loading ? 'Salvando...' : 'Salvar Avatar'}
             </button>
