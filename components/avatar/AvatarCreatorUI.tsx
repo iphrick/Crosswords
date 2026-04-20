@@ -1,5 +1,4 @@
 import React, { useState, useRef, useMemo } from 'react';
-import { toPng } from 'html-to-image';
 import JuridicalAvatar from './JuridicalAvatar';
 
 // Opções do Avataaars
@@ -61,6 +60,7 @@ export default function AvatarCreatorUI({ initialData, maxLevel, onSave, onClose
   const handleExport = async () => {
     if (!avatarRef.current) return;
     try {
+      const { toPng } = await import('html-to-image');
       const dataUrl = await toPng(avatarRef.current, { cacheBust: true, quality: 1 });
       const link = document.createElement('a');
       link.download = 'juriquest-avatar.png';
