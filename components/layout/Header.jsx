@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import styles from './Header.module.css';
 
-export default function Header({ onLoginClick, onRegisterClick, onRankingClick }) {
+export default function Header({ onLoginClick, onRegisterClick, onRankingClick, onContactClick }) {
   const { user, gameState, logout } = useAuth();
   const [menuOpen, setMenuOpen]     = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
@@ -11,6 +11,8 @@ export default function Header({ onLoginClick, onRegisterClick, onRankingClick }
   const nickname    = gameState?.nickname;
   const fallback    = user?.email ? user.email.split('@')[0] : user?.phoneNumber;
   const displayName = nickname || fallback || '';
+  const ADMIN_EMAIL = 'pedrohenriqueinsec281@gmail.com';
+  const isAdmin = user && user.email && user.email.toLowerCase() === ADMIN_EMAIL.toLowerCase();
 
   return (
     <header className={styles.header}>
@@ -26,12 +28,22 @@ export default function Header({ onLoginClick, onRegisterClick, onRankingClick }
             <button id="login-modal-btn"    className="btn btn--secondary" onClick={() => { onLoginClick();    setMenuOpen(false); }}>Entrar</button>
             <button id="register-modal-btn" className="btn btn--secondary" onClick={() => { onRegisterClick(); setMenuOpen(false); }}>Cadastrar</button>
             <button id="ranking-modal-btn"  className="btn btn--secondary" onClick={() => { onRankingClick();  setMenuOpen(false); }}>Ranking</button>
+            <button id="contact-modal-btn"  className="btn btn--ghost" onClick={() => { onContactClick(); setMenuOpen(false); }}>Contato</button>
           </>
         ) : (
           <>
             <button id="ranking-modal-btn" className="btn btn--secondary" onClick={() => { onRankingClick(); setMenuOpen(false); }}>
               🏆 Ranking
             </button>
+            <button id="contact-modal-btn" className="btn btn--ghost" onClick={() => { onContactClick(); setMenuOpen(false); }}>
+              Contato
+            </button>
+            
+            {isAdmin && (
+              <a href="/admin/feedbacks" className="btn btn--primary" style={{backgroundColor: '#10b981', color: 'white', borderColor: '#059669'}}>
+                ⚙️ Admin
+              </a>
+            )}
 
             {/* User dropdown */}
             <div className={styles.avatarMenu}>
