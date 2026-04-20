@@ -87,215 +87,225 @@ export default function AvatarCreatorUI({ initialData, maxLevel, onSave, onClose
     setSkinColor(skinColors[Math.floor(Math.random() * skinColors.length)]);
   };
 
-  // Helper para formatação de nomes camelCase
   const formatName = (str: string) => str.replace(/([A-Z])/g, ' $1').trim();
 
   return (
-    <div className="flex flex-col w-full max-w-3xl mx-auto bg-surface rounded-2xl overflow-hidden border border-border shadow-2xl font-sans">
-      
-      {/* 1. SEÇÃO DO AVATAR (TOPO) */}
-      <div className="w-full bg-surface2 p-6 pb-8 relative flex flex-col items-center justify-center border-b border-border">
-        {/* Badge do Ranking (Canto Superior Esquerdo) */}
-        <div className="absolute top-5 left-5 bg-accent text-surface text-xs md:text-sm font-bold px-4 py-1.5 rounded-full uppercase tracking-wider shadow-lg">
-          {rank}
-        </div>
+    <div className="w-full bg-gray-900 text-gray-100 rounded-xl overflow-y-auto max-h-[90vh] custom-scrollbar">
+      <div className="max-w-4xl mx-auto px-4 py-6">
         
-        {/* Botão Aleatório (Canto Inferior Esquerdo) */}
-        <button 
-          onClick={randomAvatar} 
-          className="absolute bottom-5 left-5 px-4 py-2 bg-surface hover:bg-border text-text font-semibold rounded-lg border border-border transition-colors flex items-center gap-2 text-sm"
-        >
-          <span>🎲</span> <span className="hidden sm:inline">Aleatório</span>
-        </button>
-
-        {/* Botão Exportar (Canto Inferior Direito) */}
-        <button 
-          onClick={handleExport} 
-          className="absolute bottom-5 right-5 px-4 py-2 bg-surface hover:bg-border text-text font-semibold rounded-lg border border-border transition-colors flex items-center gap-2 text-sm"
-        >
-          <span>📸</span> <span className="hidden sm:inline">Exportar</span>
-        </button>
-
-        <div ref={avatarRef} className="w-48 h-48 md:w-56 md:h-56 shadow-2xl rounded-xl mt-4">
-          <JuridicalAvatar
-            topType={topType}
-            hairColor={hairColor}
-            facialHairType={facialHairType}
-            skinColor={skinColor}
-            background={background}
-            customClothe={customClothe}
-            customAccessory={customAccessory}
-          />
+        {/* Avatar (preview) */}
+        <div className="flex justify-center mb-6 relative">
+          <div className="absolute top-0 right-0 md:right-10 bg-blue-600 text-xs px-3 py-1 rounded-full font-bold shadow-md">
+            Rank: {rank}
+          </div>
+          
+          <div ref={avatarRef} className="w-[160px] h-[160px] rounded-xl shadow-lg border border-gray-700 bg-gray-800 flex items-center justify-center">
+            <JuridicalAvatar
+              topType={topType}
+              hairColor={hairColor}
+              facialHairType={facialHairType}
+              skinColor={skinColor}
+              background={background}
+              customClothe={customClothe}
+              customAccessory={customAccessory}
+              size={160}
+            />
+          </div>
         </div>
-      </div>
 
-      {/* 2. ABAS DE NAVEGAÇÃO */}
-      <div className="flex overflow-x-auto border-b border-border bg-surface shrink-0 custom-scrollbar justify-start sm:justify-center">
-        {['Face', 'Cabelo', 'Roupa', 'Acessórios', 'Fundo'].map(cat => (
-          <button
-            key={cat}
-            onClick={() => setCategory(cat as any)}
-            className={`px-6 py-4 text-sm font-semibold whitespace-nowrap transition-all ${
-              category === cat 
-                ? 'text-accent border-b-2 border-accent bg-accentDim/30' 
-                : 'text-textMuted hover:text-text hover:bg-surface2'
-            }`}
-          >
-            {cat}
-          </button>
-        ))}
-      </div>
+        {/* Abas (menu) */}
+        <div className="flex gap-2 justify-center flex-wrap mb-6">
+          {['Face', 'Cabelo', 'Roupa', 'Acessórios', 'Fundo'].map(cat => (
+            <button
+              key={cat}
+              onClick={() => setCategory(cat as any)}
+              className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                category === cat 
+                  ? 'bg-blue-600 text-white shadow-md' 
+                  : 'bg-gray-800 hover:bg-gray-700 text-gray-300 border border-gray-700'
+              }`}
+            >
+              {cat}
+            </button>
+          ))}
+        </div>
 
-      {/* 3. PAINEL DE CONTEÚDO (GRID) */}
-      <div className="p-6 bg-surface h-[40vh] sm:h-[45vh] overflow-y-auto custom-scrollbar">
-        
-        {category === 'Face' && (
-          <div className="space-y-8">
-            {/* Tom de Pele */}
-            <section>
-              <h3 className="text-sm font-bold text-text mb-3 uppercase tracking-wider">Tom de Pele</h3>
-              <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-7 gap-3">
-                {skinColors.map(c => (
-                  <button 
-                    key={c} 
-                    onClick={() => setSkinColor(c)} 
-                    className={`p-3 rounded-xl border-2 transition-all font-medium text-sm ${skinColor === c ? 'border-accent bg-accentDim text-accent shadow-md' : 'border-border text-textMuted hover:border-textMuted hover:text-text'}`}
+        {/* Área de opções */}
+        <div className="bg-gray-800 rounded-xl p-4 shadow-inner border border-gray-700">
+          
+          {category === 'Face' && (
+            <div className="space-y-6">
+              <div>
+                <p className="text-xs text-gray-400 uppercase tracking-wider mb-3">Tom de Pele</p>
+                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
+                  {skinColors.map(c => (
+                    <button
+                      key={c}
+                      onClick={() => setSkinColor(c)}
+                      className={`px-3 py-2 rounded-lg text-sm transition-colors border ${
+                        skinColor === c ? 'bg-blue-600 border-blue-500 text-white' : 'bg-gray-700 hover:bg-gray-600 border-gray-600'
+                      }`}
+                    >
+                      {c}
+                    </button>
+                  ))}
+                </div>
+              </div>
+              <div>
+                <p className="text-xs text-gray-400 uppercase tracking-wider mb-3">Barba / Bigode</p>
+                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
+                  {facialHairTypes.map(h => (
+                    <button
+                      key={h}
+                      onClick={() => setFacialHairType(h)}
+                      className={`px-3 py-2 rounded-lg text-sm transition-colors border truncate ${
+                        facialHairType === h ? 'bg-blue-600 border-blue-500 text-white' : 'bg-gray-700 hover:bg-gray-600 border-gray-600'
+                      }`}
+                    >
+                      {h === 'Blank' ? 'Nenhum' : formatName(h).replace('Beard', 'Barba ').replace('Moustache', 'Bigode ')}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
+
+          {category === 'Cabelo' && (
+            <div className="space-y-6">
+              <div>
+                <p className="text-xs text-gray-400 uppercase tracking-wider mb-3">Cor do Cabelo</p>
+                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
+                  {hairColors.map(c => (
+                    <button
+                      key={c}
+                      onClick={() => setHairColor(c)}
+                      className={`px-3 py-2 rounded-lg text-sm transition-colors border ${
+                        hairColor === c ? 'bg-blue-600 border-blue-500 text-white' : 'bg-gray-700 hover:bg-gray-600 border-gray-600'
+                      }`}
+                    >
+                      {formatName(c)}
+                    </button>
+                  ))}
+                </div>
+              </div>
+              <div>
+                <p className="text-xs text-gray-400 uppercase tracking-wider mb-3">Estilo de Cabelo</p>
+                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 max-h-64 overflow-y-auto pr-2 custom-scrollbar">
+                  {topTypes.map(h => (
+                    <button
+                      key={h}
+                      onClick={() => setTopType(h)}
+                      className={`px-3 py-2 rounded-lg text-sm transition-colors border truncate ${
+                        topType === h ? 'bg-blue-600 border-blue-500 text-white' : 'bg-gray-700 hover:bg-gray-600 border-gray-600'
+                      }`}
+                      title={formatName(h)}
+                    >
+                      {formatName(h)}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
+
+          {category === 'Roupa' && (
+            <div>
+              <p className="text-xs text-gray-400 uppercase tracking-wider mb-3">Trajes Formal (Por Nível)</p>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                {availableClothes.map(c => (
+                  <button
+                    key={c.id}
+                    onClick={() => setCustomClothe(c.id)}
+                    className={`px-3 py-3 flex justify-between items-center rounded-lg text-sm transition-colors border ${
+                      customClothe === c.id ? 'bg-blue-600 border-blue-500 text-white' : 'bg-gray-700 hover:bg-gray-600 border-gray-600'
+                    }`}
                   >
-                    {c}
+                    <span>{c.label}</span>
+                    {customClothe === c.id && <span>✓</span>}
                   </button>
                 ))}
               </div>
-            </section>
-            
-            {/* Pelos Faciais */}
-            <section>
-              <h3 className="text-sm font-bold text-text mb-3 uppercase tracking-wider">Barba / Bigode</h3>
-              <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-                {facialHairTypes.map(h => (
-                  <button 
-                    key={h} 
-                    onClick={() => setFacialHairType(h)} 
-                    className={`p-3 rounded-xl border-2 transition-all font-medium text-sm ${facialHairType === h ? 'border-accent bg-accentDim text-accent shadow-md' : 'border-border text-textMuted hover:border-textMuted hover:text-text'}`}
+            </div>
+          )}
+
+          {category === 'Acessórios' && (
+            <div>
+              <p className="text-xs text-gray-400 uppercase tracking-wider mb-3">Acessórios de Prestígio</p>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                {availableAccessories.map(a => (
+                  <button
+                    key={a.id}
+                    onClick={() => setCustomAccessory(a.id)}
+                    className={`px-3 py-3 flex justify-between items-center rounded-lg text-sm transition-colors border ${
+                      customAccessory === a.id ? 'bg-blue-600 border-blue-500 text-white' : 'bg-gray-700 hover:bg-gray-600 border-gray-600'
+                    }`}
                   >
-                    {h === 'Blank' ? 'Nenhum' : formatName(h).replace('Beard', 'Barba ').replace('Moustache', 'Bigode ')}
+                    <span>{a.label}</span>
+                    {customAccessory === a.id && <span>✓</span>}
                   </button>
                 ))}
               </div>
-            </section>
+            </div>
+          )}
+
+          {category === 'Fundo' && (
+            <div>
+              <p className="text-xs text-gray-400 uppercase tracking-wider mb-3">Cor de Fundo</p>
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                {backgrounds.map(b => (
+                  <button
+                    key={b}
+                    onClick={() => setBackground(b)}
+                    className={`px-3 py-3 flex flex-col items-center gap-2 rounded-lg text-sm transition-colors border capitalize ${
+                      background === b ? 'bg-blue-600 border-blue-500 text-white' : 'bg-gray-700 hover:bg-gray-600 border-gray-600'
+                    }`}
+                  >
+                    <div className="w-6 h-6 rounded-full border border-gray-500" style={{ 
+                      backgroundColor: b === 'courtroom' ? '#8B5A2B' : b === 'lawOffice' ? '#2F4F4F' : '#F0F0F0' 
+                    }}></div>
+                    <span>{b.replace('lawOffice', 'Escritório').replace('courtroom', 'Tribunal').replace('minimal', 'Minimalista')}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+
+        </div>
+
+        {/* Botões principais */}
+        <div className="flex flex-col sm:flex-row justify-between items-center mt-6 gap-4 border-t border-gray-800 pt-6">
+          <div className="flex gap-4 w-full sm:w-auto">
+            <button 
+              onClick={randomAvatar} 
+              className="flex-1 sm:flex-none px-4 py-2 rounded-lg bg-gray-700 hover:bg-gray-600 text-sm font-medium border border-gray-600 flex items-center justify-center gap-2"
+            >
+              <span>🎲</span> Aleatório
+            </button>
+            <button 
+              onClick={handleExport} 
+              className="flex-1 sm:flex-none px-4 py-2 rounded-lg bg-gray-700 hover:bg-gray-600 text-sm font-medium border border-gray-600 flex items-center justify-center gap-2"
+            >
+              <span>📸</span> Exportar
+            </button>
           </div>
-        )}
-
-        {category === 'Cabelo' && (
-          <div className="space-y-8">
-            {/* Cor do Cabelo */}
-            <section>
-              <h3 className="text-sm font-bold text-text mb-3 uppercase tracking-wider">Cor do Cabelo</h3>
-              <div className="grid grid-cols-3 sm:grid-cols-5 gap-3">
-                {hairColors.map(c => (
-                  <button 
-                    key={c} 
-                    onClick={() => setHairColor(c)} 
-                    className={`p-2.5 rounded-xl border-2 transition-all font-medium text-sm ${hairColor === c ? 'border-accent bg-accentDim text-accent shadow-md' : 'border-border text-textMuted hover:border-textMuted hover:text-text'}`}
-                  >
-                    {formatName(c)}
-                  </button>
-                ))}
-              </div>
-            </section>
-
-            {/* Estilo do Cabelo */}
-            <section>
-              <h3 className="text-sm font-bold text-text mb-3 uppercase tracking-wider">Estilo de Cabelo</h3>
-              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
-                {topTypes.map(h => (
-                  <button 
-                    key={h} 
-                    onClick={() => setTopType(h)} 
-                    className={`p-3 rounded-xl border-2 transition-all font-medium text-xs sm:text-sm truncate ${topType === h ? 'border-accent bg-accentDim text-accent shadow-md' : 'border-border text-textMuted hover:border-textMuted hover:text-text'}`}
-                    title={formatName(h)}
-                  >
-                    {formatName(h)}
-                  </button>
-                ))}
-              </div>
-            </section>
+          
+          <div className="flex gap-4 w-full sm:w-auto justify-end">
+            <button 
+              onClick={onClose} 
+              className="px-4 py-2 rounded-lg text-gray-400 hover:text-white text-sm font-medium transition-colors"
+            >
+              Cancelar
+            </button>
+            <button 
+              onClick={handleSave} 
+              disabled={loading}
+              className="px-6 py-2 rounded-lg bg-blue-600 hover:bg-blue-500 text-white text-sm font-bold shadow-lg transition-transform active:scale-95"
+            >
+              {loading ? 'Salvando...' : 'Salvar Avatar'}
+            </button>
           </div>
-        )}
+        </div>
 
-        {category === 'Roupa' && (
-          <section className="space-y-4">
-            <p className="text-sm text-textMuted mb-4">Roupas formais são desbloqueadas conforme você avança de nível.</p>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              {availableClothes.map(c => (
-                <button
-                  key={c.id}
-                  onClick={() => setCustomClothe(c.id)}
-                  className={`flex items-center justify-between p-4 rounded-xl border-2 transition-all ${customClothe === c.id ? 'border-accent bg-accentDim shadow-md' : 'border-border bg-surface2 hover:border-accent hover:bg-surface'}`}
-                >
-                  <span className={`font-semibold ${customClothe === c.id ? 'text-accent' : 'text-text'}`}>{c.label}</span>
-                  {customClothe === c.id && <span className="text-accent text-lg">✓</span>}
-                </button>
-              ))}
-            </div>
-          </section>
-        )}
-
-        {category === 'Acessórios' && (
-          <section className="space-y-4">
-            <p className="text-sm text-textMuted mb-4">Acessórios de prestígio são liberados nos níveis Promotor e Juiz.</p>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              {availableAccessories.map(a => (
-                <button
-                  key={a.id}
-                  onClick={() => setCustomAccessory(a.id)}
-                  className={`flex items-center justify-between p-4 rounded-xl border-2 transition-all ${customAccessory === a.id ? 'border-accent bg-accentDim shadow-md' : 'border-border bg-surface2 hover:border-accent hover:bg-surface'}`}
-                >
-                  <span className={`font-semibold ${customAccessory === a.id ? 'text-accent' : 'text-text'}`}>{a.label}</span>
-                  {customAccessory === a.id && <span className="text-accent text-lg">✓</span>}
-                </button>
-              ))}
-            </div>
-          </section>
-        )}
-
-        {category === 'Fundo' && (
-          <section className="space-y-4">
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-              {backgrounds.map(b => (
-                <button
-                  key={b}
-                  onClick={() => setBackground(b)}
-                  className={`flex flex-col items-center justify-center p-6 rounded-xl border-2 transition-all ${background === b ? 'border-accent bg-accentDim shadow-md' : 'border-border bg-surface2 hover:border-accent hover:bg-surface'}`}
-                >
-                  <div className="w-12 h-12 rounded-full mb-3 shadow-inner" style={{ 
-                    backgroundColor: b === 'courtroom' ? '#8B5A2B' : b === 'lawOffice' ? '#2F4F4F' : '#F0F0F0' 
-                  }}></div>
-                  <span className={`font-semibold capitalize ${background === b ? 'text-accent' : 'text-text'}`}>
-                    {b.replace('lawOffice', 'Escritório').replace('courtroom', 'Tribunal').replace('minimal', 'Minimalista')}
-                  </span>
-                </button>
-              ))}
-            </div>
-          </section>
-        )}
-
-      </div>
-
-      {/* 4. RODAPÉ (FIXO NA PARTE INFERIOR) */}
-      <div className="p-5 border-t border-border bg-surface2 flex justify-end items-center gap-4 shrink-0">
-        <button 
-          onClick={onClose} 
-          className="px-6 py-2.5 font-bold text-textMuted hover:text-text hover:bg-border rounded-xl transition-all"
-        >
-          Cancelar
-        </button>
-        <button 
-          onClick={handleSave} 
-          disabled={loading}
-          className="px-8 py-3 font-bold bg-accent hover:brightness-110 text-bg rounded-xl shadow-lg shadow-accent/20 transition-all transform active:scale-95 flex items-center justify-center min-w-[140px]"
-        >
-          {loading ? 'Salvando...' : 'Salvar Avatar'}
-        </button>
       </div>
     </div>
   );
