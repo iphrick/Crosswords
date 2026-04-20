@@ -1,81 +1,62 @@
 // components/game/CharacterCreator.jsx
-import { useState } from 'react';
 import { useAuth } from '@/context/AuthContext';
-import { CHARACTERS, getAvatarHeadUrl } from '@/lib/juriMessages';
 import styles from '../auth/Modal.module.css';
+import AvatarCreatorUI from '../avatar/AvatarCreatorUI';
 
 export default function CharacterCreator({ visible, onClose }) {
   const { gameState, updateGameState } = useAuth();
-  const [nickname, setNickname] = useState(gameState?.nickname || '');
-  const [selectedChar, setSelectedChar] = useState(gameState?.avatar?.username || CHARACTERS[0].u);
-  const [loading, setLoading] = useState(false);
-
-  // Sync state when opened if user already has an avatar
-  const handleOpen = () => {
-    if (gameState?.nickname) setNickname(gameState.nickname);
-    if (gameState?.avatar?.username) setSelectedChar(gameState.avatar.username);
-  };
 
   if (!visible) return null;
 
-  async function handleSave(e) {
-    e.preventDefault();
-    setLoading(true);
-    try {
-      await updateGameState(gs => {
-        gs.nickname = nickname;
-        gs.avatar = { username: selectedChar };
-      });
-      onClose();
-    } catch (err) {
-      console.error(err);
-    } finally {
-      setLoading(false);
+  // Calcula o maior nível atingido pelo usuário
+  let maxLevel = 1;
+  if (gameState?.subjects) {
+    for (const key in gameState.subjects) {
+      if (gameState.subjects[key].level > maxLevel) {
+        maxLevel = gameState.subjects[key].level;
+      }
     }
   }
 
+  // Prepara os dados iniciais do avatar baseados no Firestore
+  const initialData = gameState?.avatar || {
+    topType: 'ShortHairShortFlat',
+    hairColor: 'BrownDark',
+    facialHairType: 'Blank',
+    skinColor: 'Light',
+    background: 'minimal',
+    customClothe: 'None',
+    customAccessory: 'None'
+  };
+
+  const handleSave = async (avatarData) => {
+    try {
+      await updateGameState(gs => {
+        gs.avatar = avatarData;
+      });
+      onClose();
+    } catch (err) {
+      console.error("Erro ao salvar avatar", err);
+    }
+  };
+
   return (
     <div className={styles.backdrop} onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}>
-      <div className={styles.modal} role="dialog" aria-modal="true" aria-labelledby="avatar-title" style={{ maxWidth: '400px' }}>
-        <button className={styles.close} onClick={onClose} aria-label="Fechar">×</button>
-        <h2 id="avatar-title" className={styles.title}>Meu Avatar</h2>
-
-        <form onSubmit={handleSave} className={styles.form}>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: '10px', marginBottom: '15px' }}>
-            {CHARACTERS.map(char => (
-              <button
-                key={char.u}
-                type="button"
-                onClick={() => setSelectedChar(char.u)}
-                title={char.l}
-                style={{
-                  background: 'none',
-                  border: selectedChar === char.u ? '2px solid var(--color-accent)' : '2px solid transparent',
-                  borderRadius: 'var(--radius-md)',
-                  padding: '5px',
-                  cursor: 'pointer',
-                  transition: 'all 0.2s'
-                }}
-              >
-                <img src={getAvatarHeadUrl(char.u)} alt={char.l} style={{ width: '100%', borderRadius: '4px' }} />
-              </button>
-            ))}
-          </div>
-
-          <input 
-            type="text" 
-            placeholder="Seu Nickname" 
-            value={nickname}
-            onChange={e => setNickname(e.target.value)}
-            required 
-            className={styles.input} 
-            maxLength={20}
-          />
-
-          <button type="submit" className="btn btn--primary" disabled={loading} style={{width:'100%'}}>
-            {loading ? 'Salvando…' : 'Salvar Avatar'}
-          </button>
-        </form>
+      {/* O AvatarCreatorUI já cuida do layout interno do modal, só precisamos garantir o tamanho externo */}
+      <div className="w-full max-w-4xl animate-[slideUp_0.3s_ease] shadow-2xl relative" role="dialog" aria-modal="true">
+        <button 
+          className="absolute -top-10 right-0 text-white hover:text-amber-400 text-3xl z-50 transition-colors" 
+          onClick={onClose} 
+          aria-label="Fechar"
+        >
+          &times;
+        </button>
+        <AvatarCreatorUI 
+          initialData={initialData} 
+          maxLevel={maxLevel} 
+          onSave={handleSave} 
+          onClose={onClose} 
+        />
       </div>
     </div>
   );

@@ -1,7 +1,7 @@
 // components/layout/Header.jsx
 import { useState } from 'react';
 import { useAuth } from '@/context/AuthContext';
-import { getAvatarHeadUrl } from '@/lib/juriMessages';
+import JuridicalAvatar from '../avatar/JuridicalAvatar';
 import styles from './Header.module.css';
 
 export default function Header({ onLoginClick, onRegisterClick, onRankingClick, onAvatarEdit }) {
@@ -13,7 +13,6 @@ export default function Header({ onLoginClick, onRegisterClick, onRankingClick, 
   const avatarData  = gameState?.avatar;
   const fallback    = user?.email ? user.email.split('@')[0] : user?.phoneNumber;
   const displayName = nickname || fallback || '';
-  const headUrl     = avatarData ? getAvatarHeadUrl(avatarData.username) : null;
 
   return (
     <header className={styles.header}>
@@ -44,8 +43,8 @@ export default function Header({ onLoginClick, onRegisterClick, onRankingClick, 
                 aria-expanded={avatarOpen}
                 aria-label="Menu de avatar"
               >
-                {headUrl
-                  ? <img src={headUrl} alt="Avatar" className={styles.avatarThumb} />
+                {avatarData
+                  ? <JuridicalAvatar {...avatarData} size={32} />
                   : <span className={styles.avatarEmoji}>🧑‍⚖️</span>
                 }
                 <span className={styles.avatarName}>{displayName}</span>
