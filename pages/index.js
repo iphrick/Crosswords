@@ -1,5 +1,5 @@
 // pages/index.js
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import Head from 'next/head';
 import { useAuth } from '@/context/AuthContext';
 import { useGameState } from '@/hooks/useGameState';
@@ -33,6 +33,13 @@ export default function Home() {
   const [rankingOpen,  setRankingOpen]  = useState(false);
   const [contactOpen,  setContactOpen]  = useState(false);
   const [avatarOpen,   setAvatarOpen]   = useState(false);
+
+  // Auto-open AvatarSelector after login if no avatar is set
+  useEffect(() => {
+    if (user && !loading && gameState && !gameState.avatarId) {
+      setAvatarOpen(true);
+    }
+  }, [user, loading, gameState]);
 
   // Game state
   const [subject, setSubject] = useState(SUBJECTS[0]);

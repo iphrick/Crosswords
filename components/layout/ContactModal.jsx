@@ -160,22 +160,22 @@ export default function ContactModal({ visible, onClose }) {
         )}
 
         {activeTab === 'donate' && (
-          <div className="animate-in fade-in slide-in-from-bottom-2 duration-300 text-center pb-4">
+          <div className="animate-in fade-in slide-in-from-bottom-2 duration-300 flex flex-col items-center text-center pb-4">
             <div className="mb-4">
               <span className="text-4xl">☕</span>
             </div>
             <h3 className="text-lg font-bold text-white mb-2">Ajude o JuriQuest a crescer!</h3>
-            <p className="text-sm text-gray-400 mb-6 px-4">
+            <p className="text-sm text-gray-400 mb-6 px-4 max-w-[400px]">
               O projeto é gratuito, mas requer empenho e tempo dedicados assim como custos com servidores.
               Qualquer contribuição via PIX nos ajuda a continuar melhorando e deixando o JuriQuest exatamente como vocês gostam.
             </p>
 
-            <div className="bg-gray-800/50 border border-gray-700 rounded-2xl p-4 mx-auto w-fit mb-6 shadow-2xl">
-              <div className="bg-white p-2 rounded-lg shadow-inner flex items-center justify-center mx-auto">
+            <div className="flex justify-center w-full mb-6">
+              <div className="bg-white p-3 rounded-2xl shadow-[0_0_25px_rgba(255,255,255,0.1)] flex items-center justify-center">
                 {PIX_QR_CODE_IMG ? (
-                  <img src={PIX_QR_CODE_IMG} alt="QR Code do PIX" className="w-56 h-56 object-contain" />
+                  <img src={PIX_QR_CODE_IMG} alt="QR Code do PIX" className="w-64 h-64 object-contain" />
                 ) : (
-                  <div className="w-56 h-56 flex items-center justify-center">
+                  <div className="w-64 h-64 flex items-center justify-center">
                     <div className="text-center px-4">
                       <p className="text-gray-800 text-sm font-bold mb-1">Seu QR Code Aqui</p>
                       <p className="text-gray-400 text-[10px] leading-tight">
@@ -187,20 +187,22 @@ export default function ContactModal({ visible, onClose }) {
               </div>
             </div>
 
-            <p className="text-xs text-gray-400 mb-2 uppercase tracking-wide">Ou use o Pix Copia e Cola:</p>
-            <div className="flex bg-gray-800 border border-gray-700 rounded-lg overflow-hidden">
-              <input
-                type="text"
-                readOnly
-                value={PIX_CHAVE_COPIA_COLA}
-                className="bg-transparent text-gray-300 text-sm px-3 py-2 flex-1 focus:outline-none w-full min-w-0"
-              />
-              <button
-                onClick={handleCopyPix}
-                className="bg-emerald-600 hover:bg-emerald-500 text-white px-4 py-2 text-sm font-bold transition-colors whitespace-nowrap"
-              >
-                {copiedPix ? 'Copiado!' : 'Copiar PIX'}
-              </button>
+            <div className="w-full max-w-[320px]">
+              <p className="text-xs text-gray-400 mb-2 uppercase tracking-wide">Ou use o Pix Copia e Cola:</p>
+              <div className="flex bg-gray-800 border border-gray-700 rounded-lg overflow-hidden">
+                <input
+                  type="text"
+                  readOnly
+                  value={PIX_CHAVE_COPIA_COLA}
+                  className="bg-transparent text-gray-300 text-sm px-3 py-2 flex-1 focus:outline-none w-full min-w-0"
+                />
+                <button
+                  onClick={handleCopyPix}
+                  className="bg-emerald-600 hover:bg-emerald-500 text-white px-4 py-2 text-sm font-bold transition-colors whitespace-nowrap"
+                >
+                  {copiedPix ? 'Copiado!' : 'Copiar PIX'}
+                </button>
+              </div>
             </div>
           </div>
         )}
