@@ -5,6 +5,12 @@ import { useAuth } from '@/context/AuthContext';
 import { db } from '@/lib/firebase-client';
 import { collection, query, orderBy, getDocs } from 'firebase/firestore';
 
+// Shadcn Components
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardFooter, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+
 const ADMIN_EMAIL = 'pedrohenriqueinsec281@gmail.com';
 
 export default function FeedbacksDashboard() {
@@ -33,8 +39,6 @@ export default function FeedbacksDashboard() {
   const fetchFeedbacks = async () => {
     setLoading(true);
     try {
-      // Fetching all and sorting/filtering in client for simplicity, 
-      // but in a large app we'd do it in the query.
       const q = query(collection(db, 'feedbacks'), orderBy('createdAt', 'desc'));
       const snapshot = await getDocs(q);
       const data = snapshot.docs.map(doc => ({
@@ -60,114 +64,116 @@ export default function FeedbacksDashboard() {
 
   if (authLoading || loading) {
     return (
-      <div className="min-h-screen bg-gray-900 flex items-center justify-center text-white">
-        <p>Carregando Dashboard...</p>
+      <div className="min-h-screen bg-background flex items-center justify-center text-foreground">
+        <p className="animate-pulse">Carregando Dashboard...</p>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-900 text-gray-100 p-4 md:p-8 font-sans">
+    <div className="min-h-screen bg-background text-foreground p-4 md:p-8 font-sans">
       <Head>
         <title>Admin Dashboard - Feedbacks</title>
       </Head>
 
-      <div className="max-w-5xl mx-auto">
-        <header className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
+      <div className="max-w-6xl mx-auto space-y-8">
+        
+        {/* Header Section */}
+        <header className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
           <div>
-            <h1 className="text-3xl font-bold text-white mb-2">Painel de Feedbacks</h1>
-            <p className="text-gray-400">Gerencie as opiniões e reportes dos usuários</p>
+            <h1 className="text-3xl font-bold tracking-tight">Painel de Feedbacks</h1>
+            <p className="text-muted-foreground mt-1">Gerencie as opiniões e reportes dos usuários do JuriQuest</p>
           </div>
-          <button 
-            onClick={() => router.push('/')}
-            className="px-4 py-2 bg-gray-800 hover:bg-gray-700 rounded-lg border border-gray-700 transition-colors"
-          >
+          <Button variant="outline" onClick={() => router.push('/')}>
             Voltar ao Jogo
-          </button>
+          </Button>
         </header>
 
-        {/* Filtros */}
-        <div className="bg-gray-800 p-4 rounded-xl border border-gray-700 mb-6 flex flex-col sm:flex-row gap-4 justify-between">
+        {/* Filters Section */}
+        <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between bg-card p-4 rounded-xl border shadow-sm">
           <div className="flex flex-wrap gap-2">
-            <button 
+            <Button 
+              variant={sentimentFilter === 'all' ? 'default' : 'secondary'} 
               onClick={() => setSentimentFilter('all')}
-              className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
-                sentimentFilter === 'all' ? 'bg-blue-600 text-white' : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
-              }`}
+              className="rounded-full"
             >
               Todos
-            </button>
-            <button 
+            </Button>
+            <Button 
+              variant={sentimentFilter === 'positive' ? 'default' : 'secondary'} 
               onClick={() => setSentimentFilter('positive')}
-              className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
-                sentimentFilter === 'positive' ? 'bg-green-600 text-white' : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
-              }`}
+              className={`rounded-full ${sentimentFilter === 'positive' ? 'bg-emerald-600 hover:bg-emerald-700' : ''}`}
             >
               Positivos 🟢
-            </button>
-            <button 
+            </Button>
+            <Button 
+              variant={sentimentFilter === 'negative' ? 'default' : 'secondary'} 
               onClick={() => setSentimentFilter('negative')}
-              className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
-                sentimentFilter === 'negative' ? 'bg-red-600 text-white' : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
-              }`}
+              className={`rounded-full ${sentimentFilter === 'negative' ? 'bg-red-600 hover:bg-red-700' : ''}`}
             >
               Críticas 🔴
-            </button>
+            </Button>
           </div>
 
-          <div>
-            <select 
-              value={sortOrder}
-              onChange={(e) => setSortOrder(e.target.value)}
-              className="px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white text-sm focus:outline-none focus:border-blue-500"
-            >
-              <option value="desc">Mais Recentes</option>
-              <option value="asc">Mais Antigos</option>
-            </select>
+          <div className="w-[180px]">
+            <Select value={sortOrder} onValueChange={setSortOrder}>
+              <SelectTrigger>
+                <SelectValue placeholder="Ordenar por" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="desc">Mais Recentes</SelectItem>
+                <SelectItem value="asc">Mais Antigos</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
         </div>
 
-        {/* Lista de Feedbacks */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        {/* Feedbacks Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
           {filteredFeedbacks.length === 0 ? (
-            <div className="col-span-full text-center py-12 text-gray-400 bg-gray-800 rounded-xl border border-gray-700">
-              Nenhum feedback encontrado.
+            <div className="col-span-full flex flex-col items-center justify-center p-12 text-center border border-dashed rounded-xl bg-card/50">
+              <span className="text-4xl mb-4">📭</span>
+              <h3 className="text-lg font-medium">Nenhum feedback encontrado</h3>
+              <p className="text-muted-foreground">Tente alterar os filtros para ver outros resultados.</p>
             </div>
           ) : (
             filteredFeedbacks.map(fb => (
-              <div key={fb.id} className="bg-gray-800 p-5 rounded-xl border border-gray-700 shadow-md flex flex-col h-full">
-                <div className="flex justify-between items-start mb-3">
-                  <div className="flex items-center gap-2">
+              <Card key={fb.id} className="flex flex-col hover:shadow-md transition-shadow duration-200">
+                <CardHeader className="pb-3">
+                  <div className="flex justify-between items-start">
                     {fb.sentiment === 'positive' ? (
-                      <span className="bg-green-500/20 text-green-400 text-xs px-2 py-1 rounded-full font-bold border border-green-500/30">
+                      <Badge className="bg-emerald-500/15 text-emerald-500 hover:bg-emerald-500/25 border-emerald-200/20">
                         ELOGIO
-                      </span>
+                      </Badge>
                     ) : (
-                      <span className="bg-red-500/20 text-red-400 text-xs px-2 py-1 rounded-full font-bold border border-red-500/30">
+                      <Badge variant="destructive" className="bg-red-500/15 text-red-500 hover:bg-red-500/25 border-red-200/20">
                         CRÍTICA
-                      </span>
+                      </Badge>
                     )}
+                    <span className="text-xs text-muted-foreground font-medium">
+                      {fb.createdAt instanceof Date 
+                        ? fb.createdAt.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' }) 
+                        : 'Data desconhecida'}
+                    </span>
                   </div>
-                  <span className="text-xs text-gray-500">
-                    {fb.createdAt instanceof Date 
-                      ? fb.createdAt.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' }) 
-                      : 'Data desconhecida'}
-                  </span>
-                </div>
+                </CardHeader>
                 
-                <p className="text-sm text-gray-200 flex-grow mb-4 leading-relaxed whitespace-pre-wrap">
-                  {fb.message}
-                </p>
-
-                <div className="border-t border-gray-700 pt-3 mt-auto">
-                  <p className="text-xs text-gray-400 truncate">
-                    De: <span className="text-gray-300">{fb.email}</span>
+                <CardContent className="flex-grow">
+                  <p className="text-sm leading-relaxed whitespace-pre-wrap text-foreground/90">
+                    {fb.message}
                   </p>
-                  <p className="text-xs text-gray-500 truncate mt-1" title={fb.uid}>
+                </CardContent>
+
+                <CardFooter className="pt-3 border-t bg-muted/20 flex-col items-start gap-1">
+                  <p className="text-xs font-medium truncate w-full">
+                    <span className="text-muted-foreground mr-1">De:</span> 
+                    {fb.email}
+                  </p>
+                  <p className="text-[10px] text-muted-foreground font-mono truncate w-full" title={fb.uid}>
                     UID: {fb.uid}
                   </p>
-                </div>
-              </div>
+                </CardFooter>
+              </Card>
             ))
           )}
         </div>
