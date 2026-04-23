@@ -375,7 +375,7 @@ export default function Home() {
 
             {/* Game Content Area */}
             {gameVisible && (
-              <div className="flex flex-col lg:flex-row gap-10 items-start justify-center mt-12 px-2 sm:px-6">
+              <div className="flex flex-col lg:flex-row gap-6 lg:gap-10 items-start justify-center mt-6 lg:mt-12 px-2 sm:px-6">
                 
                 {/* Left Side: Avatar Card */}
                 {gameState?.avatarUrl && (

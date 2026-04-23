@@ -230,7 +230,13 @@ export default function CrosswordBoard({ placedWords, onSolved, avatarUrl }) {
                     activeDirection={direction}
                     onInput={(char) => handleInput(x, y, char)}
                     onKeyDown={(e) => handleKeyDown(e, x, y)}
-                    onFocus={() => setActiveCell({ x, y })}
+                    onFocus={() => {
+              setActiveCell({ x, y });
+              // Scroll into view on mobile to avoid keyboard overlap
+              if (window.innerWidth < 768) {
+                inputRefs.current[key]?.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'center' });
+              }
+            }}
                     onClick={() => handleCellClick(x, y)}
                     inputRef={(el) => (inputRefs.current[key] = el)}
                   />
