@@ -14,6 +14,7 @@ import RankingToast from '@/components/notifications/RankingToast';
 import RankingModal from '@/components/game/RankingModal';
 import ContactModal from '@/components/layout/ContactModal';
 import AvatarSelector from '@/components/avatar/AvatarSelector';
+import OnboardingTutorial from '@/components/game/OnboardingTutorial';
 import dynamic from 'next/dynamic';
 import styles from '@/styles/Home.module.css';
 
@@ -33,13 +34,20 @@ export default function Home() {
   const [rankingOpen,  setRankingOpen]  = useState(false);
   const [contactOpen,  setContactOpen]  = useState(false);
   const [avatarOpen,   setAvatarOpen]   = useState(false);
+  const [showTutorial, setShowTutorial] = useState(false);
 
-  // Auto-open AvatarSelector after login if no avatar is set
+  // Auto-open AvatarSelector or Tutorial
   useEffect(() => {
-    if (user && !loading && gameState && !gameState.avatarId) {
-      setAvatarOpen(true);
+    if (user && !loading && gameState) {
+      if (!gameState.avatarId) {
+        setAvatarOpen(true);
+      } else {
+        const tutorialDone = localStorage.getItem('juriquest_tutorial_done');
+        if (!tutorialDone) setShowTutorial(true);
+      }
     }
   }, [user, loading, gameState]);
+
 
   // Game state
   const [subject, setSubject] = useState(SUBJECTS[0]);
@@ -397,7 +405,7 @@ export default function Home() {
                 )}
 
                 {/* Right Side: Crossword Board */}
-                <div className="flex-1 w-full max-w-5xl">
+                <div id="crossword-grid" className="flex-1 w-full max-w-5xl">
                   <CrosswordBoard
                     placedWords={placedWords}
                     onSolved={handleSolved}
@@ -424,6 +432,10 @@ export default function Home() {
       <RankingModal  visible={rankingOpen}  onClose={() => setRankingOpen(false)} />
       <ContactModal  visible={contactOpen}  onClose={() => setContactOpen(false)} />
       <AvatarSelector visible={avatarOpen}  onClose={() => setAvatarOpen(false)} />
+      
+      {showTutorial && (
+        <OnboardingTutorial onComplete={() => setShowTutorial(false)} />
+      )}
 
       {/* ---- Notifications ---- */}
       <FeedbackOverlay
