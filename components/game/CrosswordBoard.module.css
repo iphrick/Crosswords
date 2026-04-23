@@ -196,7 +196,24 @@
 .acrossLabel .clueTooltip {
   bottom: 140%;
   left: 50%;
-  transform: translateX(-50%);
+  /* Removed default transform to allow alignment classes to control it */
+}
+
+.tooltipLeft {
+  left: 0 !important;
+  transform: translateX(0) !important;
+  text-align: left !important;
+}
+
+.tooltipRight {
+  left: auto !important;
+  right: 0 !important;
+  transform: translateX(0) !important;
+  text-align: right !important;
+}
+
+.tooltipCenter {
+  transform: translateX(-50%) !important;
 }
 
 .downLabel .clueTooltip {

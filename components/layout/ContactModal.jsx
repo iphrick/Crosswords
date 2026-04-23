@@ -20,9 +20,9 @@ export default function ContactModal({ visible, onClose }) {
   const [copiedEmail, setCopiedEmail] = useState(false);
   const [copiedPix, setCopiedPix] = useState(false);
 
-  // DADOS DO PIX (Substitua pelos seus dados reais)
-  const PIX_CHAVE_COPIA_COLA = "00020126580014br.gov.bcb.pix0136012437e8-14de-43c8-85a3-c1cbb940a3755204000053039865802BR5925PEDRO HENRIQUE CLEMENTINO6009Sao Paulo62290525REC69E64BB02C3E719732270963040B47"; // Substitua por seu código real
-  const PIX_QR_CODE_IMG = "img-pix.jpeg"; // Opcional: coloque o caminho da imagem do QR code, ex: "/pix-qrcode.png"
+  // PIX Data
+  const PIX_CHAVE_COPIA_COLA = "00020126580014br.gov.bcb.pix0136012437e8-14de-43c8-85a3-c1cbb940a3755204000053039865802BR5925PEDRO HENRIQUE CLEMENTINO6009Sao Paulo62290525REC69E64BB02C3E719732270963040B47";
+  const PIX_QR_CODE_IMG = "img-pix.jpeg";
 
   if (!visible) return null;
 
@@ -58,7 +58,7 @@ export default function ContactModal({ visible, onClose }) {
       setTimeout(() => {
         onClose();
         setFeedbackMsg({ text: '', type: '' });
-      }, 2000);
+      }, 2500);
     } catch (error) {
       console.error("Erro ao enviar feedback:", error);
       setFeedbackMsg({ text: 'Erro ao enviar. Tente novamente mais tarde.', type: 'error' });
@@ -69,143 +69,153 @@ export default function ContactModal({ visible, onClose }) {
 
   return (
     <div className={styles.backdrop} onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}>
-      <div className={`${styles.modal} bg-gray-900 border border-gray-700 flex flex-col`} role="dialog" aria-modal="true" style={{ maxWidth: '500px' }}>
-        <button className={styles.close} onClick={onClose} aria-label="Fechar">×</button>
-        <h2 className="text-xl font-bold text-white mb-4">Contato & Apoio</h2>
-
-        {/* Custom Tabs */}
-        <div className="flex bg-gray-800 rounded-lg p-1 mb-6 border border-gray-700">
-          <button
-            onClick={() => setActiveTab('feedback')}
-            className={`flex-1 py-1.5 text-sm font-medium rounded-md transition-colors ${activeTab === 'feedback' ? 'bg-gray-700 text-white shadow' : 'text-gray-400 hover:text-gray-200'}`}
-          >
-            Feedback
-          </button>
-          <button
-            onClick={() => setActiveTab('donate')}
-            className={`flex-1 py-1.5 text-sm font-medium rounded-md transition-colors ${activeTab === 'donate' ? 'bg-emerald-600 text-white shadow' : 'text-gray-400 hover:text-gray-200'}`}
-          >
-            💚 Apoiar o Projeto
-          </button>
+      <div className={`${styles.modal} bg-[#0e1117] border border-slate-800 p-0 overflow-hidden flex flex-col`} role="dialog" aria-modal="true" style={{ maxWidth: '480px' }}>
+        
+        {/* Header Section */}
+        <div className="p-6 pb-0 relative">
+          <button className="absolute right-6 top-6 text-slate-500 hover:text-white transition-colors text-2xl leading-none" onClick={onClose} aria-label="Fechar">×</button>
+          <h2 className="text-2xl font-bold text-white tracking-tight">Contato & Apoio</h2>
+          <p className="text-slate-400 text-sm mt-1">Fale conosco ou ajude o projeto a crescer.</p>
         </div>
 
-        {activeTab === 'feedback' && (
-          <div className="animate-in fade-in slide-in-from-bottom-2 duration-300">
-            {/* Email Copy Area */}
-            <div className="bg-gray-800 p-4 rounded-lg mb-6 flex items-center justify-between border border-gray-700">
-              <div>
-                <p className="text-sm text-gray-400 mb-1">Email de suporte:</p>
-                <p className="font-mono text-blue-400 text-sm md:text-base">playJuriQuest@gmail.com</p>
+        {/* Minimalist Tabs */}
+        <div className="px-6 mt-6">
+          <div className="flex bg-slate-900/50 rounded-xl p-1 border border-slate-800">
+            <button
+              onClick={() => setActiveTab('feedback')}
+              className={`flex-1 py-2 text-sm font-semibold rounded-lg transition-all duration-300 ${activeTab === 'feedback' ? 'bg-slate-800 text-white shadow-lg' : 'text-slate-500 hover:text-slate-300'}`}
+            >
+              Feedback
+            </button>
+            <button
+              onClick={() => setActiveTab('donate')}
+              className={`flex-1 py-2 text-sm font-semibold rounded-lg transition-all duration-300 ${activeTab === 'donate' ? 'bg-[#c9a96e] text-slate-950 shadow-lg' : 'text-slate-500 hover:text-slate-300'}`}
+            >
+              Apoiar o Projeto
+            </button>
+          </div>
+        </div>
+
+        <div className="p-6">
+          {activeTab === 'feedback' && (
+            <div className="animate-in fade-in slide-in-from-bottom-2 duration-500">
+              {/* Email Support Card */}
+              <div className="bg-slate-900/40 p-4 rounded-xl mb-6 border border-slate-800/50 flex items-center justify-between">
+                <div className="flex flex-col">
+                  <span className="text-[10px] uppercase font-extrabold text-slate-500 tracking-wider mb-1">Suporte via E-mail</span>
+                  <span className="text-sm font-medium text-blue-400 font-mono">playJuriQuest@gmail.com</span>
+                </div>
+                <button
+                  onClick={handleCopyEmail}
+                  className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-xs font-bold text-slate-200 rounded-lg transition-all border border-slate-700"
+                >
+                  {copiedEmail ? 'Copiado!' : 'Copiar'}
+                </button>
               </div>
-              <button
-                onClick={handleCopyEmail}
-                className="px-3 py-1.5 bg-gray-700 hover:bg-gray-600 text-sm text-white rounded-md transition-colors whitespace-nowrap ml-2"
-              >
-                {copiedEmail ? '✅ Copiado' : '📋 Copiar'}
-              </button>
-            </div>
 
-            <div className="border-t border-gray-700 pt-4 mb-4">
-              <h3 className="text-sm font-semibold text-gray-300 mb-3">Deixe seu feedback para nós</h3>
-
-              <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-                <div className="flex gap-2">
-                  <button
-                    type="button"
-                    onClick={() => setSentiment('positive')}
-                    className={`flex-1 py-2 px-3 rounded-lg border flex items-center justify-center gap-2 transition-colors ${sentiment === 'positive'
-                      ? 'bg-green-600/20 border-green-500 text-green-400'
-                      : 'bg-gray-800 border-gray-700 text-gray-400 hover:bg-gray-700'
-                      }`}
-                  >
-                    <span>🟢</span> Elogio / Ideia
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setSentiment('negative')}
-                    className={`flex-1 py-2 px-3 rounded-lg border flex items-center justify-center gap-2 transition-colors ${sentiment === 'negative'
-                      ? 'bg-red-600/20 border-red-500 text-red-400'
-                      : 'bg-gray-800 border-gray-700 text-gray-400 hover:bg-gray-700'
-                      }`}
-                  >
-                    <span>🔴</span> Crítica / Erro
-                  </button>
+              <form onSubmit={handleSubmit} className="space-y-5">
+                <div>
+                  <label className="text-[10px] uppercase font-extrabold text-slate-500 tracking-wider block mb-3">Qual o seu feedback?</label>
+                  <div className="flex gap-3">
+                    <button
+                      type="button"
+                      onClick={() => setSentiment('positive')}
+                      className={`flex-1 py-3 px-4 rounded-xl border flex items-center justify-center gap-3 transition-all ${sentiment === 'positive'
+                        ? 'bg-emerald-500/10 border-emerald-500/50 text-emerald-400 ring-1 ring-emerald-500/30'
+                        : 'bg-slate-900/50 border-slate-800 text-slate-500 hover:border-slate-700'
+                        }`}
+                    >
+                      <span className={`w-3 h-3 rounded-full ${sentiment === 'positive' ? 'bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.8)]' : 'bg-slate-700'}`}></span>
+                      <span className="text-sm font-bold">Elogio / Ideia</span>
+                    </button>
+                    
+                    <button
+                      type="button"
+                      onClick={() => setSentiment('negative')}
+                      className={`flex-1 py-3 px-4 rounded-xl border flex items-center justify-center gap-3 transition-all ${sentiment === 'negative'
+                        ? 'bg-rose-500/10 border-rose-500/50 text-rose-400 ring-1 ring-rose-500/30'
+                        : 'bg-slate-900/50 border-slate-800 text-slate-500 hover:border-slate-700'
+                        }`}
+                    >
+                      <span className={`w-3 h-3 rounded-full ${sentiment === 'negative' ? 'bg-rose-500 shadow-[0_0_8px_rgba(244,63,94,0.8)]' : 'bg-slate-700'}`}></span>
+                      <span className="text-sm font-bold">Crítica / Erro</span>
+                    </button>
+                  </div>
                 </div>
 
-                <textarea
-                  rows={4}
-                  value={message}
-                  onChange={(e) => setMessage(e.target.value)}
-                  placeholder="O que você achou do jogo? Encontrou algum problema?"
-                  className="w-full bg-gray-800 border border-gray-700 rounded-lg p-3 text-white placeholder-gray-500 focus:outline-none focus:border-blue-500 resize-none text-sm"
-                  required
-                ></textarea>
+                <div className="relative group">
+                  <textarea
+                    rows={4}
+                    value={message}
+                    onChange={(e) => setMessage(e.target.value)}
+                    placeholder="Conte-nos o que você achou do JuriQuest..."
+                    className="w-full bg-slate-900/50 border border-slate-800 rounded-xl p-4 text-slate-200 placeholder-slate-600 focus:outline-none focus:border-[#c9a96e]/50 focus:ring-1 focus:ring-[#c9a96e]/20 transition-all text-sm resize-none"
+                    required
+                  ></textarea>
+                </div>
 
                 {feedbackMsg.text && (
-                  <p className={`text-sm text-center ${feedbackMsg.type === 'success' ? 'text-green-400' : 'text-red-400'}`}>
+                  <div className={`p-3 rounded-lg text-xs font-bold text-center animate-in zoom-in-95 ${feedbackMsg.type === 'success' ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 'bg-rose-500/10 text-rose-400 border border-rose-500/20'}`}>
                     {feedbackMsg.text}
-                  </p>
+                  </div>
                 )}
 
                 <button
                   type="submit"
                   disabled={loading || !message.trim()}
-                  className="w-full py-2.5 bg-blue-600 hover:bg-blue-500 disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold rounded-lg transition-colors mt-2"
+                  className="w-full py-4 bg-[#c9a96e] hover:bg-[#d4b47a] disabled:opacity-30 disabled:cursor-not-allowed text-slate-950 font-extrabold rounded-xl transition-all shadow-xl shadow-[#c9a96e]/5 flex items-center justify-center gap-2"
                 >
-                  {loading ? 'Enviando...' : 'Enviar Feedback'}
+                  {loading ? (
+                    <span className="flex items-center gap-2">
+                      <div className="w-4 h-4 border-2 border-slate-950/30 border-t-slate-950 rounded-full animate-spin"></div>
+                      Enviando...
+                    </span>
+                  ) : 'Enviar para os Desenvolvedores'}
                 </button>
               </form>
             </div>
-          </div>
-        )}
+          )}
 
-        {activeTab === 'donate' && (
-          <div className="animate-in fade-in slide-in-from-bottom-2 duration-300 flex flex-col items-center text-center pb-4">
-            <div className="mb-4">
-              <span className="text-4xl">☕</span>
-            </div>
-            <h3 className="text-lg font-bold text-white mb-2">Ajude o JuriQuest a crescer!</h3>
-            <p className="text-sm text-gray-400 mb-6 px-4 max-w-[400px]">
-              O projeto é gratuito, mas requer empenho e tempo dedicados assim como custos com servidores.
-              Qualquer contribuição via PIX nos ajuda a continuar melhorando e deixando o JuriQuest exatamente como vocês gostam.
-            </p>
-
-            <div className="flex justify-center w-full mb-6">
-              <div className="bg-white p-3 rounded-2xl shadow-[0_0_25px_rgba(255,255,255,0.1)] flex items-center justify-center">
-                {PIX_QR_CODE_IMG ? (
-                  <img src={PIX_QR_CODE_IMG} alt="QR Code do PIX" className="w-64 h-64 object-contain" />
-                ) : (
-                  <div className="w-64 h-64 flex items-center justify-center">
-                    <div className="text-center px-4">
-                      <p className="text-gray-800 text-sm font-bold mb-1">Seu QR Code Aqui</p>
-                      <p className="text-gray-400 text-[10px] leading-tight">
-                        Adicione a imagem na pasta public e atualize o código.
-                      </p>
+          {activeTab === 'donate' && (
+            <div className="animate-in fade-in slide-in-from-bottom-2 duration-500 flex flex-col items-center">
+              <div className="w-full bg-slate-900/30 border border-slate-800/50 rounded-2xl p-6 mb-6">
+                <div className="flex justify-center mb-6">
+                  <div className="relative p-3 bg-white rounded-3xl shadow-[0_0_40px_rgba(255,255,255,0.05)]">
+                    <img src={PIX_QR_CODE_IMG} alt="QR Code do PIX" className="w-56 h-56 object-contain rounded-xl" />
+                    <div className="absolute -bottom-2 -right-2 bg-[#c9a96e] text-slate-950 text-[10px] font-black px-3 py-1.5 rounded-full shadow-lg">
+                      PIX SEGURO
                     </div>
                   </div>
-                )}
-              </div>
-            </div>
+                </div>
 
-            <div className="w-full max-w-[320px]">
-              <p className="text-xs text-gray-400 mb-2 uppercase tracking-wide">Ou use o Pix Copia e Cola:</p>
-              <div className="flex bg-gray-800 border border-gray-700 rounded-lg overflow-hidden">
-                <input
-                  type="text"
-                  readOnly
-                  value={PIX_CHAVE_COPIA_COLA}
-                  className="bg-transparent text-gray-300 text-sm px-3 py-2 flex-1 focus:outline-none w-full min-w-0"
-                />
-                <button
-                  onClick={handleCopyPix}
-                  className="bg-emerald-600 hover:bg-emerald-500 text-white px-4 py-2 text-sm font-bold transition-colors whitespace-nowrap"
-                >
-                  {copiedPix ? 'Copiado!' : 'Copiar PIX'}
-                </button>
+                <h3 className="text-lg font-bold text-white mb-2 text-center">Apoie o Desenvolvimento</h3>
+                <p className="text-sm text-slate-400 text-center leading-relaxed max-w-[320px] mx-auto">
+                  Sua contribuição ajuda a manter os servidores e a trazer novas cruzadinhas jurídicas todos os dias.
+                </p>
               </div>
+
+              <div className="w-full">
+                <span className="text-[10px] uppercase font-extrabold text-slate-500 tracking-wider block mb-3 text-center">Pix Copia e Cola</span>
+                <div className="flex bg-slate-900 border border-slate-800 rounded-xl overflow-hidden p-1 shadow-inner">
+                  <input
+                    type="text"
+                    readOnly
+                    value={PIX_CHAVE_COPIA_COLA}
+                    className="bg-transparent text-slate-400 text-xs px-4 py-3 flex-1 focus:outline-none truncate"
+                  />
+                  <button
+                    onClick={handleCopyPix}
+                    className="bg-slate-800 hover:bg-slate-700 text-white px-6 py-2 text-xs font-bold transition-all rounded-lg border border-slate-700 shadow-lg"
+                  >
+                    {copiedPix ? 'Copiado!' : 'Copiar Chave'}
+                  </button>
+                </div>
+              </div>
+              
+              <p className="mt-8 text-[10px] text-slate-600 font-medium">JuriQuest • Feito com dedicação para estudantes de Direito</p>
             </div>
-          </div>
-        )}
+          )}
+        </div>
       </div>
     </div>
   );
