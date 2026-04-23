@@ -50,25 +50,6 @@
   overflow: hidden; /* Ensure watermark doesn't overflow */
 }
 
-.avatarWatermark {
-  position: absolute;
-  inset: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  pointer-events: none;
-  z-index: 1; /* Behind cells (z-index: 5/10/20) */
-  opacity: 0.15; /* Discrete but visible */
-  mix-blend-mode: luminosity; /* Better integration with dark theme */
-}
-
-.avatarWatermark img {
-  width: 60%;
-  height: 60%;
-  object-fit: contain;
-  filter: grayscale(1) contrast(1.2);
-}
-
 /* CELLS */
 .cell {
   position: relative;

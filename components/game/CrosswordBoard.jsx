@@ -207,12 +207,6 @@ export default function CrosswordBoard({ placedWords, onSolved, avatarUrl }) {
               gridTemplateRows: `repeat(${gridDimensions.rows}, auto)`
             }}
           >
-            {/* Avatar Background */}
-            {avatarUrl && (
-              <div className={styles.avatarWatermark}>
-                <img src={avatarUrl} alt="Avatar background" />
-              </div>
-            )}
 
             {Array.from({ length: gridDimensions.rows }).map((_, yIdx) => {
               const y = yIdx + gridBounds.minY;

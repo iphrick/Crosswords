@@ -373,43 +373,46 @@ export default function Home() {
               </div>
             )}
 
-            {/* Avatar Card during Game */}
-            {gameVisible && gameState?.avatarUrl && (
-              <div className="flex justify-center mb-8">
-                <div className="relative group bg-slate-900 border border-slate-800 rounded-2xl p-2 w-40 sm:w-48 shadow-2xl animate-in slide-in-from-top-4 duration-700">
-                  <div className="aspect-[2/3] relative rounded-xl overflow-hidden bg-slate-800 border border-slate-700 shadow-inner">
-                    <img src={gameState.avatarUrl} alt={gameState.profession} className="w-full h-full object-cover" />
-                    <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-transparent to-transparent opacity-80" />
-                    <div className="absolute bottom-0 left-0 right-0 p-3 text-center">
-                      <p className="text-white font-bold text-sm leading-tight mb-0.5">{gameState.profession}</p>
-                      <p className="text-[10px] text-emerald-400 uppercase font-extrabold tracking-widest">{gameState.nickname || user?.email?.split('@')[0]}</p>
+            {/* Game Content Area */}
+            {gameVisible && (
+              <div className="flex flex-col lg:flex-row gap-10 items-start justify-center mt-12 px-2 sm:px-6">
+                
+                {/* Left Side: Avatar Card */}
+                {gameState?.avatarUrl && (
+                  <div className="w-full lg:w-fit lg:sticky lg:top-28 flex justify-center animate-in slide-in-from-left-8 duration-1000">
+                    <div className="relative group bg-slate-900 border border-slate-800 rounded-2xl p-2 w-44 sm:w-52 shadow-2xl">
+                      <div className="aspect-[2/3] relative rounded-xl overflow-hidden bg-slate-800 border border-slate-700 shadow-inner">
+                        <img src={gameState.avatarUrl} alt={gameState.profession} className="w-full h-full object-cover" />
+                        <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-transparent to-transparent opacity-80" />
+                        <div className="absolute bottom-0 left-0 right-0 p-3 text-center">
+                          <p className="text-white font-bold text-sm leading-tight mb-0.5">{gameState.profession}</p>
+                          <p className="text-[10px] text-emerald-400 uppercase font-extrabold tracking-widest">{gameState.nickname || user?.email?.split('@')[0]}</p>
+                        </div>
+                      </div>
+                      <div className="absolute -top-2 -right-2 bg-emerald-500 text-white text-[9px] font-bold px-2 py-1 rounded-lg shadow-lg border border-emerald-400 z-20">
+                        SESSÃO ATIVA
+                      </div>
                     </div>
                   </div>
-                  <div className="absolute -top-2 -right-2 bg-emerald-500 text-white text-[9px] font-bold px-2 py-1 rounded-lg shadow-lg border border-emerald-400 z-20">
-                    SESSÃO ATIVA
-                  </div>
+                )}
+
+                {/* Right Side: Crossword Board */}
+                <div className="flex-1 w-full max-w-5xl">
+                  <CrosswordBoard
+                    placedWords={placedWords}
+                    onSolved={handleSolved}
+                  />
+
+                  {/* Board action buttons */}
+                  {!showNextLvl && (
+                    <div className={styles.boardActions}>
+                      <button id="hint-btn"   className="btn btn--secondary" onClick={handleHint}>💡 Dica</button>
+                      <button id="clear-btn"  className="btn btn--secondary" onClick={handleClear}>🗑 Limpar</button>
+                      <button id="reveal-btn" className="btn btn--danger"    onClick={handleRevealAll}>👁 Revelar Tudo</button>
+                    </div>
+                  )}
                 </div>
               </div>
-            )}
-
-            {/* Crossword */}
-            {gameVisible && (
-              <>
-                <CrosswordBoard
-                  placedWords={placedWords}
-                  onSolved={handleSolved}
-                  avatarUrl={gameState?.avatarUrl}
-                />
-
-                {/* Board action buttons */}
-                {!showNextLvl && (
-                  <div className={styles.boardActions}>
-                    <button id="hint-btn"   className="btn btn--secondary" onClick={handleHint}>💡 Dica</button>
-                    <button id="clear-btn"  className="btn btn--secondary" onClick={handleClear}>🗑 Limpar</button>
-                    <button id="reveal-btn" className="btn btn--danger"    onClick={handleRevealAll}>👁 Revelar Tudo</button>
-                  </div>
-                )}
-              </>
             )}
           </>
         )}
