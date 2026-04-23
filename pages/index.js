@@ -167,18 +167,19 @@ export default function Home() {
 
   // ---- Hint ----
   function handleHint() {
+    if (hintCount >= MAX_HINTS) {
+      showFeedback('Você já usou todos os corações! Não é possível mais pedir dicas nesta fase.', 'error', 4000);
+      return;
+    }
+
     if (!window._crosswordRevealHint) return;
     const revealed = window._crosswordRevealHint();
     if (revealed) {
       const next = hintCount + 1;
       setHintCount(next);
-      if (next <= MAX_HINTS) {
-        showFeedback(`Você usou um coração! Restam ${MAX_HINTS - next}.`, 'info', 3000);
-      } else {
-        showFeedback('Atenção: Você perdeu todos os corações! Esta fase não renderá mais pontos.', 'error', 4000);
-      }
+      showFeedback(`Você usou um coração! Restam ${MAX_HINTS - next}.`, 'info', 3000);
     } else {
-      showFeedback('Selecione uma dica primeiro.', 'error', 3000);
+      showFeedback('Selecione uma palavra ou célula primeiro para receber a dica.', 'error', 3000);
     }
   }
 
@@ -397,6 +398,7 @@ export default function Home() {
                 <CrosswordBoard
                   placedWords={placedWords}
                   onSolved={handleSolved}
+                  avatarUrl={gameState?.avatarUrl}
                 />
 
                 {/* Board action buttons */}

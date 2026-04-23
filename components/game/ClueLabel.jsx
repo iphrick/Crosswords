@@ -4,7 +4,8 @@ import styles from './CrosswordBoard.module.css';
 export default function ClueLabel({ 
   word, 
   isSelected, 
-  onClick 
+  onClick,
+  gridBounds
 }) {
   const { number, direction, clue, col, row } = word;
   
@@ -21,8 +22,8 @@ export default function ClueLabel({
         ${isSelected ? styles.selectedLabel : ''}
       `}
       style={{
-        gridColumn: col + 1,
-        gridRow: row + 1,
+        gridColumn: col - (gridBounds?.minX || 0) + 1,
+        gridRow: row - (gridBounds?.minY || 0) + 1,
       }}
       onClick={(e) => {
         e.stopPropagation();
