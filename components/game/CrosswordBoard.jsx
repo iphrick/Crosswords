@@ -1,339 +1,286 @@
 // components/game/CrosswordBoard.jsx
-import { useRef, useEffect, useCallback, useState } from 'react';
+import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import { GRID_SIZE } from '@/lib/crosswordEngine';
-import CluesPanel from './CluesPanel';
+import CrosswordCell from './CrosswordCell';
+import ClueLabel from './ClueLabel';
 import styles from './CrosswordBoard.module.css';
 
-const CLASSES = {
-  BLOCKED:   'grid__cell--blocked',
-  ACTIVE:    'grid__cell--active',
-  NUMBER:    'grid__cell__number',
-  INPUT:     'grid__cell__input',
-  CORRECT:   'grid__cell__input--correct',
-  WRONG:     'grid__cell__input--wrong',
-  REVEALED:  'grid__cell__input--revealed',
-  HINT:      'grid__cell__input--hint',
-  HIGHLIGHT: 'grid__cell__input--highlight',
-  SOLVED:    'clues__item--solved',
-  SELECTED:  'clues__item--selected',
-};
-
 export default function CrosswordBoard({ placedWords, onSolved }) {
-  const gridRef      = useRef(null);
-  const activeWordRef = useRef(null);
-  const directionRef  = useRef('across');
-  const [activeNumber, setActiveNumber] = useState(null);
-  const [activeDir,    setActiveDir]    = useState('across');
+  // State
+  const [userAnswers, setUserAnswers] = useState({});
+  const [cellFeedback, setCellFeedback] = useState({}); // { "x,y": 'correct' | 'wrong' | 'revealed' | 'hint' }
+  const [activeWordIndex, setActiveWordIndex] = useState(null);
+  const [activeCell, setActiveCell] = useState({ x: -1, y: -1 });
+  const [direction, setDirection] = useState('across');
 
-  // Build grid DOM
-  useEffect(() => {
-    if (!gridRef.current || !placedWords?.length) return;
-    const grid = gridRef.current;
-    grid.innerHTML = '';
-    grid.style.gridTemplateColumns = `repeat(${GRID_SIZE}, minmax(28px, 34px))`;
-    grid.style.gridAutoRows = 'minmax(28px, 34px)';
+  const inputRefs = useRef({}); // { "x,y": HTMLInputElement }
 
-    // Create cells
-    for (let i = 0; i < GRID_SIZE * GRID_SIZE; i++) {
-      const cell = document.createElement('div');
-      cell.className = `grid__cell ${CLASSES.BLOCKED}`;
-      grid.appendChild(cell);
-    }
-
-    // Place words
-    placedWords.forEach(({ answer, col, row, direction, number }) => {
+  // Memoized grid data
+  const gridMap = useMemo(() => {
+    const map = {};
+    placedWords.forEach((word) => {
+      const { answer, col, row, direction, number } = word;
       for (let i = 0; i < answer.length; i++) {
-        const x    = direction === 'across' ? col + i : col;
-        const y    = direction === 'across' ? row     : row + i;
-        const cell = grid.children[y * GRID_SIZE + x];
-        if (!cell) continue;
-
-        cell.classList.remove(CLASSES.BLOCKED);
-
-        if (!cell.querySelector('input')) {
-          const inp = document.createElement('input');
-          inp.type = 'text'; inp.maxLength = 1; inp.autocomplete = 'off'; inp.spellcheck = false;
-          inp.className = CLASSES.INPUT;
-          inp.dataset.answer = answer[i];
-          cell.appendChild(inp);
+        const x = direction === 'across' ? col + i : col;
+        const y = direction === 'across' ? row : row + i;
+        const key = `${x},${y}`;
+        if (!map[key]) {
+          map[key] = { answer: answer[i], words: [], isFirst: false, number: null };
         }
-        if (i === 0 && !cell.querySelector(`.${CLASSES.NUMBER}`)) {
-          const num = document.createElement('span');
-          num.className = CLASSES.NUMBER;
-          num.textContent = number;
-          cell.prepend(num);
+        map[key].words.push(word);
+        if (i === 0) {
+          map[key].isFirst = true;
+          map[key].number = number;
         }
       }
     });
-
-    // Focus first input
-    const firstInput = grid.querySelector(`.${CLASSES.INPUT}`);
-    if (firstInput) {
-      const coords = getCoordsFromInput(firstInput, grid);
-      handleCellFocus(firstInput, coords, false, grid, placedWords, activeWordRef, directionRef);
-    }
+    return map;
   }, [placedWords]);
 
-  // Check all solved
-  const checkAllSolved = useCallback((grid, words) => {
-    if (!words?.length) return;
-    const allSolved = words.every(w => isWordSolved(w, grid));
-    if (allSolved) onSolved?.();
-  }, [onSolved]);
+  const activeWord = useMemo(() => {
+    if (activeWordIndex === null) return null;
+    return placedWords[activeWordIndex];
+  }, [activeWordIndex, placedWords]);
 
-  // Attach event listeners
+  // Methods
+  const getCellKey = (x, y) => `${x},${y}`;
+
+  const checkWordSolved = useCallback((word, currentAnswers) => {
+    for (let i = 0; i < word.answer.length; i++) {
+      const x = word.direction === 'across' ? word.col + i : word.col;
+      const y = word.direction === 'across' ? word.row : word.row + i;
+      const key = getCellKey(x, y);
+      if (currentAnswers[key] !== word.answer[i]) return false;
+    }
+    return true;
+  }, []);
+
+  const handleInput = useCallback((x, y, char) => {
+    const key = getCellKey(x, y);
+    const correctChar = gridMap[key]?.answer;
+    
+    const newUserAnswers = { ...userAnswers, [key]: char };
+    setUserAnswers(newUserAnswers);
+
+    // Provide feedback immediately if char is not empty
+    if (char) {
+      setCellFeedback(prev => ({
+        ...prev,
+        [key]: char === correctChar ? 'correct' : 'wrong'
+      }));
+      
+      // Auto-advance
+      if (char === correctChar) {
+        moveToNextCell(x, y);
+      }
+    } else {
+      setCellFeedback(prev => {
+        const newPrev = { ...prev };
+        delete newPrev[key];
+        return newPrev;
+      });
+    }
+
+    // Check if the whole game is solved
+    const allSolved = placedWords.every(w => checkWordSolved(w, newUserAnswers));
+    if (allSolved) {
+      onSolved?.();
+    }
+  }, [userAnswers, gridMap, placedWords, checkWordSolved, onSolved]);
+
+  const moveToNextCell = (x, y) => {
+    if (!activeWord) return;
+    const { answer, col, row, direction } = activeWord;
+    const index = direction === 'across' ? x - col : y - row;
+    if (index < answer.length - 1) {
+      const nextX = direction === 'across' ? x + 1 : x;
+      const nextY = direction === 'across' ? y : y + 1;
+      inputRefs.current[`${nextX},${nextY}`]?.focus();
+    }
+  };
+
+  const handleKeyDown = (e, x, y) => {
+    if (e.key === 'Backspace' && !userAnswers[getCellKey(x, y)]) {
+      e.preventDefault();
+      moveToPrevCell(x, y);
+    } else if (e.key === 'ArrowRight') {
+      inputRefs.current[`${x + 1},${y}`]?.focus();
+    } else if (e.key === 'ArrowLeft') {
+      inputRefs.current[`${x - 1},${y}`]?.focus();
+    } else if (e.key === 'ArrowDown') {
+      inputRefs.current[`${x},${y + 1}`]?.focus();
+    } else if (e.key === 'ArrowUp') {
+      inputRefs.current[`${x},${y - 1}`]?.focus();
+    } else if (e.key === 'Tab') {
+      // Find next word
+      e.preventDefault();
+      const nextIndex = (activeWordIndex + 1) % placedWords.length;
+      selectWord(placedWords[nextIndex]);
+    }
+  };
+
+  const moveToPrevCell = (x, y) => {
+    if (!activeWord) return;
+    const { col, row, direction } = activeWord;
+    const index = direction === 'across' ? x - col : y - row;
+    if (index > 0) {
+      const prevX = direction === 'across' ? x - 1 : x;
+      const prevY = direction === 'across' ? y : y - 1;
+      inputRefs.current[`${prevX},${prevY}`]?.focus();
+    }
+  };
+
+  const selectWord = (word) => {
+    const index = placedWords.indexOf(word);
+    setActiveWordIndex(index);
+    setDirection(word.direction);
+    setActiveCell({ x: word.col, y: word.row });
+    inputRefs.current[`${word.col},${word.row}`]?.focus();
+  };
+
+  const handleCellClick = (x, y) => {
+    const key = getCellKey(x, y);
+    const cellWords = gridMap[key]?.words || [];
+    if (cellWords.length === 0) return;
+
+    let targetWord = cellWords[0];
+    
+    // Toggle direction if clicking the same cell
+    if (activeCell.x === x && activeCell.y === y && cellWords.length > 1) {
+      const nextDir = direction === 'across' ? 'down' : 'across';
+      targetWord = cellWords.find(w => w.direction === nextDir) || cellWords[0];
+    } else if (cellWords.length > 1) {
+      targetWord = cellWords.find(w => w.direction === direction) || cellWords[0];
+    }
+
+    selectWord(targetWord);
+  };
+
+  // Public methods exposed to parent
   useEffect(() => {
-    const grid = gridRef.current;
-    if (!grid || !placedWords?.length) return;
-
-    function onInput(e) {
-      const inp = e.target.closest(`.${CLASSES.INPUT}`);
-      if (!inp) return;
-      checkInput(inp);
-      if (inp.value.toUpperCase() === inp.dataset.answer) advanceFocus(inp, grid, activeWordRef);
-      updateClueStates(grid, placedWords);
-      checkAllSolved(grid, placedWords);
-    }
-
-    function onKeydown(e) {
-      const inp = e.target.closest(`.${CLASSES.INPUT}`);
-      if (!inp) return;
-      if (['ArrowUp','ArrowDown','ArrowLeft','ArrowRight'].includes(e.key)) {
-        e.preventDefault();
-        moveFocusWithArrows(inp, e.key, grid);
-        return;
-      }
-      if (e.key === 'Backspace' && inp.value === '' && activeWordRef.current) {
-        moveFocus(inp, -1, grid, activeWordRef);
-      }
-    }
-
-    function onFocusin(e) {
-      const inp = e.target.closest(`.${CLASSES.INPUT}`);
-      if (!inp) return;
-      const coords = getCoordsFromInput(inp, grid);
-      handleCellFocus(inp, coords, false, grid, placedWords, activeWordRef, directionRef);
-    }
-
-    function onClick(e) {
-      const inp = e.target.closest(`.${CLASSES.INPUT}`);
-      if (!inp) return;
-      const coords = getCoordsFromInput(inp, grid);
-      handleCellFocus(inp, coords, true, grid, placedWords, activeWordRef, directionRef);
-    }
-
-    grid.addEventListener('input',   onInput);
-    grid.addEventListener('keydown', onKeydown);
-    grid.addEventListener('focusin', onFocusin);
-    grid.addEventListener('click',   onClick);
-
-    return () => {
-      grid.removeEventListener('input',   onInput);
-      grid.removeEventListener('keydown', onKeydown);
-      grid.removeEventListener('focusin', onFocusin);
-      grid.removeEventListener('click',   onClick);
+    window._crosswordRevealAll = () => {
+      const allAnswers = {};
+      const allFeedback = {};
+      placedWords.forEach(w => {
+        for (let i = 0; i < w.answer.length; i++) {
+          const x = w.direction === 'across' ? w.col + i : w.col;
+          const y = w.direction === 'across' ? w.row : w.row + i;
+          const key = `${x},${y}`;
+          allAnswers[key] = w.answer[i];
+          allFeedback[key] = 'revealed';
+        }
+      });
+      setUserAnswers(allAnswers);
+      setCellFeedback(allFeedback);
     };
-  }, [placedWords, checkAllSolved]);
 
-  // Public methods via ref
-  const revealAll = useCallback(async () => {
-    const grid = gridRef.current;
-    if (!grid) return;
-    const inputs = grid.querySelectorAll(`.${CLASSES.INPUT}:not([readOnly])`);
-    for (const inp of inputs) {
-      inp.value = inp.dataset.answer;
-      inp.readOnly = true;
-      inp.classList.remove(CLASSES.CORRECT, CLASSES.WRONG);
-      inp.classList.add(CLASSES.REVEALED);
-      await new Promise(r => setTimeout(r, 35));
-    }
-    updateClueStates(grid, placedWords);
-  }, [placedWords]);
-
-  const revealHint = useCallback(() => {
-    if (!activeWordRef.current) return false;
-    const grid = gridRef.current;
-    const { answer, col, row, direction } = activeWordRef.current;
-    for (let i = 0; i < answer.length; i++) {
-      const x = direction === 'across' ? col + i : col;
-      const y = direction === 'across' ? row     : row + i;
-      const inp = cellAt(x, y, grid)?.querySelector('input');
-      if (inp && !inp.readOnly && inp.value.toUpperCase() !== answer[i]) {
-        inp.value = answer[i];
-        inp.classList.add(CLASSES.HINT);
-        checkInput(inp);
-        updateClueStates(grid, placedWords);
-        return true;
+    window._crosswordRevealHint = () => {
+      if (!activeWord) return false;
+      for (let i = 0; i < activeWord.answer.length; i++) {
+        const x = activeWord.direction === 'across' ? activeWord.col + i : activeWord.col;
+        const y = activeWord.direction === 'across' ? activeWord.row : activeWord.row + i;
+        const key = `${x},${y}`;
+        if (userAnswers[key] !== activeWord.answer[i]) {
+          setUserAnswers(prev => ({ ...prev, [key]: activeWord.answer[i] }));
+          setCellFeedback(prev => ({ ...prev, [key]: 'hint' }));
+          return true;
+        }
       }
-    }
-    return false;
-  }, [placedWords]);
+      return false;
+    };
 
-  const clearAll = useCallback(() => {
-    const grid = gridRef.current;
-    if (!grid) return;
-    grid.querySelectorAll(`.${CLASSES.INPUT}`).forEach(inp => {
-      if (inp.readOnly) return;
-      inp.value = '';
-      inp.classList.remove(CLASSES.CORRECT, CLASSES.WRONG, CLASSES.REVEALED, CLASSES.HINT);
-    });
-    updateClueStates(grid, placedWords);
-  }, [placedWords]);
+    window._crosswordClearAll = () => {
+      setUserAnswers({});
+      setCellFeedback({});
+    };
 
-  // Expose methods via window (to be called from parent page)
-  useEffect(() => {
-    window._crosswordRevealAll  = revealAll;
-    window._crosswordRevealHint = revealHint;
-    window._crosswordClearAll   = clearAll;
     return () => {
       delete window._crosswordRevealAll;
       delete window._crosswordRevealHint;
       delete window._crosswordClearAll;
     };
-  }, [revealAll, revealHint, clearAll]);
+  }, [activeWord, placedWords, userAnswers]);
 
-  // Clue click handler
-  const handleClueClick = useCallback((number, direction) => {
-    const grid = gridRef.current;
-    if (!grid) return;
-    const word = placedWords.find(w => w.number === number && w.direction === direction);
-    if (!word) return;
-    setActiveWord(word, grid, activeWordRef, directionRef);
-    setActiveNumber(number);
-    setActiveDir(direction);
-    const inp = cellAt(word.col, word.row, grid)?.querySelector('input');
-    inp?.focus();
+  // Initial focus
+  useEffect(() => {
+    if (placedWords.length > 0 && activeWordIndex === null) {
+      selectWord(placedWords[0]);
+    }
   }, [placedWords]);
+
+  // Render grid
+  const renderGrid = () => {
+    const cells = [];
+    for (let y = 0; y < GRID_SIZE; y++) {
+      for (let x = 0; x < GRID_SIZE; x++) {
+        const key = getCellKey(x, y);
+        const data = gridMap[key];
+        const feedback = cellFeedback[key];
+        
+        cells.push(
+          <CrosswordCell
+            key={key}
+            x={x} y={y}
+            isBlocked={!data}
+            answer={data?.answer}
+            value={userAnswers[key] || ''}
+            number={data?.number}
+            isActive={activeCell.x === x && activeCell.y === y}
+            isHighlighted={activeWord && data?.words.some(w => w === activeWord)}
+            isCorrect={feedback === 'correct'}
+            isWrong={feedback === 'wrong'}
+            isRevealed={feedback === 'revealed'}
+            isHint={feedback === 'hint'}
+            activeDirection={direction}
+            onInput={(char) => handleInput(x, y, char)}
+            onKeyDown={(e) => handleKeyDown(e, x, y)}
+            onFocus={() => setActiveCell({ x, y })}
+            onClick={() => handleCellClick(x, y)}
+            inputRef={(el) => (inputRefs.current[key] = el)}
+          />
+        );
+      }
+    }
+    return cells;
+  };
 
   return (
     <div className={styles.board}>
       <div className={styles.gridWrapper}>
-        <div
-          ref={gridRef}
-          className="grid"
-          role="grid"
-          aria-label="Grade da cruzadinha"
-        />
-        <div className={styles.actions} id="crossword-actions">
-          <slot name="actions" />
+        {/* Active Clue Mini-Bar (Desktop) */}
+        {activeWord && (
+          <div className="hidden lg:flex items-center gap-4 bg-emerald-500/10 border border-emerald-500/30 p-3 rounded-xl mb-4 animate-in fade-in slide-in-from-top-2">
+            <div className="bg-emerald-500 text-slate-900 font-extrabold px-3 py-1 rounded-lg text-sm">
+              {activeWord.number} {activeWord.direction === 'across' ? '→' : '↓'}
+            </div>
+            <p className="text-emerald-100 font-medium text-lg leading-tight">
+              {activeWord.clue}
+            </p>
+          </div>
+        )}
+
+        <div className={styles.gridScroll}>
+          <div 
+            className={styles.grid}
+            style={{ 
+              gridTemplateColumns: `repeat(${GRID_SIZE}, auto)`,
+              gridTemplateRows: `repeat(${GRID_SIZE}, auto)`
+            }}
+          >
+            {renderGrid()}
+            
+            {/* Clue Labels Overlay */}
+            {placedWords.map((word, idx) => (
+              <ClueLabel 
+                key={`${word.direction}-${word.number}`}
+                word={word}
+                isSelected={activeWordIndex === idx}
+                onClick={selectWord}
+              />
+            ))}
+          </div>
         </div>
       </div>
-      <CluesPanel
-        placedWords={placedWords}
-        activeNumber={activeNumber}
-        activeDir={activeDir}
-        onClueClick={handleClueClick}
-      />
     </div>
   );
-}
-
-/* ---- helpers (imperative DOM — same logic as original script.js) ---- */
-function cellAt(col, row, grid) {
-  return grid.children[row * GRID_SIZE + col] || null;
-}
-
-function getCoordsFromInput(inp, grid) {
-  const cell  = inp.closest('.grid__cell');
-  const index = [...grid.children].indexOf(cell);
-  return index === -1 ? { col: 0, row: 0 } : { col: index % GRID_SIZE, row: Math.floor(index / GRID_SIZE) };
-}
-
-function getCoordsForIndex(word, i) {
-  return {
-    col: word.direction === 'across' ? word.col + i : word.col,
-    row: word.direction === 'across' ? word.row     : word.row + i,
-  };
-}
-
-function isCoordInWord(word, col, row) {
-  if (word.direction === 'across') return row === word.row && col >= word.col && col < word.col + word.answer.length;
-  return col === word.col && row >= word.row && row < word.row + word.answer.length;
-}
-
-function checkInput(inp) {
-  if (inp.readOnly) return;
-  const correct = inp.value.toUpperCase() === inp.dataset.answer;
-  inp.classList.toggle(CLASSES.CORRECT, correct && inp.value !== '');
-  inp.classList.toggle(CLASSES.WRONG,   !correct && inp.value !== '');
-}
-
-function setActiveWord(word, grid, activeWordRef, directionRef) {
-  activeWordRef.current   = word;
-  directionRef.current    = word.direction;
-  document.querySelectorAll(`.${CLASSES.SELECTED}`).forEach(el => el.classList.remove(CLASSES.SELECTED));
-  const clue = document.querySelector(`.clues__item[data-number="${word.number}"][data-direction="${word.direction}"]`);
-  clue?.classList.add(CLASSES.SELECTED);
-  clue?.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
-  highlightWord(word, grid);
-}
-
-function highlightWord(word, grid) {
-  document.querySelectorAll(`.${CLASSES.HIGHLIGHT}`).forEach(el => el.classList.remove(CLASSES.HIGHLIGHT));
-  if (!word) return;
-  for (let i = 0; i < word.answer.length; i++) {
-    const { col, row } = getCoordsForIndex(word, i);
-    cellAt(col, row, grid)?.querySelector('input')?.classList.add(CLASSES.HIGHLIGHT);
-  }
-}
-
-function handleCellFocus(inp, { col, row }, forceToggle, grid, placedWords, activeWordRef, directionRef) {
-  const wordsAt   = placedWords.filter(w => isCoordInWord(w, col, row));
-  if (!wordsAt.length) return;
-  const acrossWord = wordsAt.find(w => w.direction === 'across');
-  const downWord   = wordsAt.find(w => w.direction === 'down');
-  let dir = directionRef.current;
-  let active = activeWordRef.current;
-
-  if (forceToggle && active && isCoordInWord(active, col, row) && acrossWord && downWord) {
-    dir = dir === 'across' ? 'down' : 'across';
-  }
-
-  if (dir === 'across' && acrossWord) active = acrossWord;
-  else if (dir === 'down' && downWord) active = downWord;
-  else active = acrossWord || downWord;
-
-  setActiveWord(active, grid, activeWordRef, directionRef);
-}
-
-function advanceFocus(inp, grid, activeWordRef) { moveFocus(inp, 1, grid, activeWordRef); }
-
-function moveFocus(inp, delta, grid, activeWordRef) {
-  if (!activeWordRef.current) return;
-  const { col, row } = getCoordsFromInput(inp, grid);
-  const w = activeWordRef.current;
-  const cur = w.direction === 'across' ? col - w.col : row - w.row;
-  const next = cur + delta;
-  if (next >= 0 && next < w.answer.length) {
-    const { col: nc, row: nr } = getCoordsForIndex(w, next);
-    cellAt(nc, nr, grid)?.querySelector('input')?.focus();
-  }
-}
-
-function moveFocusWithArrows(inp, key, grid) {
-  let { col, row } = getCoordsFromInput(inp, grid);
-  if (key === 'ArrowUp')    row--;
-  if (key === 'ArrowDown')  row++;
-  if (key === 'ArrowLeft')  col--;
-  if (key === 'ArrowRight') col++;
-  if (row >= 0 && row < GRID_SIZE && col >= 0 && col < GRID_SIZE) {
-    cellAt(col, row, grid)?.querySelector('input')?.focus();
-  }
-}
-
-function isWordSolved(word, grid) {
-  for (let i = 0; i < word.answer.length; i++) {
-    const { col, row } = getCoordsForIndex(word, i);
-    const inp = cellAt(col, row, grid)?.querySelector('input');
-    if (!inp || inp.value.toUpperCase() !== word.answer[i]) return false;
-  }
-  return true;
-}
-
-function updateClueStates(grid, placedWords) {
-  placedWords.forEach(word => {
-    const solved = isWordSolved(word, grid);
-    const clue   = document.querySelector(`.clues__item[data-number="${word.number}"][data-direction="${word.direction}"]`);
-    clue?.classList.toggle(CLASSES.SOLVED, solved);
-  });
 }
