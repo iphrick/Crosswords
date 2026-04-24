@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
+import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const STEPS = [
@@ -44,18 +45,21 @@ export default function OnboardingTutorial({ onComplete }) {
   const [currentStep, setCurrentStep] = useState(0);
   const [coords, setCoords] = useState({ top: 0, left: 0, width: 0, height: 0, arrowUp: false });
   const [windowSize, setWindowSize] = useState({ width: 0, height: 0 });
+  const [mounted, setMounted] = useState(false);
   const cardRef = useRef(null);
 
   const step = STEPS[currentStep];
 
   useEffect(() => {
+    setMounted(true);
     setWindowSize({ width: window.innerWidth, height: window.innerHeight });
     
     const updatePosition = () => {
       const el = document.getElementById(step.targetId);
       if (el) {
         const rect = el.getBoundingClientRect();
-        const arrowUp = rect.top < 350;
+        // Se estiver nos primeiros 40% da tela, mostra abaixo. Se não, mostra acima.
+        const arrowUp = rect.top < window.innerHeight * 0.4;
         
         setCoords({
           top: rect.top + window.scrollY,
@@ -76,22 +80,24 @@ export default function OnboardingTutorial({ onComplete }) {
     };
 
     const timer = setTimeout(updatePosition, 150);
-    window.addEventListener('resize', () => {
+    const handleResize = () => {
       setWindowSize({ width: window.innerWidth, height: window.innerHeight });
       updatePosition();
-    });
+    };
+    window.addEventListener('resize', handleResize);
+    window.addEventListener('scroll', updatePosition, true);
+
     return () => {
       clearTimeout(timer);
-      window.removeEventListener('resize', updatePosition);
+      window.removeEventListener('resize', handleResize);
+      window.removeEventListener('scroll', updatePosition, true);
     };
   }, [currentStep, step.targetId]);
 
   const handleNext = () => {
-    console.log('[Tutorial Debug] Indo para o próximo passo:', currentStep + 1);
     if (currentStep < STEPS.length - 1) {
       setCurrentStep(currentStep + 1);
     } else {
-      console.log('[Tutorial Debug] Tutorial concluído com sucesso.');
       localStorage.setItem('juriquest_tutorial_done', 'true');
       onComplete();
     }
@@ -104,10 +110,11 @@ export default function OnboardingTutorial({ onComplete }) {
   };
 
   const handleSkip = () => {
-    console.log('[Tutorial Debug] Tutorial ignorado pelo usuário.');
     localStorage.setItem('juriquest_tutorial_done', 'true');
     onComplete();
   };
+
+  if (!mounted) return null;
 
   // Cálculo de posição responsiva do card
   const getCardStyle = () => {
@@ -115,29 +122,36 @@ export default function OnboardingTutorial({ onComplete }) {
     const cardWidth = isMobile ? Math.min(windowSize.width - 40, 340) : 420;
     
     let top = coords.arrowUp 
-      ? coords.top + coords.height + 25 
-      : coords.top - (isMobile ? 220 : 280);
+      ? coords.top + coords.height + 30 
+      : coords.top - (isMobile ? 240 : 300);
       
     let left = coords.left + coords.width / 2 - cardWidth / 2;
     
     // Viewport bounds
-    const margin = 20;
+    const margin = 16;
     if (left < margin) left = margin;
-    if (left + cardWidth > windowSize.width - margin) left = windowSize.width - cardWidth - margin;
+    if (left + cardWidth > windowSize.width - margin) {
+      left = windowSize.width - cardWidth - margin;
+    }
 
     return { top, left, width: cardWidth };
   };
 
   const cardStyle = getCardStyle();
 
-  return (
-    <div className="fixed inset-0 z-[10000] pointer-events-none overflow-hidden">
+  return createPortal(
+    <div className="fixed inset-0 z-[99999] pointer-events-none overflow-hidden">
       {/* Overlay com clip-path dinâmico */}
       <motion.div 
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        className="absolute inset-0 bg-slate-950/80"
-        style={{
+        className="absolute inset-0 bg-slate-950/80 pointer-events-auto"
+        onClick={handleSkip} // Permite fechar clicando fora
+      />
+
+      {/* Destaque do elemento alvo */}
+      <motion.div 
+        animate={{
           clipPath: `polygon(
             0% 0%, 0% 100%, 
             ${coords.left - 8}px 100%, 
@@ -149,6 +163,7 @@ export default function OnboardingTutorial({ onComplete }) {
             100% 100%, 100% 0%
           )`
         }}
+        className="absolute inset-0 bg-transparent pointer-events-none"
       />
 
       <motion.div
@@ -160,78 +175,76 @@ export default function OnboardingTutorial({ onComplete }) {
           opacity: [0.3, 0.8, 0.3]
         }}
         transition={{ duration: 2, repeat: Infinity }}
-        className="absolute border-2 border-[#c9a96e] rounded-xl shadow-[0_0_30px_rgba(201,169,110,0.4)] z-[10001]"
+        className="absolute border-2 border-[#c9a96e] rounded-xl shadow-[0_0_40px_rgba(201,169,110,0.5)] z-[100001] pointer-events-none"
       />
 
       <AnimatePresence mode="wait">
         <motion.div
           key={currentStep}
           ref={cardRef}
-          initial={{ opacity: 0, y: coords.arrowUp ? 20 : -20, scale: 0.9 }}
-          animate={{ opacity: 1, y: 0, scale: 1 }}
-          exit={{ opacity: 0, y: coords.arrowUp ? 20 : -20, scale: 0.9 }}
+          initial={{ opacity: 0, scale: 0.8, y: coords.arrowUp ? 20 : -20 }}
+          animate={{ opacity: 1, scale: 1, y: 0 }}
+          exit={{ opacity: 0, scale: 0.8, y: coords.arrowUp ? 20 : -20 }}
           transition={{ type: 'spring', damping: 25, stiffness: 240 }}
-          className="absolute pointer-events-auto bg-slate-900 border border-[#c9a96e]/20 rounded-[2rem] p-6 sm:p-8 shadow-[0_30px_90px_rgba(0,0,0,0.9)] z-[10002] flex flex-col gap-4"
+          className="absolute pointer-events-auto bg-slate-900 border border-[#c9a96e]/30 rounded-[2.5rem] p-8 shadow-[0_40px_100px_rgba(0,0,0,1)] z-[100002] flex flex-col gap-5"
           style={{
             top: cardStyle.top,
             left: cardStyle.left,
             width: cardStyle.width,
-            maxHeight: '80vh',
-            overflowY: 'auto'
+            maxHeight: '75vh',
           }}
         >
           {/* Header & Progress Bar */}
-          <div className="flex flex-col gap-4">
+          <div className="flex flex-col gap-5">
             <div className="flex items-center justify-between">
-              <span className="text-[10px] font-black text-[#c9a96e] uppercase tracking-[0.25em]">
-                {currentStep + 1} / {STEPS.length}
+              <span className="text-[11px] font-black text-[#c9a96e] uppercase tracking-[0.3em]">
+                GUIA JURIQUEST {currentStep + 1} / {STEPS.length}
               </span>
-              <button onClick={handleSkip} className="text-[10px] font-bold text-slate-500 hover:text-white uppercase tracking-widest transition-colors p-1">
+              <button onClick={handleSkip} className="text-[11px] font-bold text-slate-500 hover:text-white uppercase tracking-widest transition-colors p-1">
                 Pular
               </button>
             </div>
-            <div className="flex gap-1.5 h-1">
+            <div className="flex gap-2 h-1.5 bg-slate-800/50 rounded-full overflow-hidden">
               {STEPS.map((_, i) => (
-                <div key={i} className={`h-full rounded-full flex-1 transition-all duration-500 ${i <= currentStep ? 'bg-[#c9a96e]' : 'bg-slate-800'}`} />
+                <div key={i} className={`h-full flex-1 transition-all duration-700 ${i <= currentStep ? 'bg-[#c9a96e]' : 'bg-transparent'}`} />
               ))}
             </div>
           </div>
 
-          <div className="space-y-2 mt-2">
-            <h4 className="text-white font-black text-lg sm:text-xl leading-tight break-words">{step.title}</h4>
+          <div className="space-y-3 mt-2">
+            <h4 className="text-white font-black text-xl sm:text-2xl leading-tight break-words tracking-tight">{step.title}</h4>
             <p className="text-slate-400 text-sm sm:text-base leading-relaxed break-words overflow-wrap-anywhere">{step.text}</p>
           </div>
 
-          <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 mt-4">
-            <div className="flex gap-2 order-2 sm:order-1">
-              {currentStep > 0 && (
-                <button 
-                  onClick={handleBack}
-                  className="px-5 py-3 bg-slate-800/50 text-slate-300 text-xs font-bold rounded-xl hover:bg-slate-700 transition-all border border-slate-700/30 flex-1 sm:flex-none"
-                >
-                  ← Voltar
-                </button>
-              )}
-            </div>
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4 mt-6">
+            {currentStep > 0 ? (
+              <button 
+                onClick={handleBack}
+                className="px-6 py-4 bg-slate-800 text-slate-300 text-xs font-bold rounded-2xl hover:bg-slate-700 transition-all border border-slate-700/50 flex-1 sm:flex-none"
+              >
+                ← Voltar
+              </button>
+            ) : <div />}
             
             <button
               onClick={handleNext}
-              className="px-8 py-4 bg-[#c9a96e] text-slate-950 text-sm font-black rounded-xl hover:bg-[#d4b47a] transition-all transform active:scale-95 shadow-xl shadow-[#c9a96e]/10 order-1 sm:order-2 flex-1 sm:flex-none text-center"
+              className="px-10 py-4 bg-[#c9a96e] text-slate-950 text-sm font-black rounded-2xl hover:bg-[#d4b47a] transition-all transform active:scale-95 shadow-2xl shadow-[#c9a96e]/20 order-1 sm:order-2 flex-1 sm:flex-none text-center"
             >
               {currentStep === STEPS.length - 1 ? 'Vamos Jogar! 🚀' : 'Próximo Passo'}
             </button>
           </div>
 
-          {/* Arrow */}
+          {/* Seta dinamicamente posicionada */}
           <div 
-            className={`absolute w-6 h-6 bg-slate-900 border-l border-t border-[#c9a96e]/20 rotate-45 pointer-events-none
+            className={`absolute w-8 h-8 bg-slate-900 border-l border-t border-[#c9a96e]/30 rotate-45 pointer-events-none
               ${coords.arrowUp 
-                ? '-top-3 left-1/2 -translate-x-1/2' 
-                : '-bottom-3 left-1/2 -translate-x-1/2 border-r border-b border-l-0 border-t-0'
+                ? '-top-4 left-1/2 -translate-x-1/2' 
+                : '-bottom-4 left-1/2 -translate-x-1/2 border-r border-b border-l-0 border-t-0'
               }`}
           />
         </motion.div>
       </AnimatePresence>
-    </div>
+    </div>,
+    document.body
   );
 }
