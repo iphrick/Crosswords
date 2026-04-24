@@ -102,35 +102,40 @@ export default function OnboardingTutorial({ onComplete }) {
           animate={{ opacity: 1, y: 0, scale: 1 }}
           exit={{ opacity: 0, y: -20, scale: 0.95 }}
           transition={{ type: 'spring', damping: 20 }}
-          className="absolute pointer-events-auto w-72 sm:w-80 bg-slate-900 border border-[#c9a96e]/30 rounded-2xl p-6 shadow-2xl shadow-black/50"
+          className="absolute pointer-events-auto w-[320px] sm:w-[380px] bg-slate-900 border border-[#c9a96e]/40 rounded-2xl p-8 shadow-2xl shadow-black/60"
           style={{
-            top: step.position === 'bottom' ? coords.top + coords.height + 20 : coords.top - 200,
-            left: Math.max(20, Math.min(window.innerWidth - 300, coords.left + coords.width / 2 - 150))
+            // Smart positioning: if too close to top, force to bottom
+            top: (step.position === 'bottom' || coords.top < 250) 
+              ? coords.top + coords.height + 25 
+              : coords.top - 240,
+            left: Math.max(15, Math.min(window.innerWidth - 335, coords.left + coords.width / 2 - 190)),
+            // Ensure it doesn't hit the very top
+            marginTop: 0
           }}
         >
           {/* Progress Dots */}
-          <div className="flex gap-1.5 mb-4">
+          <div className="flex gap-2 mb-5">
             {STEPS.map((_, i) => (
               <div 
                 key={i} 
-                className={`h-1 rounded-full transition-all duration-300 ${i === currentStep ? 'w-6 bg-[#c9a96e]' : 'w-2 bg-slate-700'}`}
+                className={`h-1.5 rounded-full transition-all duration-500 ${i === currentStep ? 'w-8 bg-[#c9a96e]' : 'w-2 bg-slate-800'}`}
               />
             ))}
           </div>
 
-          <h4 className="text-white font-bold text-lg mb-2">{step.title}</h4>
-          <p className="text-slate-400 text-sm leading-relaxed mb-6">{step.text}</p>
+          <h4 className="text-white font-bold text-xl mb-3">{step.title}</h4>
+          <p className="text-slate-400 text-base leading-relaxed mb-8">{step.text}</p>
 
-          <div className="flex items-center justify-between gap-4">
+          <div className="flex items-center justify-between gap-6">
             <button 
               onClick={handleSkip}
-              className="text-xs font-bold text-slate-500 hover:text-slate-300 transition-colors"
+              className="text-xs font-bold text-slate-500 hover:text-[#c9a96e] transition-colors"
             >
               Pular Tudo
             </button>
             <button
               onClick={handleNext}
-              className="px-6 py-2 bg-[#c9a96e] text-slate-950 text-sm font-black rounded-xl hover:bg-[#d4b47a] transition-all transform active:scale-95"
+              className="px-8 py-2.5 bg-[#c9a96e] text-slate-950 text-sm font-black rounded-xl hover:bg-[#d4b47a] transition-all transform active:scale-95 shadow-lg shadow-[#c9a96e]/20"
             >
               {currentStep === STEPS.length - 1 ? 'Começar!' : 'Próximo →'}
             </button>
@@ -138,7 +143,11 @@ export default function OnboardingTutorial({ onComplete }) {
 
           {/* Arrow */}
           <div 
-            className={`absolute w-4 h-4 bg-slate-900 border-l border-t border-[#c9a96e]/30 rotate-45 ${step.position === 'bottom' ? '-top-2 left-1/2 -translate-x-1/2' : '-bottom-2 left-1/2 -translate-x-1/2 border-r border-b border-l-0 border-t-0'}`}
+            className={`absolute w-5 h-5 bg-slate-900 border-l border-t border-[#c9a96e]/40 rotate-45 
+              ${(step.position === 'bottom' || coords.top < 250) 
+                ? '-top-2.5 left-1/2 -translate-x-1/2' 
+                : '-bottom-2.5 left-1/2 -translate-x-1/2 border-r border-b border-l-0 border-t-0'
+              }`}
           />
         </motion.div>
       </AnimatePresence>

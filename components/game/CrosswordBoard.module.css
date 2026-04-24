@@ -177,16 +177,17 @@
 
 .clueTooltip {
   position: absolute;
-  background: var(--color-accent);
+  background: rgba(201, 169, 110, 0.95);
+  backdrop-filter: blur(4px);
   color: var(--color-bg);
   padding: 12px 18px;
-  border-radius: 10px;
+  border-radius: 12px;
   font-size: 14px;
   font-weight: 700;
   width: 280px;
   max-width: 80vw;
   text-align: center;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(255, 255, 255, 0.1);
   pointer-events: none;
   z-index: 100;
   animation: tooltipFade 0.2s ease;
@@ -194,9 +195,8 @@
 }
 
 .acrossLabel .clueTooltip {
-  bottom: 140%;
+  bottom: 160%;
   left: 50%;
-  /* Removed default transform to allow alignment classes to control it */
 }
 
 .tooltipLeft {
@@ -218,7 +218,7 @@
 
 .downLabel .clueTooltip {
   top: 50%;
-  left: 140%;
+  left: 180%;
   transform: translateY(-50%);
 }
 
