@@ -39,6 +39,10 @@ export function useGameState(subject) {
     });
   }
 
+  async function unlockNextLevel() {
+    await updateGameState(gs => { _getSubject(gs).level += 1; });
+  }
+
   async function setLevelCompleted(val) {
     await updateGameState(gs => { _getSubject(gs).isLevelCompleted = val; });
   }
