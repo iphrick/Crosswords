@@ -32,7 +32,7 @@
 .gridScroll {
   width: 100%;
   overflow: auto;
-  padding: 60px 40px;
+  padding: 80px 120px;
   display: flex;
   justify-content: center;
   scrollbar-width: thin;

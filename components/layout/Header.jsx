@@ -30,6 +30,7 @@ export default function Header({ onLoginClick, onRegisterClick, onRankingClick, 
             <button id="login-modal-btn"    className="btn btn--secondary" onClick={() => { onLoginClick();    setMenuOpen(false); }}>Entrar</button>
             <button id="register-modal-btn" className="btn btn--secondary" onClick={() => { onRegisterClick(); setMenuOpen(false); }}>Cadastrar</button>
             <button id="ranking-modal-btn"  className="btn btn--secondary" onClick={() => { onRankingClick();  setMenuOpen(false); }}>Ranking</button>
+            <button id="tutorial-btn" className="btn btn--secondary" onClick={() => { onTutorialClick(); setMenuOpen(false); }}>Instruções</button>
             <button id="contact-modal-btn"  className="btn btn--ghost" onClick={() => { onContactClick(); setMenuOpen(false); }}>Contato</button>
           </>
         ) : (

@@ -49,8 +49,14 @@ export default function OnboardingTutorial({ onComplete }) {
           width: rect.width,
           height: rect.height
         });
-        // Scroll into view if needed
         el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      } else {
+        // Se o elemento não existir, tenta ir para o próximo passo ou fecha
+        if (currentStep < STEPS.length - 1) {
+          setCurrentStep(prev => prev + 1);
+        } else {
+          onComplete();
+        }
       }
     };
 
