@@ -8,36 +8,32 @@ export default async function handler(req, res) {
   if (!username || username.length < 3) return res.status(400).json({ error: 'Username muito curto.' });
   if (username.length > 30) return res.status(400).json({ error: 'Username muito longo (máx 30).' });
 
-  // Normalização idêntica ao update-username
-  const cleanUsername = username.toLowerCase().trim().replace(/[^a-z0-9_]/g, '');
+  // Normalização: permite letras, números, underscore e ESPAÇO
+  const cleanUsername = username.toLowerCase().trim().replace(/[^a-z0-9_ ]/g, '');
 
   try {
     const usernameRef = db.collection('usernames').doc(cleanUsername);
     const doc = await usernameRef.get();
     
-    if (doc.exists()) {
+    if (doc.exists) { // Corrigido: .exists é uma propriedade no Admin SDK
       const data = doc.data();
       const ownerUid = data.uid;
 
-      // Caso 1: É o próprio usuário checando seu nome já registrado
       if (uid && ownerUid === uid) {
         return res.status(200).json({ available: true, isOwner: true });
       }
 
-      // Caso 2: O registro existe, mas o usuário dono pode ter sido deletado
       const ownerSnap = await db.collection('users').doc(ownerUid).get();
-      if (!ownerSnap.exists) {
-        await usernameRef.delete(); // Limpa registro fantasma
+      if (!ownerSnap.exists) { // Corrigido: .exists é uma propriedade no Admin SDK
+        await usernameRef.delete();
         return res.status(200).json({ available: true });
       }
 
-      // Caso 3: Nome realmente ocupado por outro usuário ativo
       return res.status(200).json({ available: false });
     }
 
-    // Caso 4: Registro não existe no index, mas vamos conferir no documento do usuário (Double Check)
     const userWithNick = await db.collection('users')
-      .where('nickname', '==', username) // Busca pelo nome original (ou normalizado)
+      .where('nickname', '==', username)
       .limit(1)
       .get();
     

@@ -58,7 +58,7 @@ export default function UsernameModal({ isOpen }) {
               type="text"
               placeholder="ex: advogado_ninja"
               value={username}
-              onChange={(e) => setUsername(e.target.value.toLowerCase().replace(/[^a-z0-9_]/g, ''))}
+              onChange={(e) => setUsername(e.target.value.toLowerCase().replace(/[^a-z0-9_ ]/g, ''))}
               required
               minLength={3}
               maxLength={30}
@@ -68,7 +68,7 @@ export default function UsernameModal({ isOpen }) {
                 {status.loading ? 'Verificando...' : status.message}
               </p>
             )}
-            <p className={styles.subHint}>Apenas letras, números e underline (_). Entre 3-20 caracteres.</p>
+            <p className={styles.subHint}>Apenas letras, números, underline (_) e espaços. Entre 3-30 caracteres.</p>
           </div>
 
           {error && <div className={styles.error}>{error}</div>}

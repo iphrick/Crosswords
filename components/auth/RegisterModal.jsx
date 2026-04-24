@@ -13,7 +13,7 @@ export default function RegisterModal({ visible, onClose }) {
   if (!visible) return null;
 
   async function handleUsernameChange(val) {
-    const clean = val.toLowerCase().replace(/[^a-z0-9_]/g, '');
+    const clean = val.toLowerCase().replace(/[^a-z0-9_ ]/g, '');
     setUsername(clean);
     if (clean.length < 3) {
       setStatus({ checking: false, available: null, msg: '' });

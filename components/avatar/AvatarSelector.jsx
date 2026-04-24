@@ -27,7 +27,7 @@ export default function AvatarSelector({ visible, onClose }) {
   }, [gender, visible, gameState?.avatarId]);
 
   async function handleNameChange(val) {
-    const clean = val.toLowerCase().replace(/[^a-z0-9_]/g, '');
+    const clean = val.toLowerCase().replace(/[^a-z0-9_ ]/g, '');
     setEditingName(clean);
     if (clean === gameState?.nickname) {
       setNameStatus({ checking: false, available: true, msg: '' });
@@ -90,27 +90,27 @@ export default function AvatarSelector({ visible, onClose }) {
             <h2 className="text-3xl sm:text-4xl font-black text-white mb-2 tracking-tight">Identidade Jurídica</h2>
             
             {/* Username Edit Section */}
-            <div className="max-w-xs mx-auto mt-4 mb-8">
-               <div className="relative group">
+            <div className="max-w-sm mx-auto mt-6 mb-10">
+               <div className="relative flex items-center">
                   <input 
                     type="text"
                     value={editingName}
                     onChange={e => handleNameChange(e.target.value)}
                     placeholder="Seu username"
-                    className="w-full bg-slate-900 border-2 border-slate-800 rounded-xl px-4 py-3 text-white font-bold focus:border-[#c9a96e] outline-none transition-all pr-24"
+                    className="w-full bg-slate-900 border-2 border-slate-800 rounded-2xl pl-6 pr-24 py-4 text-white font-bold text-lg focus:border-[#c9a96e] focus:bg-slate-900/50 outline-none transition-all shadow-inner"
                   />
                   {editingName !== gameState?.nickname && (
                     <button 
                       onClick={saveUsername}
                       disabled={!nameStatus.available || saveLoading}
-                      className="absolute right-2 top-2 bottom-2 px-3 bg-[#c9a96e] text-slate-950 text-[10px] font-black uppercase rounded-lg disabled:opacity-30 transition-all"
+                      className="absolute right-3 px-4 py-2 bg-[#c9a96e] text-slate-950 text-xs font-black uppercase rounded-xl disabled:opacity-30 hover:scale-105 active:scale-95 transition-all shadow-lg"
                     >
                       {saveLoading ? '...' : 'Salvar'}
                     </button>
                   )}
                </div>
                {nameStatus.msg && (
-                 <p className={`text-[10px] mt-1 font-bold ${nameStatus.available ? 'text-emerald-500' : 'text-red-500'}`}>
+                 <p className={`text-[11px] mt-2 font-bold tracking-tight ${nameStatus.available ? 'text-emerald-500' : 'text-red-500'}`}>
                    {nameStatus.msg}
                  </p>
                )}
