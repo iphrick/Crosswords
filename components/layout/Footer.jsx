@@ -2,8 +2,8 @@ import React from 'react';
 
 export default function Footer() {
   return (
-    <footer className="w-full pt-12 pb-20 mt-auto border-t border-slate-800 bg-slate-950/50 backdrop-blur-md">
-      <div className="max-w-[1600px] mx-auto px-10 flex flex-col md:flex-row items-center justify-between gap-12">
+    <footer className="w-full pt-12 pb-24 mt-auto border-t border-slate-800 bg-slate-950/50 backdrop-blur-md">
+      <div className="max-w-6xl mx-auto px-10 flex flex-col lg:flex-row items-center justify-between gap-12">
         
         {/* Visual Keyboard Sketch */}
         <div className="flex flex-col md:flex-row items-center gap-8">
