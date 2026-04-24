@@ -184,9 +184,9 @@ export default function ContactModal({ visible, onClose }) {
                   Sua contribuição ajuda a manter os servidores ativos e a trazer novas cruzadinhas jurídicas todos os dias para a comunidade.
                 </p>
 
-                <div className="relative p-5 bg-white rounded-[2.5rem] shadow-[0_20px_60px_rgba(0,0,0,0.4)]">
+                <div className="relative p-5 bg-white rounded-[2.5rem] shadow-[0_20px_60px_rgba(0,0,0,0.4)] mt-4">
                   <img src={PIX_QR_CODE_IMG} alt="QR Code do PIX" className="w-44 h-44 sm:w-52 sm:h-52 object-contain rounded-2xl" />
-                  <div className="absolute -top-3 -right-3 bg-[#c9a96e] text-slate-950 text-[10px] font-black px-4 py-2 rounded-full shadow-2xl border-2 border-[#0e1117] z-10">
+                  <div className="absolute -bottom-3 -right-3 bg-[#c9a96e] text-slate-950 text-[10px] font-black px-4 py-2 rounded-full shadow-2xl border-2 border-[#0e1117] z-10">
                     PIX SEGURO
                   </div>
                 </div>
