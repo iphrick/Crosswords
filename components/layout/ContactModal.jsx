@@ -178,41 +178,39 @@ export default function ContactModal({ visible, onClose }) {
 
           {activeTab === 'donate' && (
             <div className="animate-in fade-in slide-in-from-bottom-2 duration-500 flex flex-col items-center">
-              <div className="w-full bg-slate-900/30 border border-slate-800/50 rounded-2xl p-6 mb-6">
-                <div className="flex justify-center mb-6">
-                  <div className="relative p-3 bg-white rounded-3xl shadow-[0_0_40px_rgba(255,255,255,0.05)]">
-                    <img src={PIX_QR_CODE_IMG} alt="QR Code do PIX" className="w-56 h-56 object-contain rounded-xl" />
-                    <div className="absolute -bottom-2 -right-2 bg-[#c9a96e] text-slate-950 text-[10px] font-black px-3 py-1.5 rounded-full shadow-lg">
-                      PIX SEGURO
-                    </div>
-                  </div>
-                </div>
-
-                <h3 className="text-xl font-bold text-white mb-3 text-center">Apoie o Desenvolvimento</h3>
-                <p className="text-sm text-slate-400 text-center leading-relaxed max-w-[320px] mx-auto">
+              <div className="w-full bg-slate-900/30 border border-slate-800/50 rounded-3xl p-8 mb-6 flex flex-col items-center text-center">
+                <h3 className="text-xl sm:text-2xl font-black text-white tracking-tight mb-3">Apoie o Desenvolvimento</h3>
+                <p className="text-sm text-slate-400 leading-relaxed max-w-[320px] mb-8 font-medium">
                   Sua contribuição ajuda a manter os servidores ativos e a trazer novas cruzadinhas jurídicas todos os dias para a comunidade.
                 </p>
+
+                <div className="relative p-5 bg-white rounded-[2.5rem] shadow-[0_20px_60px_rgba(0,0,0,0.4)]">
+                  <img src={PIX_QR_CODE_IMG} alt="QR Code do PIX" className="w-44 h-44 sm:w-52 sm:h-52 object-contain rounded-2xl" />
+                  <div className="absolute -top-3 -right-3 bg-[#c9a96e] text-slate-950 text-[10px] font-black px-4 py-2 rounded-full shadow-2xl border-2 border-[#0e1117] z-10">
+                    PIX SEGURO
+                  </div>
+                </div>
               </div>
 
-              <div className="w-full">
-                <span className="text-[10px] uppercase font-extrabold text-slate-500 tracking-wider block mb-3 text-center">Pix Copia e Cola</span>
-                <div className="flex bg-slate-900 border border-slate-800 rounded-xl overflow-hidden p-1 shadow-inner">
+              <div className="w-full space-y-4">
+                <label className="text-[10px] uppercase font-black text-slate-500 tracking-[0.25em] block text-center">Pix Copia e Cola</label>
+                <div className="flex flex-col sm:flex-row bg-slate-950 border border-slate-800 rounded-2xl overflow-hidden p-1.5 gap-1.5">
                   <input
                     type="text"
                     readOnly
                     value={PIX_CHAVE_COPIA_COLA}
-                    className="bg-transparent text-slate-400 text-xs px-4 py-3 flex-1 focus:outline-none truncate"
+                    className="bg-transparent text-slate-400 text-xs px-5 py-4 flex-1 focus:outline-none truncate font-mono"
                   />
                   <button
                     onClick={handleCopyPix}
-                    className="bg-slate-800 hover:bg-slate-700 text-white px-6 py-2 text-xs font-bold transition-all rounded-lg border border-slate-700 shadow-lg"
+                    className="bg-[#c9a96e] hover:bg-[#d4b47a] text-slate-950 px-8 py-4 text-xs font-black transition-all rounded-xl shadow-lg whitespace-nowrap"
                   >
-                    {copiedPix ? 'Copiado!' : 'Copiar Chave'}
+                    {copiedPix ? '✓ Copiado' : 'Copiar Chave'}
                   </button>
                 </div>
               </div>
               
-              <p className="mt-8 text-[10px] text-slate-600 font-medium">JuriQuest • Feito com dedicação para estudantes de Direito</p>
+              <p className="mt-10 text-[10px] text-slate-600 font-bold tracking-[0.2em] uppercase">JuriQuest • Feito por e para Advogados</p>
             </div>
           )}
         </div>
