@@ -202,6 +202,7 @@ export default function Home() {
         body: JSON.stringify({ secret, subject, level: parseInt(lvl, 10) }),
       });
       const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Erro desconhecido');
       showFeedback(`✅ ${data.message}`, 'success', 8000);
     } catch (err) {
       showFeedback(`❌ ${err.message}`, 'error', 8000);
