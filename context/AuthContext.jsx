@@ -100,7 +100,8 @@ export function AuthProvider({ children }) {
 
   async function checkUsername(username) {
     if (!username || username.length < 3) return false;
-    const res = await fetch(`/api/auth/check-username?username=${encodeURIComponent(username)}`);
+    const url = `/api/auth/check-username?username=${encodeURIComponent(username)}&uid=${user?.uid || ''}`;
+    const res = await fetch(url);
     const data = await res.json();
     return data.available;
   }
