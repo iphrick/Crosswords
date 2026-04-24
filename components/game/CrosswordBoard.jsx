@@ -91,8 +91,13 @@ export default function CrosswordBoard({ placedWords, onSolved, avatarUrl }) {
     } else {
       setCellFeedback(prev => { const n = { ...prev }; delete n[key]; return n; });
     }
-    if (placedWords.every(w => checkWordSolved(w, newUserAnswers))) onSolved?.();
-  }, [userAnswers, gridMap, placedWords, checkWordSolved, onSolved]);
+  }, [userAnswers, gridMap]);
+
+  useEffect(() => {
+    if (placedWords.length > 0 && placedWords.every(w => checkWordSolved(w, userAnswers))) {
+      onSolved?.();
+    }
+  }, [userAnswers, placedWords, checkWordSolved, onSolved]);
 
   const moveToNextCell = (x, y) => {
     if (!activeWord) return;
