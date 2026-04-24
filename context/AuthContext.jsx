@@ -99,11 +99,11 @@ export function AuthProvider({ children }) {
   }
 
   async function checkUsername(username) {
-    if (!username || username.length < 3) return false;
+    if (!username || username.length < 3) return { available: false, error: 'Muito curto' };
     const url = `/api/auth/check-username?username=${encodeURIComponent(username)}&uid=${user?.uid || ''}`;
     const res = await fetch(url);
     const data = await res.json();
-    return data.available;
+    return { available: data.available, error: data.error };
   }
 
   async function updateUsername(username) {

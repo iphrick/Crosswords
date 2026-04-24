@@ -6,6 +6,7 @@ export default async function handler(req, res) {
 
   const { username, uid } = req.query;
   if (!username || username.length < 3) return res.status(400).json({ error: 'Username muito curto.' });
+  if (username.length > 30) return res.status(400).json({ error: 'Username muito longo (máx 30).' });
 
   // Normalização idêntica ao update-username
   const cleanUsername = username.toLowerCase().trim().replace(/[^a-z0-9_]/g, '');

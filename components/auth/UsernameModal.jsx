@@ -18,11 +18,11 @@ export default function UsernameModal({ isOpen }) {
       if (username.length < 3) return;
       
       setStatus(prev => ({ ...prev, loading: true }));
-      const isAvailable = await checkUsername(username);
+      const data = await checkUsername(username);
       setStatus({
         loading: false,
-        available: isAvailable,
-        message: isAvailable ? '✔ Disponível' : '✖ Já em uso'
+        available: data.available,
+        message: data.available ? '✔ Disponível' : (data.error || '✖ Já em uso')
       });
     }, 500);
 
@@ -61,7 +61,7 @@ export default function UsernameModal({ isOpen }) {
               onChange={(e) => setUsername(e.target.value.toLowerCase().replace(/[^a-z0-9_]/g, ''))}
               required
               minLength={3}
-              maxLength={20}
+              maxLength={30}
             />
             {username.length > 0 && (
               <p className={`${styles.hint} ${status.available ? 'text-emerald-500' : 'text-red-500'}`}>

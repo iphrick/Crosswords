@@ -38,8 +38,12 @@ export default function AvatarSelector({ visible, onClose }) {
       return;
     }
     setNameStatus(s => ({ ...s, checking: true }));
-    const isAvail = await checkUsername(clean);
-    setNameStatus({ checking: false, available: isAvail, msg: isAvail ? '✔ Disponível' : '✖ Já em uso' });
+    const data = await checkUsername(clean);
+    setNameStatus({ 
+      checking: false, 
+      available: data.available, 
+      msg: data.available ? '✔ Disponível' : (data.error || '✖ Já em uso') 
+    });
   }
 
   async function saveUsername() {
