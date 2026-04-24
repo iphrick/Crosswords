@@ -3,7 +3,7 @@ import Head from 'next/head';
 import { useAuth } from '@/context/AuthContext';
 import { useGameState } from '@/hooks/useGameState';
 import { buildLayout } from '@/lib/crosswordEngine';
-import { SUBJECTS, SUCCESS_MESSAGES, randomFrom, rankingUpMsg } from '@/lib/juriMessages';
+import { SUBJECTS, SUCCESS_MESSAGES, randomFrom, rankingUpMsg, ADMIN_EMAIL, ADMIN_PHONE } from '@/lib/juriMessages';
 
 import LoginModal from '@/components/auth/LoginModal';
 import RegisterModal from '@/components/auth/RegisterModal';
@@ -18,13 +18,42 @@ import { useDevice } from '@/hooks/useDevice';
 import DesktopLayout from '@/components/ui/desktop/DesktopLayout';
 import MobileLayout from '@/components/ui/mobile/MobileLayout';
 
-const ADMIN_EMAIL = 'pedrohenriqueinsec281@gmail.com';
-const ADMIN_PHONE = '+5584991101624';
 const MAX_HINTS   = 3;
 
 export default function Home() {
   const { user, gameState, loading: authLoading } = useAuth();
   const { isMobile, isLoaded } = useDevice();
+
+  // ---- Shared Handlers ----
+  const showFeedback = useCallback((msg, type, duration = 4000) => {
+    setFeedback({ msg, type });
+    if (duration > 0) setTimeout(() => setFeedback({ msg: '', type: '' }), duration);
+  }, []);
+
+  const showOverlay = useCallback((icon, message, type) => {
+    setOverlay({ visible: true, icon, message, type });
+  }, []);
+
+  const showToast = useCallback((icon, message, type, duration = 6000) => {
+    setToast({ visible: true, icon, message, type });
+    setTimeout(() => setToast(t => ({ ...t, visible: false })), duration);
+  }, []);
+
+  const handleHint = useCallback(() => {
+    if (hintCount >= MAX_HINTS) {
+      showFeedback('Você já usou todos os corações! Não é possível mais pedir dicas nesta fase.', 'error', 4000);
+      return;
+    }
+    if (!window._crosswordRevealHint) return;
+    const revealed = window._crosswordRevealHint();
+    if (revealed) {
+      const next = hintCount + 1;
+      setHintCount(next);
+      showFeedback(`Você usou um coração! Restam ${MAX_HINTS - next}.`, 'info', 3000);
+    } else {
+      showFeedback('Selecione uma palavra ou célula primeiro.', 'error', 3000);
+    }
+  }, [hintCount, showFeedback]);
 
   // Modals
   const [loginOpen,    setLoginOpen]    = useState(false);
@@ -52,42 +81,6 @@ export default function Home() {
     }
   }, [user, authLoading, !!gameState?.avatarId]); // Dependência mais específica
 
-  // Atalho de teclado para dicas (Tecla H)
-  useEffect(() => {
-    const handleGlobalKeyDown = (e) => {
-      if (e.key.toLowerCase() === 'h' && !e.ctrlKey && !e.altKey && !e.metaKey) {
-        // Ignora se estiver digitando em um campo de texto (exceto as células do tabuleiro)
-        const activeEl = document.activeElement;
-        const isInput = activeEl.tagName === 'INPUT' || activeEl.tagName === 'TEXTAREA';
-        const isBoardCell = activeEl.closest('#crossword-grid');
-
-        // Se estiver em um input que não é do tabuleiro, ignora (ex: modal de contato)
-        if (isInput && !isBoardCell) return;
-
-        // Se estiver no tabuleiro, vamos usar Alt+H ou apenas H se não estiver em foco?
-        // Para seguir o pedido do usuário (tecla H), vamos disparar se não estiver no meio de uma digitação clara
-        // Mas para evitar que o usuário perca a chance de digitar 'H' em palavras como "HABEAS", 
-        // vamos sugerir o uso de Alt+H ou apenas permitir se o input estiver vazio?
-        // Decisão: Implementar 'H' global mas se estiver focado em uma célula, o 'H' normal digita a letra.
-        // Se NÃO estiver focado em nada ou for um clique genérico, 'H' dá a dica.
-        
-        if (!isInput) {
-          e.preventDefault();
-          handleHint();
-        }
-      }
-      
-      // Atalho alternativo universal: Alt + H sempre funciona
-      if (e.key.toLowerCase() === 'h' && e.altKey) {
-        e.preventDefault();
-        handleHint();
-      }
-    };
-
-    window.addEventListener('keydown', handleGlobalKeyDown);
-    return () => window.removeEventListener('keydown', handleGlobalKeyDown);
-  }, [handleHint]);
-
   // Game state
   const [subject, setSubject] = useState(SUBJECTS[0]);
   const gs = useGameState(subject);
@@ -112,21 +105,6 @@ export default function Home() {
     (user.email && user.email.toLowerCase() === ADMIN_EMAIL.toLowerCase()) ||
     user.phoneNumber === ADMIN_PHONE
   );
-
-  // ---- Shared Handlers ----
-  const showFeedback = useCallback((msg, type, duration = 4000) => {
-    setFeedback({ msg, type });
-    if (duration > 0) setTimeout(() => setFeedback({ msg: '', type: '' }), duration);
-  }, []);
-
-  const showOverlay = useCallback((icon, message, type) => {
-    setOverlay({ visible: true, icon, message, type });
-  }, []);
-
-  const showToast = useCallback((icon, message, type, duration = 6000) => {
-    setToast({ visible: true, icon, message, type });
-    setTimeout(() => setToast(t => ({ ...t, visible: false })), duration);
-  }, []);
 
   const handleGenerate = async () => {
     if (!user) return;
@@ -192,22 +170,6 @@ export default function Home() {
       }
     } catch (_) {}
   }, [levelDone, revealUsed, hintCount, placedWords, gs, gameState, user, showOverlay, showToast]);
-
-  const handleHint = () => {
-    if (hintCount >= MAX_HINTS) {
-      showFeedback('Você já usou todos os corações! Não é possível mais pedir dicas nesta fase.', 'error', 4000);
-      return;
-    }
-    if (!window._crosswordRevealHint) return;
-    const revealed = window._crosswordRevealHint();
-    if (revealed) {
-      const next = hintCount + 1;
-      setHintCount(next);
-      showFeedback(`Você usou um coração! Restam ${MAX_HINTS - next}.`, 'info', 3000);
-    } else {
-      showFeedback('Selecione uma palavra ou célula primeiro.', 'error', 3000);
-    }
-  };
 
   const handleRevealAll = async () => {
     if (!confirm('Revelar tudo? Não pontuará.')) return;
