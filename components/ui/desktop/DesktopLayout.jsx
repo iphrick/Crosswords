@@ -83,7 +83,7 @@ export default function DesktopLayout({
                   <label className="text-[10px] text-slate-500 font-black uppercase tracking-[0.2em] px-1">Matéria de Estudo</label>
                   <select
                     id="subject-select"
-                    className="bg-slate-950/80 border border-slate-800 text-white rounded-2xl px-5 py-3.5 min-w-[280px] focus:ring-2 focus:ring-[#c9a96e] outline-none transition-all font-bold text-sm shadow-inner"
+                    className="bg-slate-950/80 border border-slate-800 text-white rounded-2xl px-5 h-14 min-w-[280px] focus:ring-2 focus:ring-[#c9a96e] outline-none transition-all font-bold text-sm shadow-inner"
                     value={subject}
                     onChange={e => { setSubject(e.target.value); }}
                   >
@@ -111,11 +111,11 @@ export default function DesktopLayout({
               </div>
 
               {/* Action Buttons */}
-              <div className="flex items-center gap-5">
+              <div className="flex items-center gap-4">
                 {!showNextLvl ? (
                   <button 
                     id="generate-btn" 
-                    className="px-12 py-5 bg-[#c9a96e] text-slate-950 font-black rounded-2xl hover:bg-[#d4b47a] transition-all transform hover:-translate-y-1 active:scale-95 shadow-2xl shadow-[#c9a96e]/20 flex items-center justify-center gap-3 min-w-[240px]" 
+                    className="px-10 h-14 bg-[#c9a96e] text-slate-950 font-black rounded-2xl hover:bg-[#d4b47a] transition-all transform hover:-translate-y-1 active:scale-95 shadow-xl shadow-[#c9a96e]/20 flex items-center justify-center gap-3 min-w-[240px]" 
                     onClick={handleGenerate} 
                     disabled={isLoading}
                   >
@@ -126,14 +126,18 @@ export default function DesktopLayout({
                     )}
                   </button>
                 ) : (
-                  <button className="px-12 py-5 bg-emerald-600 text-white font-black rounded-2xl hover:bg-emerald-500 transition-all transform hover:-translate-y-1 active:scale-95 shadow-2xl shadow-emerald-600/30 flex items-center justify-center gap-3 min-w-[240px]" onClick={handleNextLevel}>
+                  <button className="px-10 h-14 bg-emerald-600 text-white font-black rounded-2xl hover:bg-emerald-500 transition-all transform hover:-translate-y-1 active:scale-95 shadow-xl shadow-emerald-600/30 flex items-center justify-center gap-3 min-w-[240px]" onClick={handleNextLevel}>
                     Próximo Nível ➜
                   </button>
                 )}
-                <button className="px-8 py-5 bg-slate-800/60 text-slate-300 font-bold rounded-2xl hover:bg-slate-800 hover:text-white transition-all border border-slate-700/50 min-w-[140px]" onClick={handleReset}>
+                <button className="px-8 h-14 bg-slate-800/60 text-slate-300 font-bold rounded-2xl hover:bg-slate-800 hover:text-white transition-all border border-slate-700/50 min-w-[140px] flex items-center justify-center" onClick={handleReset}>
                   Resetar
                 </button>
-                {isAdmin && <button className="p-5 bg-red-950/30 text-red-500 border border-red-900/30 rounded-2xl hover:bg-red-900/20 transition-all" onClick={handleAdminSeed}>⚙️</button>}
+                {isAdmin && (
+                  <button className="w-14 h-14 flex items-center justify-center bg-red-950/30 text-red-500 border border-red-900/30 rounded-2xl hover:bg-red-900/20 transition-all aspect-square" onClick={handleAdminSeed}>
+                    ⚙️
+                  </button>
+                )}
               </div>
             </section>
 

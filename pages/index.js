@@ -41,10 +41,16 @@ export default function Home() {
         setAvatarOpen(true);
       } else {
         const tutorialDone = localStorage.getItem('juriquest_tutorial_done');
-        if (!tutorialDone) setShowTutorial(true);
+        console.log('[Tutorial Debug] tutorialDone:', tutorialDone);
+        
+        // Só abre automaticamente se não houver registro de conclusão
+        if (tutorialDone !== 'true' && !showTutorial) {
+          console.log('[Tutorial Debug] Abrindo tutorial automaticamente para novo usuário.');
+          setShowTutorial(true);
+        }
       }
     }
-  }, [user, authLoading, gameState]);
+  }, [user, authLoading, !!gameState?.avatarId]); // Dependência mais específica
 
   // Game state
   const [subject, setSubject] = useState(SUBJECTS[0]);
