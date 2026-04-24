@@ -76,13 +76,14 @@ export default function DesktopLayout({
           </section>
         ) : (
           <>
-            <section className="bg-slate-900/40 backdrop-blur-md border border-slate-800 p-6 rounded-3xl mb-12 shadow-2xl flex flex-wrap items-end justify-between gap-8">
-              <div className="flex flex-wrap items-center gap-10">
+            <section className="bg-slate-900/60 backdrop-blur-xl border border-slate-800 p-6 rounded-[2rem] mb-12 shadow-2xl flex flex-wrap items-center justify-between gap-10">
+              <div className="flex flex-wrap items-center gap-12">
+                {/* Subject Selector */}
                 <div className="space-y-2">
-                  <label className="text-[10px] text-slate-500 font-black uppercase tracking-widest px-1">Matéria de Estudo</label>
+                  <label className="text-[10px] text-slate-500 font-black uppercase tracking-[0.2em] px-1">Matéria de Estudo</label>
                   <select
                     id="subject-select"
-                    className="bg-slate-950 border border-slate-700 text-white rounded-xl px-4 py-3 min-w-[240px] focus:ring-2 focus:ring-[#c9a96e] outline-none transition-all font-bold"
+                    className="bg-slate-950/80 border border-slate-800 text-white rounded-2xl px-5 py-3.5 min-w-[280px] focus:ring-2 focus:ring-[#c9a96e] outline-none transition-all font-bold text-sm shadow-inner"
                     value={subject}
                     onChange={e => { setSubject(e.target.value); }}
                   >
@@ -90,28 +91,47 @@ export default function DesktopLayout({
                   </select>
                 </div>
 
-                <div className="flex gap-8 border-l border-slate-800 pl-8">
+                {/* Stats & Hearts */}
+                <div className="flex items-center gap-12 border-l border-slate-800/50 pl-12">
                   <div className="text-center">
-                    <p className="text-[10px] text-slate-400 font-black uppercase tracking-widest mb-1">Nível</p>
-                    <p className="text-2xl font-black text-[#c9a96e]">{gs.level}</p>
+                    <p className="text-[10px] text-slate-500 font-black uppercase tracking-widest mb-1">Nível</p>
+                    <p className="text-2xl font-black text-[#c9a96e] drop-shadow-[0_0_8px_rgba(201,169,110,0.3)]">{gs.level}</p>
                   </div>
                   <div className="text-center">
-                    <p className="text-[10px] text-slate-400 font-black uppercase tracking-widest mb-1">Total Pontos</p>
+                    <p className="text-[10px] text-slate-500 font-black uppercase tracking-widest mb-1">Pontos</p>
                     <p className="text-2xl font-black text-white">{gs.score}</p>
                   </div>
+                  {gameVisible && !showNextLvl && (
+                    <div className="text-center bg-slate-950/40 px-6 py-2 rounded-2xl border border-slate-800/50">
+                      <p className="text-[10px] text-slate-500 font-black uppercase tracking-widest mb-1">Dicas (Corações)</p>
+                      <div className="text-xl flex gap-1 justify-center">{renderHearts()}</div>
+                    </div>
+                  )}
                 </div>
               </div>
 
-              <div className="flex items-center gap-3">
+              {/* Action Buttons */}
+              <div className="flex items-center gap-4">
                 {!showNextLvl ? (
-                  <button id="generate-btn" className="px-8 py-3.5 bg-[#c9a96e] text-slate-950 font-black rounded-xl hover:bg-[#d4b47a] transition-all transform active:scale-95 shadow-lg shadow-[#c9a96e]/10" onClick={handleGenerate} disabled={isLoading}>
-                    {isLoading ? 'Gerando…' : `Gerar Nível ${gs.level}`}
+                  <button 
+                    id="generate-btn" 
+                    className="px-10 py-4 bg-[#c9a96e] text-slate-950 font-black rounded-2xl hover:bg-[#d4b47a] transition-all transform active:scale-95 shadow-xl shadow-[#c9a96e]/10 flex items-center gap-2" 
+                    onClick={handleGenerate} 
+                    disabled={isLoading}
+                  >
+                    {isLoading ? (
+                      <><div className="w-4 h-4 border-2 border-slate-950/30 border-t-slate-950 rounded-full animate-spin" /> Gerando...</>
+                    ) : `Gerar Nível ${gs.level}`}
                   </button>
                 ) : (
-                  <button className="px-8 py-3.5 bg-emerald-600 text-white font-black rounded-xl hover:bg-emerald-500 transition-all transform active:scale-95 shadow-lg shadow-emerald-600/20" onClick={handleNextLevel}>Próximo Nível</button>
+                  <button className="px-10 py-4 bg-emerald-600 text-white font-black rounded-2xl hover:bg-emerald-500 transition-all transform active:scale-95 shadow-xl shadow-emerald-600/20" onClick={handleNextLevel}>
+                    Próximo Nível ➜
+                  </button>
                 )}
-                <button className="px-6 py-3.5 bg-slate-800 text-slate-300 font-bold rounded-xl hover:bg-slate-700 transition-all" onClick={handleReset}>Resetar</button>
-                {isAdmin && <button className="p-3.5 bg-red-600 text-white rounded-xl" onClick={handleAdminSeed}>⚙️</button>}
+                <button className="px-6 py-4 bg-slate-800/50 text-slate-400 font-bold rounded-2xl hover:bg-slate-800 hover:text-white transition-all border border-slate-700/30" onClick={handleReset}>
+                  Resetar
+                </button>
+                {isAdmin && <button className="p-4 bg-red-950/30 text-red-500 border border-red-900/30 rounded-2xl hover:bg-red-900/20 transition-all" onClick={handleAdminSeed}>⚙️</button>}
               </div>
             </section>
 
@@ -148,12 +168,6 @@ export default function DesktopLayout({
 
                 {/* Right Side: Crossword Board */}
                 <div id="crossword-grid" className="flex-1 max-w-5xl">
-                  {gameVisible && !showNextLvl && (
-                    <div className="flex items-center gap-3 mb-4 bg-slate-900/50 w-fit px-4 py-2 rounded-full border border-slate-800">
-                      <span className="text-xs font-bold text-slate-500 uppercase tracking-widest">Dicas:</span>
-                      <span className="text-lg">{renderHearts()}</span>
-                    </div>
-                  )}
                   <CrosswordBoard placedWords={placedWords} onSolved={handleSolved} />
                   {!showNextLvl && (
                     <div className="flex gap-4 mt-8 justify-center">
