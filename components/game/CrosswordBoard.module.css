@@ -135,7 +135,7 @@
 
 /* CLUE LABELS */
 .clueLabel {
-  position: absolute;
+  position: relative;
   z-index: 30;
   cursor: pointer;
   display: flex;
@@ -184,14 +184,17 @@
   border-radius: 12px;
   font-size: 14px;
   font-weight: 700;
-  width: 280px;
-  max-width: 80vw;
+  width: max-content;
+  min-width: 260px;
+  max-width: 320px;
   text-align: center;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(255, 255, 255, 0.1);
   pointer-events: none;
   z-index: 100;
   animation: tooltipFade 0.2s ease;
   line-height: 1.4;
+  white-space: normal;
+  display: block;
 }
 
 .acrossLabel .clueTooltip {
@@ -258,17 +261,29 @@
   }
 
   .clueTooltip {
-    position: fixed;
-    bottom: 20px;
-    left: 20px;
-    right: 20px;
-    width: auto;
+    position: fixed !important;
+    bottom: 20px !important;
+    left: 20px !important;
+    right: 20px !important;
+    width: auto !important;
+    transform: none !important;
     font-size: 13px;
-    padding: 12px 20px;
-    z-index: 200;
+    padding: 16px 24px;
+    z-index: 9999 !important;
     pointer-events: auto;
-    box-shadow: 0 -5px 25px rgba(0, 0, 0, 0.6);
+    box-shadow: 0 -5px 30px rgba(0, 0, 0, 0.8);
     border: 1px solid var(--color-accent);
+    background: var(--color-accent) !important; /* Non-transparent on mobile for better contrast */
+    color: var(--color-bg) !important;
+    border-radius: 16px;
+    text-align: center;
+  }
+
+  .acrossLabel .clueTooltip,
+  .downLabel .clueTooltip {
+    bottom: 20px !important;
+    left: 20px !important;
+    transform: none !important;
   }
 
   .clueIndicator {
