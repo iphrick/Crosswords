@@ -1,7 +1,9 @@
 import React from 'react';
+import dynamic from 'next/dynamic';
 import Header from '@/components/layout/Header';
-import CrosswordBoard from '@/components/game/CrosswordBoard';
 import styles from '@/styles/Home.module.css';
+
+const CrosswordBoard = dynamic(() => import('@/components/game/CrosswordBoard'), { ssr: false });
 
 export default function DesktopLayout({
   user,

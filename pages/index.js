@@ -1,6 +1,26 @@
+import { useState, useCallback, useEffect } from 'react';
+import Head from 'next/head';
+import { useAuth } from '@/context/AuthContext';
+import { useGameState } from '@/hooks/useGameState';
+import { buildLayout } from '@/lib/crosswordEngine';
+import { SUBJECTS, SUCCESS_MESSAGES, randomFrom, rankingUpMsg } from '@/lib/juriMessages';
+
+import LoginModal from '@/components/auth/LoginModal';
+import RegisterModal from '@/components/auth/RegisterModal';
+import FeedbackOverlay from '@/components/notifications/FeedbackOverlay';
+import RankingToast from '@/components/notifications/RankingToast';
+import RankingModal from '@/components/game/RankingModal';
+import ContactModal from '@/components/layout/ContactModal';
+import AvatarSelector from '@/components/avatar/AvatarSelector';
+import OnboardingTutorial from '@/components/game/OnboardingTutorial';
+
 import { useDevice } from '@/hooks/useDevice';
 import DesktopLayout from '@/components/ui/desktop/DesktopLayout';
 import MobileLayout from '@/components/ui/mobile/MobileLayout';
+
+const ADMIN_EMAIL = 'pedrohenriqueinsec281@gmail.com';
+const ADMIN_PHONE = '+5584991101624';
+const MAX_HINTS   = 3;
 
 export default function Home() {
   const { user, gameState, loading: authLoading } = useAuth();
