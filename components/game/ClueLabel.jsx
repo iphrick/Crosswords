@@ -14,13 +14,15 @@ export default function ClueLabel({
   // Down: Above the first cell
   const isAcross = direction === 'across';
 
-  // Smart alignment to prevent clipping
-  const relCol = col - (gridBounds?.minX || 0);
-  const totalCols = (gridBounds?.maxX || 0) - (gridBounds?.minX || 0);
-  
-  let tooltipClass = styles.tooltipCenter;
-  if (relCol < 4) tooltipClass = styles.tooltipLeft;
-  else if (totalCols - relCol < 4) tooltipClass = styles.tooltipRight;
+  // Smart alignment only for Across words (to prevent clipping)
+  let tooltipClass = '';
+  if (isAcross) {
+    const relCol = col - (gridBounds?.minX || 0);
+    const totalCols = (gridBounds?.maxX || 0) - (gridBounds?.minX || 0);
+    tooltipClass = styles.tooltipCenter;
+    if (relCol < 4) tooltipClass = styles.tooltipLeft;
+    else if (totalCols - relCol < 4) tooltipClass = styles.tooltipRight;
+  }
   
   return (
     <div 

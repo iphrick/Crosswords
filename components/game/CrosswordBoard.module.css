@@ -195,8 +195,15 @@
 }
 
 .acrossLabel .clueTooltip {
+  bottom: 220%; /* Even higher to clear the horizontal word */
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.downLabel .clueTooltip {
   bottom: 160%;
   left: 50%;
+  transform: translateX(-50%);
 }
 
 .tooltipLeft {
@@ -214,12 +221,6 @@
 
 .tooltipCenter {
   transform: translateX(-50%) !important;
-}
-
-.downLabel .clueTooltip {
-  top: 50%;
-  left: 180%;
-  transform: translateY(-50%);
 }
 
 .actions {
