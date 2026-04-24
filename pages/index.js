@@ -24,6 +24,34 @@ export default function Home() {
   const { user, gameState, loading: authLoading } = useAuth();
   const { isMobile, isLoaded } = useDevice();
 
+  // ---- State Declarations (Top Level) ----
+  const [loginOpen,    setLoginOpen]    = useState(false);
+  const [registerOpen, setRegisterOpen] = useState(false);
+  const [rankingOpen,  setRankingOpen]  = useState(false);
+  const [contactOpen,  setContactOpen]  = useState(false);
+  const [avatarOpen,   setAvatarOpen]   = useState(false);
+  const [showTutorial, setShowTutorial] = useState(false);
+
+  const [subject,      setSubject]      = useState(SUBJECTS[0]);
+  const [placedWords,  setPlacedWords]  = useState([]);
+  const [gameVisible,  setGameVisible]  = useState(false);
+  const [isLoading,    setIsLoading]    = useState(false);
+  const [feedback,     setFeedback]     = useState({ msg: '', type: '' });
+  const [hintCount,    setHintCount]    = useState(0);
+  const [revealUsed,   setRevealUsed]   = useState(false);
+  const [levelDone,    setLevelDone]    = useState(false);
+  const [showNextLvl,  setShowNextLvl]  = useState(false);
+  const [overlay,      setOverlay]      = useState({ visible: false, icon: '', message: '', type: 'neutral' });
+  const [toast,        setToast]        = useState({ visible: false, icon: '', message: '', type: 'neutral' });
+  const [failCounts,   setFailCounts]   = useState({});
+
+  const gs = useGameState(subject);
+
+  const isAdmin = user && (
+    (user.email && user.email.toLowerCase() === ADMIN_EMAIL.toLowerCase()) ||
+    user.phoneNumber === ADMIN_PHONE
+  );
+
   // ---- Shared Handlers ----
   const showFeedback = useCallback((msg, type, duration = 4000) => {
     setFeedback({ msg, type });
@@ -55,56 +83,19 @@ export default function Home() {
     }
   }, [hintCount, showFeedback]);
 
-  // Modals
-  const [loginOpen,    setLoginOpen]    = useState(false);
-  const [registerOpen, setRegisterOpen] = useState(false);
-  const [rankingOpen,  setRankingOpen]  = useState(false);
-  const [contactOpen,  setContactOpen]  = useState(false);
-  const [avatarOpen,   setAvatarOpen]   = useState(false);
-  const [showTutorial, setShowTutorial] = useState(false);
-
-  // Auto-open AvatarSelector or Tutorial
+  // ---- Effects ----
   useEffect(() => {
     if (user && !authLoading && gameState) {
       if (!gameState.avatarId) {
         setAvatarOpen(true);
       } else {
         const tutorialDone = localStorage.getItem('juriquest_tutorial_done');
-        console.log('[Tutorial Debug] tutorialDone:', tutorialDone);
-        
-        // Só abre automaticamente se não houver registro de conclusão
         if (tutorialDone !== 'true' && !showTutorial) {
-          console.log('[Tutorial Debug] Abrindo tutorial automaticamente para novo usuário.');
           setShowTutorial(true);
         }
       }
     }
-  }, [user, authLoading, !!gameState?.avatarId]); // Dependência mais específica
-
-  // Game state
-  const [subject, setSubject] = useState(SUBJECTS[0]);
-  const gs = useGameState(subject);
-
-  const [placedWords,  setPlacedWords]  = useState([]);
-  const [gameVisible,  setGameVisible]  = useState(false);
-  const [isLoading,    setIsLoading]    = useState(false);
-  const [feedback,     setFeedback]     = useState({ msg: '', type: '' });
-  const [hintCount,    setHintCount]    = useState(0);
-  const [revealUsed,   setRevealUsed]   = useState(false);
-  const [levelDone,    setLevelDone]    = useState(false);
-  const [showNextLvl,  setShowNextLvl]  = useState(false);
-
-  // Overlay + toast
-  const [overlay, setOverlay] = useState({ visible: false, icon: '', message: '', type: 'neutral' });
-  const [toast,   setToast]   = useState({ visible: false, icon: '', message: '', type: 'neutral' });
-
-  // Fail counter per phase
-  const [failCounts, setFailCounts] = useState({});
-
-  const isAdmin = user && (
-    (user.email && user.email.toLowerCase() === ADMIN_EMAIL.toLowerCase()) ||
-    user.phoneNumber === ADMIN_PHONE
-  );
+  }, [user, authLoading, !!gameState?.avatarId]);
 
   const handleGenerate = async () => {
     if (!user) return;
