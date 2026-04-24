@@ -144,9 +144,14 @@ export default function Home() {
     }
 
     showOverlay('⚖️', randomFrom(SUCCESS_MESSAGES), 'success');
-    if (hintCount <= MAX_HINTS) await gs.addScore(100);
-    await gs.addUsedWords(placedWords.map(w => w.answer));
-    await gs.unlockNextLevel();
+    
+    // Calcula pontos (só ganha se usar dicas dentro do limite)
+    const points = (hintCount <= MAX_HINTS) ? 100 : 0;
+    const words = placedWords.map(w => w.answer);
+    
+    // Atualiza tudo em uma única transação atômica
+    await gs.completeLevel(points, words);
+    
     setShowNextLvl(true);
 
     try {

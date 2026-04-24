@@ -88,9 +88,11 @@ export function AuthProvider({ children }) {
 
   async function updateGameState(updater) {
     setGameState(prev => {
-      const next = { ...prev };
+      const next = { 
+        ...prev,
+        subjects: prev?.subjects ? { ...prev.subjects } : {}
+      };
       updater(next);
-      // Save to Firestore asynchronously
       if (user) saveGameState(user.uid, next).catch(console.error);
       return next;
     });

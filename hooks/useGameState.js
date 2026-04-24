@@ -29,8 +29,14 @@ export function useGameState(subject) {
     });
   }
 
-  async function unlockNextLevel() {
-    await updateGameState(gs => { _getSubject(gs).level += 1; });
+  async function completeLevel(points, words) {
+    await updateGameState(gs => {
+      const sub = _getSubject(gs);
+      sub.score += points;
+      sub.usedWords = [...new Set([...sub.usedWords, ...words.map(w => w.toUpperCase())])];
+      sub.level += 1;
+      sub.isLevelCompleted = true;
+    });
   }
 
   async function setLevelCompleted(val) {
@@ -43,5 +49,9 @@ export function useGameState(subject) {
     });
   }
 
-  return { level, score, usedWords, isCompleted, addScore, addUsedWords, unlockNextLevel, setLevelCompleted, resetProgress };
+  return { 
+    level, score, usedWords, isCompleted, 
+    addScore, addUsedWords, unlockNextLevel, 
+    completeLevel, setLevelCompleted, resetProgress 
+  };
 }
