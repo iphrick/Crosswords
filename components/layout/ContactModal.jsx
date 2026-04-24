@@ -188,9 +188,9 @@ export default function ContactModal({ visible, onClose }) {
                   </div>
                 </div>
 
-                <h3 className="text-lg font-bold text-white mb-2 text-center">Apoie o Desenvolvimento</h3>
-                <p className="text-sm text-slate-400 text-center leading-relaxed max-w-[224px] mx-auto">
-                  Sua contribuição ajuda a manter os servidores e a trazer novas cruzadinhas jurídicas todos os dias.
+                <h3 className="text-xl font-bold text-white mb-3 text-center">Apoie o Desenvolvimento</h3>
+                <p className="text-sm text-slate-400 text-center leading-relaxed max-w-[320px] mx-auto">
+                  Sua contribuição ajuda a manter os servidores ativos e a trazer novas cruzadinhas jurídicas todos os dias para a comunidade.
                 </p>
               </div>
 
