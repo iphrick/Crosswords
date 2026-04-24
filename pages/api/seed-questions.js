@@ -89,16 +89,28 @@ export default async function handler(req, res) {
 
     if (data.length === 0) return res.status(500).json({ error: 'IA retornou formato inválido.' });
 
-    const batch      = db.batch();
-    const collection = db.collection('questions');
+    const batch = db.batch();
+    
+    // Caminho hierárquico: subjects/[materia]/levels/[nivel]/questions/[id]
+    const subjectDoc = db.collection('questions_v2').doc(subject);
+    const levelDoc   = subjectDoc.collection('levels').doc(parsedLevel.toString());
+    const questionsColl = levelDoc.collection('items');
+
     data.forEach(item => {
-      const id  = `${subject.replace(/\s+/g, '_').toLowerCase()}_${parsedLevel}_${item.answer}`;
-      const ref = collection.doc(id);
-      batch.set(ref, { ...item, subject, level: parsedLevel, length: item.answer.length, createdAt: new Date() });
+      const id = item.answer.toUpperCase();
+      const ref = questionsColl.doc(id);
+      batch.set(ref, { 
+        ...item, 
+        subject, 
+        level: parsedLevel, 
+        length: item.answer.length, 
+        createdAt: new Date() 
+      });
     });
+    
     await batch.commit();
 
-    return res.status(200).json({ message: `${data.length} perguntas salvas para '${subject}' nível ${parsedLevel}.` });
+    return res.status(200).json({ message: `${data.length} perguntas salvas hierarquicamente para '${subject}' nível ${parsedLevel}.` });
   } catch (e) {
     return res.status(500).json({ error: e.message });
   }

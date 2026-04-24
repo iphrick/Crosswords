@@ -21,10 +21,21 @@ export default async function handler(req, res) {
   const num = Math.min(5 + (parsedLevel - 1), 10);
 
   try {
-    const snap = await db.collection('questions')
-      .where('subject', '==', subject)
-      .where('level', '==', parsedLevel)
+    // Tenta primeiro a nova estrutura hierárquica (V2)
+    let snap = await db.collection('questions_v2')
+      .doc(subject)
+      .collection('levels')
+      .doc(parsedLevel.toString())
+      .collection('items')
       .get();
+
+    // Se estiver vazio, tenta a estrutura antiga (V1)
+    if (snap.empty) {
+      snap = await db.collection('questions')
+        .where('subject', '==', subject)
+        .where('level', '==', parsedLevel)
+        .get();
+    }
 
     if (snap.empty)
       return res.status(404).json({ error: `Nenhuma pergunta encontrada para '${subject}' nível ${parsedLevel}.` });

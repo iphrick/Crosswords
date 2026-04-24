@@ -98,6 +98,28 @@ export function AuthProvider({ children }) {
     });
   }
 
+  async function checkUsername(username) {
+    if (!username || username.length < 3) return false;
+    const res = await fetch(`/api/auth/check-username?username=${encodeURIComponent(username)}`);
+    const data = await res.json();
+    return data.available;
+  }
+
+  async function updateUsername(username) {
+    if (!user) throw new Error('Não autenticado');
+    const res = await fetch('/api/auth/update-username', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ uid: user.uid, username })
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Erro ao atualizar username');
+    
+    // Atualiza estado local
+    setGameState(prev => ({ ...prev, nickname: username }));
+    return data;
+  }
+
   const value = {
     user,
     gameState,
@@ -108,6 +130,8 @@ export function AuthProvider({ children }) {
     sendPhoneCode,
     updateGameState,
     getSubjectState,
+    checkUsername,
+    updateUsername,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

@@ -13,6 +13,7 @@ import RankingModal from '@/components/game/RankingModal';
 import ContactModal from '@/components/layout/ContactModal';
 import AvatarSelector from '@/components/avatar/AvatarSelector';
 import OnboardingTutorial from '@/components/game/OnboardingTutorial';
+import UsernameModal from '@/components/auth/UsernameModal';
 
 import { useDevice } from '@/hooks/useDevice';
 import DesktopLayout from '@/components/ui/desktop/DesktopLayout';
@@ -249,6 +250,7 @@ export default function Home() {
       {/* Shared Overlays & Modals */}
       <LoginModal    visible={loginOpen}    onClose={() => setLoginOpen(false)} />
       <RegisterModal visible={registerOpen} onClose={() => setRegisterOpen(false)} />
+      <UsernameModal isOpen={!!user && !authLoading && gameState && !gameState.nickname} />
       <RankingModal  visible={rankingOpen}  onClose={() => setRankingOpen(false)} />
       <ContactModal  visible={contactOpen}  onClose={() => setContactOpen(false)} />
       <AvatarSelector visible={avatarOpen}  onClose={() => setAvatarOpen(false)} />

@@ -6,11 +6,18 @@ import { User, UserPlus, ChevronLeft, ChevronRight, Check } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 export default function AvatarSelector({ visible, onClose }) {
-  const { gameState, updateGameState } = useAuth();
+  const { gameState, updateGameState, checkUsername, updateUsername } = useAuth();
   const [gender, setGender] = useState('feminino');
   const [index, setIndex] = useState(0);
+  const [editingName, setEditingName] = useState(gameState?.nickname || '');
+  const [nameStatus, setNameStatus] = useState({ checking: false, available: null, msg: '' });
+  const [saveLoading, setSaveLoading] = useState(false);
 
   const filteredAvatars = AVATARS.filter(a => a.gender === gender);
+
+  useEffect(() => {
+    if (gameState?.nickname) setEditingName(gameState.nickname);
+  }, [gameState?.nickname]);
 
   useEffect(() => {
     // Try to find current avatar in the filtered list
@@ -18,6 +25,35 @@ export default function AvatarSelector({ visible, onClose }) {
     if (foundIdx !== -1) setIndex(foundIdx);
     else setIndex(0);
   }, [gender, visible, gameState?.avatarId]);
+
+  async function handleNameChange(val) {
+    const clean = val.toLowerCase().replace(/[^a-z0-9_]/g, '');
+    setEditingName(clean);
+    if (clean === gameState?.nickname) {
+      setNameStatus({ checking: false, available: true, msg: '' });
+      return;
+    }
+    if (clean.length < 3) {
+      setNameStatus({ checking: false, available: null, msg: '' });
+      return;
+    }
+    setNameStatus(s => ({ ...s, checking: true }));
+    const isAvail = await checkUsername(clean);
+    setNameStatus({ checking: false, available: isAvail, msg: isAvail ? '✔ Disponível' : '✖ Já em uso' });
+  }
+
+  async function saveUsername() {
+    if (editingName === gameState?.nickname || !nameStatus.available) return;
+    setSaveLoading(true);
+    try {
+      await updateUsername(editingName);
+      setNameStatus({ checking: false, available: true, msg: 'Nome atualizado!' });
+    } catch (err) {
+      setNameStatus({ checking: false, available: false, msg: err.message });
+    } finally {
+      setSaveLoading(false);
+    }
+  }
 
   if (!visible) return null;
 
@@ -45,10 +81,36 @@ export default function AvatarSelector({ visible, onClose }) {
       >
         <button className={styles.close} onClick={onClose} aria-label="Fechar">×</button>
         
-        <div className="flex-1 flex flex-col p-6 sm:p-10">
-          <div className="text-center mb-6 sm:mb-10">
-            <h2 className="text-3xl sm:text-4xl font-black text-white mb-3 tracking-tight">Identidade Jurídica</h2>
-            <p className="text-slate-500 text-base">Deslize para escolher a face da sua carreira</p>
+        <div className="flex-1 flex flex-col p-6 sm:p-10 overflow-y-auto">
+          <div className="text-center mb-6">
+            <h2 className="text-3xl sm:text-4xl font-black text-white mb-2 tracking-tight">Identidade Jurídica</h2>
+            
+            {/* Username Edit Section */}
+            <div className="max-w-xs mx-auto mt-4 mb-8">
+               <div className="relative group">
+                  <input 
+                    type="text"
+                    value={editingName}
+                    onChange={e => handleNameChange(e.target.value)}
+                    placeholder="Seu username"
+                    className="w-full bg-slate-900 border-2 border-slate-800 rounded-xl px-4 py-3 text-white font-bold focus:border-[#c9a96e] outline-none transition-all pr-24"
+                  />
+                  {editingName !== gameState?.nickname && (
+                    <button 
+                      onClick={saveUsername}
+                      disabled={!nameStatus.available || saveLoading}
+                      className="absolute right-2 top-2 bottom-2 px-3 bg-[#c9a96e] text-slate-950 text-[10px] font-black uppercase rounded-lg disabled:opacity-30 transition-all"
+                    >
+                      {saveLoading ? '...' : 'Salvar'}
+                    </button>
+                  )}
+               </div>
+               {nameStatus.msg && (
+                 <p className={`text-[10px] mt-1 font-bold ${nameStatus.available ? 'text-emerald-500' : 'text-red-500'}`}>
+                   {nameStatus.msg}
+                 </p>
+               )}
+            </div>
           </div>
 
           {/* Gender Switcher */}
