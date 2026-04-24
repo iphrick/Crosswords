@@ -15,6 +15,7 @@ export default function CrosswordCell({
   isHint, 
   activeDirection,
   activeClue,
+  gridBounds,
   onInput, 
   onKeyDown, 
   onFocus, 
@@ -24,6 +25,12 @@ export default function CrosswordCell({
   if (isBlocked) {
     return <div className={`${styles.cell} ${styles.blocked}`} />;
   }
+
+  const relX = x - (gridBounds?.minX || 0);
+  const totalCols = (gridBounds?.maxX || 0) - (gridBounds?.minX || 0) + 1;
+  let tooltipClass = '';
+  if (relX < 3) tooltipClass = styles.tooltipLeft;
+  else if (totalCols - relX <= 3) tooltipClass = styles.tooltipRight;
 
   return (
     <div 
@@ -38,7 +45,7 @@ export default function CrosswordCell({
       
       {/* Question Balloon (Tooltip) */}
       {activeClue && (
-        <div className={styles.clueTooltip}>
+        <div className={`${styles.clueTooltip} ${tooltipClass}`}>
           <div className={styles.tooltipArrow} />
           {activeClue}
         </div>

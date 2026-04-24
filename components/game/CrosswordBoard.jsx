@@ -228,6 +228,7 @@ export default function CrosswordBoard({ placedWords, onSolved, avatarUrl }) {
                     isHint={cellFeedback[key] === 'hint'}
                     activeDirection={direction}
                     activeClue={activeCell.x === x && activeCell.y === y ? activeWord?.clue : null}
+                    gridBounds={gridBounds}
                     onInput={(char) => handleInput(x, y, char)}
                     onKeyDown={(e) => handleKeyDown(e, x, y)}
                     onFocus={() => {

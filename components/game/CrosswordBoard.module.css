@@ -32,7 +32,7 @@
 .gridScroll {
   width: 100%;
   overflow: auto;
-  padding: 40px;
+  padding: 60px 40px;
   display: flex;
   justify-content: center;
   scrollbar-width: thin;
@@ -220,19 +220,26 @@
 
 .tooltipLeft {
   left: 0 !important;
-  transform: translateX(0) !important;
+  transform: none !important;
   text-align: left !important;
+}
+
+.tooltipLeft .tooltipArrow {
+  left: 20px !important;
+  transform: rotate(45deg) !important;
 }
 
 .tooltipRight {
   left: auto !important;
   right: 0 !important;
-  transform: translateX(0) !important;
+  transform: none !important;
   text-align: right !important;
 }
 
-.tooltipCenter {
-  transform: translateX(-50%) !important;
+.tooltipRight .tooltipArrow {
+  left: auto !important;
+  right: 20px !important;
+  transform: rotate(45deg) !important;
 }
 
 .actions {
