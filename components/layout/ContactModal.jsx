@@ -114,9 +114,9 @@ export default function ContactModal({ visible, onClose }) {
               </div>
 
               <form onSubmit={handleSubmit} className="space-y-5">
-                <div>
-                  <label className="text-[10px] uppercase font-extrabold text-slate-500 tracking-wider block mb-3">Qual o seu feedback?</label>
-                  <div className="flex gap-3">
+                <div className="mb-2">
+                  <label className="text-[10px] uppercase font-extrabold text-slate-500 tracking-wider block mb-4">Qual o seu feedback?</label>
+                  <div className="flex gap-4">
                     <button
                       type="button"
                       onClick={() => setSentiment('positive')}
@@ -143,9 +143,9 @@ export default function ContactModal({ visible, onClose }) {
                   </div>
                 </div>
 
-                <div className="relative group">
+                <div className="relative group mt-2">
                   <textarea
-                    rows={4}
+                    rows={5}
                     value={message}
                     onChange={(e) => setMessage(e.target.value)}
                     placeholder="Conte-nos o que você achou do JuriQuest..."
@@ -163,7 +163,7 @@ export default function ContactModal({ visible, onClose }) {
                 <button
                   type="submit"
                   disabled={loading || !message.trim()}
-                  className="w-full py-4 bg-[#c9a96e] hover:bg-[#d4b47a] disabled:opacity-30 disabled:cursor-not-allowed text-slate-950 font-extrabold rounded-xl transition-all shadow-xl shadow-[#c9a96e]/5 flex items-center justify-center gap-2"
+                  className="w-full py-4 bg-[#c9a96e] hover:bg-[#d4b47a] disabled:opacity-30 disabled:cursor-not-allowed text-slate-950 font-extrabold rounded-xl transition-all shadow-xl shadow-[#c9a96e]/5 flex items-center justify-center gap-2 mt-4"
                 >
                   {loading ? (
                     <span className="flex items-center gap-2">
