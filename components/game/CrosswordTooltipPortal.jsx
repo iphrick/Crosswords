@@ -22,13 +22,13 @@ export default function CrosswordTooltipPortal({ targetRef, text, visible }) {
       const tooltipWidth = 320; // Max width
       const tooltipHeight = 100; // Estimação inicial
       
-      let top = targetRect.top + window.scrollY - 15;
+      let top = targetRect.top + window.scrollY;
       let left = targetRect.left + window.scrollX + targetRect.width / 2;
       let position = 'top';
 
       // Verificar espaço acima
-      if (targetRect.top < 150) {
-        top = targetRect.bottom + window.scrollY + 15;
+      if (targetRect.top < 180) {
+        top = targetRect.bottom + window.scrollY;
         position = 'bottom';
       }
 
@@ -69,16 +69,34 @@ export default function CrosswordTooltipPortal({ targetRef, text, visible }) {
       {visible && (
         <motion.div
           ref={tooltipRef}
-          initial={{ opacity: 0, scale: 0.9, y: coords.position === 'top' ? 10 : -10, x: '-50%' }}
-          animate={{ opacity: 1, scale: 1, y: 0, x: '-50%' }}
-          exit={{ opacity: 0, scale: 0.9, y: coords.position === 'top' ? 10 : -10, x: '-50%' }}
-          transition={{ type: 'spring', damping: 20, stiffness: 300 }}
+          initial={{ 
+            opacity: 0, 
+            scale: 0.9, 
+            y: coords.position === 'top' ? 20 : -20, 
+            x: '-50%' 
+          }}
+          animate={{ 
+            opacity: 1, 
+            scale: 1, 
+            y: coords.position === 'top' ? -15 : 15, // Offset real do balão em relação ao ponto de ancoragem
+            x: '-50%' 
+          }}
+          exit={{ 
+            opacity: 0, 
+            scale: 0.9, 
+            y: coords.position === 'top' ? 20 : -20, 
+            x: '-50%' 
+          }}
+          transition={{ type: 'spring', damping: 25, stiffness: 300 }}
           style={{
             position: 'absolute',
-            top: coords.top,
+            top: coords.position === 'top' ? coords.top : coords.top, // O ponto de ancoragem é o topo ou base da célula
             left: coords.left,
             zIndex: 99999,
-            pointerEvents: 'none'
+            pointerEvents: 'none',
+            transformOrigin: coords.position === 'top' ? 'bottom center' : 'top center',
+            // Se estiver no topo, sobe 100% da própria altura
+            translate: coords.position === 'top' ? '0 -100%' : '0 0'
           }}
         >
           <div style={{
@@ -89,7 +107,7 @@ export default function CrosswordTooltipPortal({ targetRef, text, visible }) {
             fontSize: '15px',
             fontWeight: '800',
             width: 'max-content',
-            maxWidth: 'calc(100vw - 32px)',
+            maxWidth: 'min(400px, 90vw)',
             minWidth: '240px',
             textAlign: 'center',
             boxShadow: '0 20px 50px rgba(0, 0, 0, 0.8)',
@@ -106,7 +124,7 @@ export default function CrosswordTooltipPortal({ targetRef, text, visible }) {
               height: '12px',
               background: '#c9a96e',
               left: coords.arrowLeft,
-              transform: `translateX(-50%) rotate(45deg) ${coords.position === 'top' ? 'translateY(6px)' : 'translateY(-6px)'}`,
+              transform: `translateX(-50%) rotate(45deg)`,
               top: coords.position === 'top' ? 'auto' : '-6px',
               bottom: coords.position === 'top' ? '-6px' : 'auto',
               zIndex: -1
