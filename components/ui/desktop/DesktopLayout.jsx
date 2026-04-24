@@ -76,40 +76,42 @@ export default function DesktopLayout({
           </section>
         ) : (
           <>
-            <section className={styles.controls}>
-              <div className={styles.controlGroup}>
-                <label className={styles.controlLabel}>Matéria</label>
-                <select
-                  id="subject-select"
-                  className={styles.select}
-                  value={subject}
-                  onChange={e => { setSubject(e.target.value); }}
-                >
-                  {modals.SUBJECTS.map(s => <option key={s} value={s}>{s}</option>)}
-                </select>
-              </div>
+            <section className="bg-slate-900/40 backdrop-blur-md border border-slate-800 p-6 rounded-3xl mb-12 shadow-2xl flex flex-wrap items-end justify-between gap-8">
+              <div className="flex flex-wrap items-center gap-10">
+                <div className="space-y-2">
+                  <label className="text-[10px] text-slate-500 font-black uppercase tracking-widest px-1">Matéria de Estudo</label>
+                  <select
+                    id="subject-select"
+                    className="bg-slate-950 border border-slate-700 text-white rounded-xl px-4 py-3 min-w-[240px] focus:ring-2 focus:ring-[#c9a96e] outline-none transition-all font-bold"
+                    value={subject}
+                    onChange={e => { setSubject(e.target.value); }}
+                  >
+                    {modals.SUBJECTS.map(s => <option key={s} value={s}>{s}</option>)}
+                  </select>
+                </div>
 
-              <div className={styles.controlGroup}>
-                <label className={styles.controlLabel}>Status</label>
-                <div className={styles.statusDisplay}>
-                  <span>Nível: <strong>{gs.level}</strong></span>
-                  <span>Pontos: <strong>{gs.score}</strong></span>
+                <div className="flex gap-8 border-l border-slate-800 pl-8">
+                  <div className="text-center">
+                    <p className="text-[10px] text-slate-400 font-black uppercase tracking-widest mb-1">Nível</p>
+                    <p className="text-2xl font-black text-[#c9a96e]">{gs.level}</p>
+                  </div>
+                  <div className="text-center">
+                    <p className="text-[10px] text-slate-400 font-black uppercase tracking-widest mb-1">Total Pontos</p>
+                    <p className="text-2xl font-black text-white">{gs.score}</p>
+                  </div>
                 </div>
               </div>
 
-              <div className={styles.controlGroup}>
-                <label className={styles.controlLabel}>Ações</label>
-                <div className={styles.controlRow}>
-                  {!showNextLvl ? (
-                    <button id="generate-btn" className="btn btn--primary" onClick={handleGenerate} disabled={isLoading}>
-                      {isLoading ? 'Gerando…' : `Iniciar Nível ${gs.level}`}
-                    </button>
-                  ) : (
-                    <button className="btn btn--primary" onClick={handleNextLevel}>Próximo Nível</button>
-                  )}
-                  <button className="btn btn--secondary" onClick={handleReset}>Resetar</button>
-                  {isAdmin && <button className="btn bg-red-600 text-white" onClick={handleAdminSeed}>⚙️ Admin</button>}
-                </div>
+              <div className="flex items-center gap-3">
+                {!showNextLvl ? (
+                  <button id="generate-btn" className="px-8 py-3.5 bg-[#c9a96e] text-slate-950 font-black rounded-xl hover:bg-[#d4b47a] transition-all transform active:scale-95 shadow-lg shadow-[#c9a96e]/10" onClick={handleGenerate} disabled={isLoading}>
+                    {isLoading ? 'Gerando…' : `Gerar Nível ${gs.level}`}
+                  </button>
+                ) : (
+                  <button className="px-8 py-3.5 bg-emerald-600 text-white font-black rounded-xl hover:bg-emerald-500 transition-all transform active:scale-95 shadow-lg shadow-emerald-600/20" onClick={handleNextLevel}>Próximo Nível</button>
+                )}
+                <button className="px-6 py-3.5 bg-slate-800 text-slate-300 font-bold rounded-xl hover:bg-slate-700 transition-all" onClick={handleReset}>Resetar</button>
+                {isAdmin && <button className="p-3.5 bg-red-600 text-white rounded-xl" onClick={handleAdminSeed}>⚙️</button>}
               </div>
             </section>
 
@@ -154,10 +156,16 @@ export default function DesktopLayout({
                   )}
                   <CrosswordBoard placedWords={placedWords} onSolved={handleSolved} />
                   {!showNextLvl && (
-                    <div className={styles.boardActions}>
-                      <button id="hint-btn" className="btn btn--secondary" onClick={handleHint}>💡 Dica</button>
-                      <button className="btn btn--secondary" onClick={handleClear}>🗑 Limpar</button>
-                      <button className="btn btn--danger"    onClick={handleRevealAll}>👁 Revelar Tudo</button>
+                    <div className="flex gap-4 mt-8 justify-center">
+                      <button id="hint-btn" className="flex items-center gap-2 px-8 py-4 bg-slate-900/50 border border-slate-800 text-white font-bold rounded-2xl hover:bg-slate-800 transition-all shadow-xl" onClick={handleHint}>
+                        💡 Pedir Dica
+                      </button>
+                      <button className="flex items-center gap-2 px-8 py-4 bg-slate-900/50 border border-slate-800 text-white font-bold rounded-2xl hover:bg-slate-800 transition-all" onClick={handleClear}>
+                        🗑 Limpar Tudo
+                      </button>
+                      <button className="flex items-center gap-2 px-8 py-4 bg-red-950/30 border border-red-900/30 text-red-400 font-bold rounded-2xl hover:bg-red-900/20 transition-all" onClick={handleRevealAll}>
+                        👁 Revelar Tudo
+                      </button>
                     </div>
                   )}
                 </div>

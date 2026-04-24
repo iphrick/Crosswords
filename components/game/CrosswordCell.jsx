@@ -14,6 +14,7 @@ export default function CrosswordCell({
   isRevealed, 
   isHint, 
   activeDirection,
+  activeClue,
   onInput, 
   onKeyDown, 
   onFocus, 
@@ -34,6 +35,15 @@ export default function CrosswordCell({
       onClick={onClick}
     >
       {number && <span className={styles.cellNumber}>{number}</span>}
+      
+      {/* Question Balloon (Tooltip) */}
+      {activeClue && (
+        <div className={styles.clueTooltip}>
+          <div className={styles.tooltipArrow} />
+          {activeClue}
+        </div>
+      )}
+
       {isActive && (
         <span className={styles.directionTip}>
           {activeDirection === 'across' ? '→' : '↓'}

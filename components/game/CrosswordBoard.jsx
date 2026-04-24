@@ -2,7 +2,6 @@
 import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import { GRID_SIZE } from '@/lib/crosswordEngine';
 import CrosswordCell from './CrosswordCell';
-import ClueLabel from './ClueLabel';
 import styles from './CrosswordBoard.module.css';
 
 export default function CrosswordBoard({ placedWords, onSolved, avatarUrl }) {
@@ -203,8 +202,8 @@ export default function CrosswordBoard({ placedWords, onSolved, avatarUrl }) {
           <div 
             className={styles.grid}
             style={{ 
-              gridTemplateColumns: `repeat(${gridDimensions.cols}, auto)`,
-              gridTemplateRows: `repeat(${gridDimensions.rows}, auto)`
+              gridTemplateColumns: `repeat(${gridDimensions.cols}, ${window.innerWidth < 1280 ? '44px' : '52px'})`,
+              gridTemplateRows: `repeat(${gridDimensions.rows}, ${window.innerWidth < 1280 ? '44px' : '52px'})`
             }}
           >
 
@@ -228,6 +227,7 @@ export default function CrosswordBoard({ placedWords, onSolved, avatarUrl }) {
                     isRevealed={cellFeedback[key] === 'revealed'}
                     isHint={cellFeedback[key] === 'hint'}
                     activeDirection={direction}
+                    activeClue={activeCell.x === x && activeCell.y === y ? activeWord?.clue : null}
                     onInput={(char) => handleInput(x, y, char)}
                     onKeyDown={(e) => handleKeyDown(e, x, y)}
                     onFocus={() => {
@@ -244,15 +244,6 @@ export default function CrosswordBoard({ placedWords, onSolved, avatarUrl }) {
               });
             })}
             
-            {placedWords.map((word, idx) => (
-              <ClueLabel 
-                key={`${word.direction}-${word.number}`}
-                word={word}
-                isSelected={activeWordIndex === idx}
-                onClick={selectWord}
-                gridBounds={gridBounds}
-              />
-            ))}
           </div>
         </div>
       </div>
