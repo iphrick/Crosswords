@@ -52,6 +52,42 @@ export default function Home() {
     }
   }, [user, authLoading, !!gameState?.avatarId]); // Dependência mais específica
 
+  // Atalho de teclado para dicas (Tecla H)
+  useEffect(() => {
+    const handleGlobalKeyDown = (e) => {
+      if (e.key.toLowerCase() === 'h' && !e.ctrlKey && !e.altKey && !e.metaKey) {
+        // Ignora se estiver digitando em um campo de texto (exceto as células do tabuleiro)
+        const activeEl = document.activeElement;
+        const isInput = activeEl.tagName === 'INPUT' || activeEl.tagName === 'TEXTAREA';
+        const isBoardCell = activeEl.closest('#crossword-grid');
+
+        // Se estiver em um input que não é do tabuleiro, ignora (ex: modal de contato)
+        if (isInput && !isBoardCell) return;
+
+        // Se estiver no tabuleiro, vamos usar Alt+H ou apenas H se não estiver em foco?
+        // Para seguir o pedido do usuário (tecla H), vamos disparar se não estiver no meio de uma digitação clara
+        // Mas para evitar que o usuário perca a chance de digitar 'H' em palavras como "HABEAS", 
+        // vamos sugerir o uso de Alt+H ou apenas permitir se o input estiver vazio?
+        // Decisão: Implementar 'H' global mas se estiver focado em uma célula, o 'H' normal digita a letra.
+        // Se NÃO estiver focado em nada ou for um clique genérico, 'H' dá a dica.
+        
+        if (!isInput) {
+          e.preventDefault();
+          handleHint();
+        }
+      }
+      
+      // Atalho alternativo universal: Alt + H sempre funciona
+      if (e.key.toLowerCase() === 'h' && e.altKey) {
+        e.preventDefault();
+        handleHint();
+      }
+    };
+
+    window.addEventListener('keydown', handleGlobalKeyDown);
+    return () => window.removeEventListener('keydown', handleGlobalKeyDown);
+  }, [handleHint]);
+
   // Game state
   const [subject, setSubject] = useState(SUBJECTS[0]);
   const gs = useGameState(subject);
