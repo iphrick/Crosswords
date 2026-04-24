@@ -1,32 +1,10 @@
-// pages/index.js
-import { useState, useCallback, useEffect } from 'react';
-import Head from 'next/head';
-import { useAuth } from '@/context/AuthContext';
-import { useGameState } from '@/hooks/useGameState';
-import { buildLayout } from '@/lib/crosswordEngine';
-import { SUBJECTS, FAILURE_MESSAGES, SUCCESS_MESSAGES, REPEATED_FAILURE_MSG,
-         randomFrom, rankingUpMsg, rankingOvertakenMsg, getAvatarUrl } from '@/lib/juriMessages';
-import Header from '@/components/layout/Header';
-import LoginModal from '@/components/auth/LoginModal';
-import RegisterModal from '@/components/auth/RegisterModal';
-import FeedbackOverlay from '@/components/notifications/FeedbackOverlay';
-import RankingToast from '@/components/notifications/RankingToast';
-import RankingModal from '@/components/game/RankingModal';
-import ContactModal from '@/components/layout/ContactModal';
-import AvatarSelector from '@/components/avatar/AvatarSelector';
-import OnboardingTutorial from '@/components/game/OnboardingTutorial';
-import dynamic from 'next/dynamic';
-import styles from '@/styles/Home.module.css';
-
-// Dynamic import for CrosswordBoard (client-only, uses DOM refs)
-const CrosswordBoard = dynamic(() => import('@/components/game/CrosswordBoard'), { ssr: false });
-
-const ADMIN_EMAIL = 'pedrohenriqueinsec281@gmail.com';
-const ADMIN_PHONE = '+5584991101624';
-const MAX_HINTS   = 3;
+import { useDevice } from '@/hooks/useDevice';
+import DesktopLayout from '@/components/ui/desktop/DesktopLayout';
+import MobileLayout from '@/components/ui/mobile/MobileLayout';
 
 export default function Home() {
-  const { user, gameState, loading } = useAuth();
+  const { user, gameState, loading: authLoading } = useAuth();
+  const { isMobile, isLoaded } = useDevice();
 
   // Modals
   const [loginOpen,    setLoginOpen]    = useState(false);
@@ -38,7 +16,7 @@ export default function Home() {
 
   // Auto-open AvatarSelector or Tutorial
   useEffect(() => {
-    if (user && !loading && gameState) {
+    if (user && !authLoading && gameState) {
       if (!gameState.avatarId) {
         setAvatarOpen(true);
       } else {
@@ -46,8 +24,7 @@ export default function Home() {
         if (!tutorialDone) setShowTutorial(true);
       }
     }
-  }, [user, loading, gameState]);
-
+  }, [user, authLoading, gameState]);
 
   // Game state
   const [subject, setSubject] = useState(SUBJECTS[0]);
@@ -74,23 +51,22 @@ export default function Home() {
     user.phoneNumber === ADMIN_PHONE
   );
 
-  // ---- Feedback helpers ----
-  function showFeedback(msg, type, duration = 4000) {
+  // ---- Shared Handlers ----
+  const showFeedback = useCallback((msg, type, duration = 4000) => {
     setFeedback({ msg, type });
     if (duration > 0) setTimeout(() => setFeedback({ msg: '', type: '' }), duration);
-  }
+  }, []);
 
-  function showOverlay(icon, message, type) {
+  const showOverlay = useCallback((icon, message, type) => {
     setOverlay({ visible: true, icon, message, type });
-  }
+  }, []);
 
-  function showToast(icon, message, type, duration = 6000) {
+  const showToast = useCallback((icon, message, type, duration = 6000) => {
     setToast({ visible: true, icon, message, type });
     setTimeout(() => setToast(t => ({ ...t, visible: false })), duration);
-  }
+  }, []);
 
-  // ---- Generate ----
-  async function handleGenerate() {
+  const handleGenerate = async () => {
     if (!user) return;
     setHintCount(0);
     setRevealUsed(false);
@@ -123,9 +99,8 @@ export default function Home() {
     } finally {
       setIsLoading(false);
     }
-  }
+  };
 
-  // ---- Level complete ----
   const handleSolved = useCallback(async () => {
     if (levelDone) return;
     setLevelDone(true);
@@ -137,49 +112,30 @@ export default function Home() {
       return;
     }
 
-    // Success
     showOverlay('⚖️', randomFrom(SUCCESS_MESSAGES), 'success');
-
     if (hintCount <= MAX_HINTS) await gs.addScore(100);
     await gs.addUsedWords(placedWords.map(w => w.answer));
     await gs.unlockNextLevel();
     setShowNextLvl(true);
 
-    // Check ranking
     try {
       const res = await fetch('/api/get-ranking');
       if (res.ok) {
         const { ranking } = await res.json();
         const nickname = gameState?.nickname || user?.email?.split('@')[0] || '';
         const myEntry  = ranking.find(p => p.name?.toLowerCase() === nickname.toLowerCase());
-        if (myEntry) {
-          const myRank = ranking.indexOf(myEntry) + 1;
-          // Simple check: if in top 3, show ranking toast
-          if (myRank <= 3) showToast('📈', rankingUpMsg(nickname), 'success');
+        if (myEntry && (ranking.indexOf(myEntry) + 1) <= 3) {
+          showToast('📈', rankingUpMsg(nickname), 'success');
         }
       }
     } catch (_) {}
-  }, [levelDone, revealUsed, hintCount, placedWords, gs, gameState, user]);
+  }, [levelDone, revealUsed, hintCount, placedWords, gs, gameState, user, showOverlay, showToast]);
 
-  // ---- Fail ----
-  function handlePhaseFail() {
-    const key   = `${subject}_${gs.level}`;
-    const count = (failCounts[key] || 0) + 1;
-    setFailCounts(p => ({ ...p, [key]: count }));
-    if (count > 3) {
-      showOverlay('📚', REPEATED_FAILURE_MSG, 'warning');
-    } else {
-      showOverlay('❌', randomFrom(FAILURE_MESSAGES), 'error');
-    }
-  }
-
-  // ---- Hint ----
-  function handleHint() {
+  const handleHint = () => {
     if (hintCount >= MAX_HINTS) {
       showFeedback('Você já usou todos os corações! Não é possível mais pedir dicas nesta fase.', 'error', 4000);
       return;
     }
-
     if (!window._crosswordRevealHint) return;
     const revealed = window._crosswordRevealHint();
     if (revealed) {
@@ -187,43 +143,37 @@ export default function Home() {
       setHintCount(next);
       showFeedback(`Você usou um coração! Restam ${MAX_HINTS - next}.`, 'info', 3000);
     } else {
-      showFeedback('Selecione uma palavra ou célula primeiro para receber a dica.', 'error', 3000);
+      showFeedback('Selecione uma palavra ou célula primeiro.', 'error', 3000);
     }
-  }
+  };
 
-  // ---- Reveal All ----
-  async function handleRevealAll() {
-    if (!confirm('Tem certeza que deseja revelar todas as respostas? Você não pontuará nesta fase.')) return;
+  const handleRevealAll = async () => {
+    if (!confirm('Revelar tudo? Não pontuará.')) return;
     setRevealUsed(true);
     await window._crosswordRevealAll?.();
-  }
+  };
 
-  // ---- Clear ----
-  function handleClear() { window._crosswordClearAll?.(); }
+  const handleClear = () => { window._crosswordClearAll?.(); };
 
-  // ---- Next Level ----
-  function handleNextLevel() {
+  const handleNextLevel = () => {
     setShowNextLvl(false);
     setGameVisible(false);
     handleGenerate();
-  }
+  };
 
-  // ---- Reset ----
-  async function handleReset() {
+  const handleReset = async () => {
     const label = SUBJECTS.find(s => s === subject) || subject;
-    if (!confirm(`Resetar progresso de "${label}"? Volta ao nível 1 e pontuação zerada.`)) return;
+    if (!confirm(`Resetar progresso de "${label}"?`)) return;
     await gs.resetProgress();
     setGameVisible(false);
     showFeedback('Progresso resetado!', 'info', 3000);
-  }
+  };
 
-  // ---- Admin seed ----
-  async function handleAdminSeed() {
-    const secret = prompt('Admin: Digite SEED_SECRET:');
+  const handleAdminSeed = async () => {
+    const secret = prompt('Admin Secret:');
     if (!secret) return;
-    const lvl = prompt('Nível para gerar:', gs.level);
-    if (!lvl) return;
-    showFeedback('⏳ IA gerando perguntas…', 'info', 0);
+    const lvl = prompt('Nível:', gs.level);
+    showFeedback('⏳ IA gerando...', 'info', 0);
     try {
       const res  = await fetch('/api/seed-questions', {
         method: 'POST',
@@ -231,227 +181,57 @@ export default function Home() {
         body: JSON.stringify({ secret, subject, level: parseInt(lvl, 10) }),
       });
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error);
       showFeedback(`✅ ${data.message}`, 'success', 8000);
     } catch (err) {
       showFeedback(`❌ ${err.message}`, 'error', 8000);
     }
-  }
+  };
 
-  // ---- Hearts UI ----
-  function renderHearts() {
+  const renderHearts = () => {
     return Array.from({ length: MAX_HINTS }, (_, i) => i < hintCount ? '🤍' : '❤️').join('');
-  }
+  };
 
-  if (loading) {
+  if (authLoading || !isLoaded) {
     return (
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '100vh' }}>
-        <div className="loading">
-          <div className="loading__spinner" />
-          <span>Carregando…</span>
-        </div>
+      <div className="flex items-center justify-center min-h-screen bg-slate-950">
+        <div className="loading"><div className="loading__spinner" /><span>Carregando JuriQuest…</span></div>
       </div>
     );
   }
 
+  const sharedProps = {
+    user, gameState, subject, setSubject, gs, isLoading, gameVisible, showNextLvl,
+    handleGenerate, handleNextLevel, handleReset, isAdmin, handleAdminSeed,
+    hintCount, MAX_HINTS, renderHearts, placedWords,
+    handleSolved, handleHint, handleClear, handleRevealAll,
+    feedback,
+    modals: {
+      setLoginOpen, setRegisterOpen, setRankingOpen, setContactOpen, setAvatarOpen,
+      SUBJECTS
+    }
+  };
+
   return (
     <>
-      <Head>
-        <title>JuriQuest — Cruzadinhas de Direito</title>
-      </Head>
+      <Head><title>JuriQuest — O Desafio Jurídico</title></Head>
 
-      <Header
-        onLoginClick={() => setLoginOpen(true)}
-        onRegisterClick={() => setRegisterOpen(true)}
-        onRankingClick={() => setRankingOpen(true)}
-        onContactClick={() => setContactOpen(true)}
-        onAvatarClick={() => setAvatarOpen(true)}
-      />
+      {isMobile ? (
+        <MobileLayout {...sharedProps} />
+      ) : (
+        <DesktopLayout {...sharedProps} />
+      )}
 
-      <main className="app">
-        {/* ---- Landing / Auth required ---- */}
-        {!user && (
-          <section className={styles.hero}>
-            <div className={styles.heroContent}>
-
-              <h1 className={styles.heroTitle}>Domine o Direito<br /><span>jogando.</span></h1>
-              <p className={styles.heroSub}>
-                Cruzadinhas jurídicas geradas por inteligência artificial. Treine para concursos e OAB com um método que gruda.
-              </p>
-              <div className={styles.heroCtas}>
-                <button className="btn btn--primary" style={{fontSize:'1.1rem', padding:'14px 32px'}} onClick={() => setRegisterOpen(true)}>
-                  Começar Grátis
-                </button>
-                <button className="btn btn--ghost" style={{fontSize:'1.1rem', padding:'14px 32px'}} onClick={() => setLoginOpen(true)}>
-                  Já tenho conta
-                </button>
-              </div>
-            </div>
-
-            <div className={styles.features}>
-              {[
-                { icon: '🤖', title: 'IA Generativa', desc: 'Perguntas únicas geradas pelo Gemini a partir da legislação oficial.' },
-                { icon: '📊', title: 'Ranking Global', desc: 'Compete com outros estudantes e sobe no placar em tempo real.' },
-                { icon: '📚', title: '8 Matérias', desc: 'Constitucional, Penal, Civil, Trabalhista, Tributário e mais.' },
-                { icon: '📱', title: 'Mobile First', desc: 'Jogue em qualquer dispositivo com notificações push.' },
-              ].map(f => (
-                <div key={f.title} className={styles.featureCard}>
-                  <span className={styles.featureIcon}>{f.icon}</span>
-                  <h3 className={styles.featureTitle}>{f.title}</h3>
-                  <p className={styles.featureDesc}>{f.desc}</p>
-                </div>
-              ))}
-            </div>
-          </section>
-        )}
-
-        {/* ---- Game area ---- */}
-        {user && (
-          <>
-            {/* Controls */}
-            <section className={styles.controls}>
-              <div className={styles.controlGroup}>
-                <label className={styles.controlLabel} htmlFor="subject-select">Matéria</label>
-                <select
-                  id="subject-select"
-                  className={styles.select}
-                  value={subject}
-                  onChange={e => { setSubject(e.target.value); setGameVisible(false); }}
-                  aria-label="Escolha a matéria jurídica"
-                >
-                  {SUBJECTS.map(s => <option key={s} value={s}>{s}</option>)}
-                </select>
-              </div>
-
-              <div className={styles.controlGroup}>
-                <label className={styles.controlLabel}>Status</label>
-                <div className={styles.statusDisplay}>
-                  <span>Nível: <strong>{gs.level}</strong></span>
-                  <span>Pontos: <strong>{gs.score}</strong></span>
-                </div>
-              </div>
-
-              <div className={styles.controlGroup}>
-                <label className={styles.controlLabel}>Ações</label>
-                <div className={styles.controlRow}>
-                  {!showNextLvl ? (
-                    <button
-                      id="generate-btn"
-                      className="btn btn--primary"
-                      onClick={handleGenerate}
-                      disabled={isLoading}
-                    >
-                      {isLoading ? 'Gerando…' : `Iniciar Nível ${gs.level}`}
-                    </button>
-                  ) : (
-                    <button id="next-level-btn" className="btn btn--primary" onClick={handleNextLevel}>
-                      Próximo Nível
-                    </button>
-                  )}
-                  <button className="btn btn--secondary" onClick={handleReset} title="Resetar progresso do tema">Resetar</button>
-                  {isAdmin && (
-                    <button className="btn" style={{background:'#dc2626',color:'#fff'}} onClick={handleAdminSeed}>
-                      ⚙️ Admin: Gerar Fase
-                    </button>
-                  )}
-                </div>
-              </div>
-            </section>
-
-            {/* Loading */}
-            {isLoading && (
-              <div className="loading" role="status" aria-live="polite">
-                <div className="loading__spinner" aria-hidden="true" />
-                <span>Gerando cruzadinha…</span>
-              </div>
-            )}
-
-            {/* Inline feedback */}
-            {feedback.msg && (
-              <div className={`feedback feedback--${feedback.type}`} role="alert" aria-live="assertive">
-                {feedback.msg}
-              </div>
-            )}
-
-            {/* Hearts / Hints */}
-            {gameVisible && !showNextLvl && (
-              <div className={styles.hearts} aria-label={`Dicas restantes: ${MAX_HINTS - hintCount}`}>
-                <span className={styles.heartsLabel}>Dicas Restantes:</span>
-                <span className={styles.heartsIcons}>{renderHearts()}</span>
-              </div>
-            )}
-
-            {/* Game Content Area */}
-            {gameVisible && (
-              <div className="flex flex-col lg:flex-row gap-6 lg:gap-10 items-start justify-center mt-6 lg:mt-12 px-2 sm:px-6">
-                
-                {/* Left Side: Avatar Card */}
-                {gameState?.avatarUrl && (
-                  <div className="w-full lg:w-fit lg:sticky lg:top-28 flex justify-center animate-in slide-in-from-left-8 duration-1000">
-                    <div className="relative group bg-slate-900 border border-slate-800 rounded-2xl p-2 w-44 sm:w-52 shadow-2xl">
-                      <div className="aspect-[2/3] relative rounded-xl overflow-hidden bg-slate-800 border border-slate-700 shadow-inner">
-                        <img src={gameState.avatarUrl} alt={gameState.profession} className="w-full h-full object-cover" />
-                        <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-transparent to-transparent opacity-80" />
-                        <div className="absolute bottom-0 left-0 right-0 p-3 text-center">
-                          <p className="text-white font-bold text-sm leading-tight mb-0.5">{gameState.profession}</p>
-                          <p className="text-[10px] text-emerald-400 uppercase font-extrabold tracking-widest">{gameState.nickname || user?.email?.split('@')[0]}</p>
-                        </div>
-                      </div>
-                      <div className="absolute -top-2 -right-2 bg-emerald-500 text-white text-[9px] font-bold px-2 py-1 rounded-lg shadow-lg border border-emerald-400 z-20">
-                        SESSÃO ATIVA
-                      </div>
-                    </div>
-                  </div>
-                )}
-
-                {/* Right Side: Crossword Board */}
-                <div id="crossword-grid" className="flex-1 w-full max-w-5xl">
-                  <CrosswordBoard
-                    placedWords={placedWords}
-                    onSolved={handleSolved}
-                  />
-
-                  {/* Board action buttons */}
-                  {!showNextLvl && (
-                    <div className={styles.boardActions}>
-                      <button id="hint-btn"   className="btn btn--secondary" onClick={handleHint}>💡 Dica</button>
-                      <button id="clear-btn"  className="btn btn--secondary" onClick={handleClear}>🗑 Limpar</button>
-                      <button id="reveal-btn" className="btn btn--danger"    onClick={handleRevealAll}>👁 Revelar Tudo</button>
-                    </div>
-                  )}
-                </div>
-              </div>
-            )}
-          </>
-        )}
-      </main>
-
-      {/* ---- Modals ---- */}
+      {/* Shared Overlays & Modals */}
       <LoginModal    visible={loginOpen}    onClose={() => setLoginOpen(false)} />
       <RegisterModal visible={registerOpen} onClose={() => setRegisterOpen(false)} />
       <RankingModal  visible={rankingOpen}  onClose={() => setRankingOpen(false)} />
       <ContactModal  visible={contactOpen}  onClose={() => setContactOpen(false)} />
       <AvatarSelector visible={avatarOpen}  onClose={() => setAvatarOpen(false)} />
       
-      {showTutorial && (
-        <OnboardingTutorial onComplete={() => setShowTutorial(false)} />
-      )}
+      {showTutorial && <OnboardingTutorial onComplete={() => setShowTutorial(false)} />}
 
-      {/* ---- Notifications ---- */}
-      <FeedbackOverlay
-        visible={overlay.visible}
-        icon={overlay.icon}
-        message={overlay.message}
-        type={overlay.type}
-        onClose={() => setOverlay(o => ({ ...o, visible: false }))}
-      />
-      <RankingToast
-        visible={toast.visible}
-        icon={toast.icon}
-        message={toast.message}
-        type={toast.type}
-        onDismiss={() => setToast(t => ({ ...t, visible: false }))}
-      />
+      <FeedbackOverlay {...overlay} onClose={() => setOverlay(o => ({ ...o, visible: false }))} />
+      <RankingToast {...toast} onDismiss={() => setToast(t => ({ ...t, visible: false }))} />
     </>
   );
 }
