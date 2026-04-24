@@ -231,6 +231,7 @@ export default function Home() {
       setRankingOpen: () => setRankingOpen(true),
       setContactOpen: () => setContactOpen(true),
       setAvatarOpen: () => setAvatarOpen(true),
+      setTutorialOpen: () => setShowTutorial(true),
       SUBJECTS
     }
   };

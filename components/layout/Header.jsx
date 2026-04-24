@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import styles from './Header.module.css';
 
-export default function Header({ onLoginClick, onRegisterClick, onRankingClick, onContactClick, onAvatarClick }) {
+export default function Header({ onLoginClick, onRegisterClick, onRankingClick, onContactClick, onAvatarClick, onTutorialClick }) {
   const { user, gameState, logout } = useAuth();
   const [menuOpen, setMenuOpen]     = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
@@ -36,6 +36,9 @@ export default function Header({ onLoginClick, onRegisterClick, onRankingClick, 
           <>
             <button id="ranking-modal-btn" className="btn btn--secondary" onClick={() => { onRankingClick(); setMenuOpen(false); }}>
               🏆 Ranking
+            </button>
+            <button id="tutorial-btn" className="btn btn--secondary" onClick={() => { onTutorialClick(); setMenuOpen(false); }}>
+              📖 Instruções
             </button>
             <button id="contact-modal-btn" className="btn btn--ghost" onClick={() => { onContactClick(); setMenuOpen(false); }}>
               Contato

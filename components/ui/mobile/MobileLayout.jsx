@@ -38,6 +38,7 @@ export default function MobileLayout({
         onRankingClick={modals.setRankingOpen}
         onContactClick={modals.setContactOpen}
         onAvatarClick={modals.setAvatarOpen}
+        onTutorialClick={modals.setTutorialOpen}
       />
 
       <main className="flex-1 flex flex-col p-4 pb-32">

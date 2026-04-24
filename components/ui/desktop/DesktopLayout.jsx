@@ -38,6 +38,7 @@ export default function DesktopLayout({
         onRankingClick={modals.setRankingOpen}
         onContactClick={modals.setContactOpen}
         onAvatarClick={modals.setAvatarOpen}
+        onTutorialClick={modals.setTutorialOpen}
       />
 
       <main className="app max-w-[1600px] mx-auto px-6 py-8">
@@ -79,6 +80,7 @@ export default function DesktopLayout({
               <div className={styles.controlGroup}>
                 <label className={styles.controlLabel}>Matéria</label>
                 <select
+                  id="subject-select"
                   className={styles.select}
                   value={subject}
                   onChange={e => { setSubject(e.target.value); }}
@@ -99,7 +101,7 @@ export default function DesktopLayout({
                 <label className={styles.controlLabel}>Ações</label>
                 <div className={styles.controlRow}>
                   {!showNextLvl ? (
-                    <button className="btn btn--primary" onClick={handleGenerate} disabled={isLoading}>
+                    <button id="generate-btn" className="btn btn--primary" onClick={handleGenerate} disabled={isLoading}>
                       {isLoading ? 'Gerando…' : `Iniciar Nível ${gs.level}`}
                     </button>
                   ) : (
@@ -153,7 +155,7 @@ export default function DesktopLayout({
                   <CrosswordBoard placedWords={placedWords} onSolved={handleSolved} />
                   {!showNextLvl && (
                     <div className={styles.boardActions}>
-                      <button className="btn btn--secondary" onClick={handleHint}>💡 Dica</button>
+                      <button id="hint-btn" className="btn btn--secondary" onClick={handleHint}>💡 Dica</button>
                       <button className="btn btn--secondary" onClick={handleClear}>🗑 Limpar</button>
                       <button className="btn btn--danger"    onClick={handleRevealAll}>👁 Revelar Tudo</button>
                     </div>
