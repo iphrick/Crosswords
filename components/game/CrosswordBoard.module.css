@@ -222,6 +222,7 @@
   left: 0 !important;
   transform: none !important;
   text-align: left !important;
+  animation: tooltipPopLeft 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275) !important;
 }
 
 .tooltipLeft .tooltipArrow {
@@ -234,12 +235,23 @@
   right: 0 !important;
   transform: none !important;
   text-align: right !important;
+  animation: tooltipPopRight 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275) !important;
 }
 
 .tooltipRight .tooltipArrow {
   left: auto !important;
   right: 20px !important;
   transform: rotate(45deg) !important;
+}
+
+@keyframes tooltipPopLeft {
+  from { opacity: 0; scale: 0.5; transform: translateY(10px); }
+  to { opacity: 1; scale: 1; transform: translateY(0); }
+}
+
+@keyframes tooltipPopRight {
+  from { opacity: 0; scale: 0.5; transform: translateY(10px); }
+  to { opacity: 1; scale: 1; transform: translateY(0); }
 }
 
 .actions {
@@ -293,12 +305,14 @@
   .tooltipLeft {
     left: 0 !important;
     transform: none !important;
+    animation: tooltipPopLeft 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275) !important;
   }
 
   .tooltipRight {
     left: auto !important;
     right: 0 !important;
     transform: none !important;
+    animation: tooltipPopRight 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275) !important;
   }
 
   .clueIndicator {
