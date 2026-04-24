@@ -1,5 +1,6 @@
-// components/game/CrosswordCell.jsx
+import { useRef } from 'react';
 import styles from './CrosswordBoard.module.css';
+import CrosswordTooltipPortal from './CrosswordTooltipPortal';
 
 export default function CrosswordCell({ 
   x, y, 
@@ -22,18 +23,15 @@ export default function CrosswordCell({
   onClick,
   inputRef
 }) {
+  const cellRef = useRef(null);
+
   if (isBlocked) {
     return <div className={`${styles.cell} ${styles.blocked}`} />;
   }
 
-  const relX = x - (gridBounds?.minX || 0);
-  const totalCols = (gridBounds?.maxX || 0) - (gridBounds?.minX || 0) + 1;
-  let tooltipClass = '';
-  if (relX < 5) tooltipClass = styles.tooltipLeft;
-  else if (totalCols - relX <= 5) tooltipClass = styles.tooltipRight;
-
   return (
     <div 
+      ref={cellRef}
       className={`
         ${styles.cell} 
         ${isActive ? styles.activeCell : ''} 
@@ -43,13 +41,12 @@ export default function CrosswordCell({
     >
       {number && <span className={styles.cellNumber}>{number}</span>}
       
-      {/* Question Balloon (Tooltip) */}
-      {activeClue && (
-        <div className={`${styles.clueTooltip} ${tooltipClass}`}>
-          <div className={styles.tooltipArrow} />
-          {activeClue}
-        </div>
-      )}
+      {/* Question Balloon (Portal) */}
+      <CrosswordTooltipPortal 
+        targetRef={cellRef}
+        text={activeClue}
+        visible={!!activeClue}
+      />
 
       {isActive && (
         <span className={styles.directionTip}>

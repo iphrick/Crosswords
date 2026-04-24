@@ -111,27 +111,29 @@ export default function DesktopLayout({
               </div>
 
               {/* Action Buttons */}
-              <div className="flex items-center gap-4">
+              <div className="flex items-center gap-5">
                 {!showNextLvl ? (
                   <button 
                     id="generate-btn" 
-                    className="px-10 py-4 bg-[#c9a96e] text-slate-950 font-black rounded-2xl hover:bg-[#d4b47a] transition-all transform active:scale-95 shadow-xl shadow-[#c9a96e]/10 flex items-center gap-2" 
+                    className="px-12 py-5 bg-[#c9a96e] text-slate-950 font-black rounded-2xl hover:bg-[#d4b47a] transition-all transform hover:-translate-y-1 active:scale-95 shadow-2xl shadow-[#c9a96e]/20 flex items-center justify-center gap-3 min-w-[240px]" 
                     onClick={handleGenerate} 
                     disabled={isLoading}
                   >
                     {isLoading ? (
-                      <><div className="w-4 h-4 border-2 border-slate-950/30 border-t-slate-950 rounded-full animate-spin" /> Gerando...</>
-                    ) : `Gerar Nível ${gs.level}`}
+                      <><div className="w-5 h-5 border-2 border-slate-950/30 border-t-slate-950 rounded-full animate-spin" /> Gerando...</>
+                    ) : (
+                      <>🚀 Gerar Nível {gs.level}</>
+                    )}
                   </button>
                 ) : (
-                  <button className="px-10 py-4 bg-emerald-600 text-white font-black rounded-2xl hover:bg-emerald-500 transition-all transform active:scale-95 shadow-xl shadow-emerald-600/20" onClick={handleNextLevel}>
+                  <button className="px-12 py-5 bg-emerald-600 text-white font-black rounded-2xl hover:bg-emerald-500 transition-all transform hover:-translate-y-1 active:scale-95 shadow-2xl shadow-emerald-600/30 flex items-center justify-center gap-3 min-w-[240px]" onClick={handleNextLevel}>
                     Próximo Nível ➜
                   </button>
                 )}
-                <button className="px-6 py-4 bg-slate-800/50 text-slate-400 font-bold rounded-2xl hover:bg-slate-800 hover:text-white transition-all border border-slate-700/30" onClick={handleReset}>
+                <button className="px-8 py-5 bg-slate-800/60 text-slate-300 font-bold rounded-2xl hover:bg-slate-800 hover:text-white transition-all border border-slate-700/50 min-w-[140px]" onClick={handleReset}>
                   Resetar
                 </button>
-                {isAdmin && <button className="p-4 bg-red-950/30 text-red-500 border border-red-900/30 rounded-2xl hover:bg-red-900/20 transition-all" onClick={handleAdminSeed}>⚙️</button>}
+                {isAdmin && <button className="p-5 bg-red-950/30 text-red-500 border border-red-900/30 rounded-2xl hover:bg-red-900/20 transition-all" onClick={handleAdminSeed}>⚙️</button>}
               </div>
             </section>
 
@@ -170,14 +172,14 @@ export default function DesktopLayout({
                 <div id="crossword-grid" className="flex-1 max-w-5xl">
                   <CrosswordBoard placedWords={placedWords} onSolved={handleSolved} />
                   {!showNextLvl && (
-                    <div className="flex gap-4 mt-8 justify-center">
-                      <button id="hint-btn" className="flex items-center gap-2 px-8 py-4 bg-slate-900/50 border border-slate-800 text-white font-bold rounded-2xl hover:bg-slate-800 transition-all shadow-xl" onClick={handleHint}>
+                    <div className="flex gap-6 mt-10 justify-center flex-wrap">
+                      <button id="hint-btn" className="flex items-center justify-center gap-3 px-10 py-5 bg-slate-900/60 border border-slate-800 text-white font-bold rounded-[1.5rem] hover:bg-slate-800 hover:-translate-y-1 transition-all shadow-2xl min-w-[200px]" onClick={handleHint}>
                         💡 Pedir Dica
                       </button>
-                      <button className="flex items-center gap-2 px-8 py-4 bg-slate-900/50 border border-slate-800 text-white font-bold rounded-2xl hover:bg-slate-800 transition-all" onClick={handleClear}>
+                      <button className="flex items-center justify-center gap-3 px-10 py-5 bg-slate-900/60 border border-slate-800 text-white font-bold rounded-[1.5rem] hover:bg-slate-800 hover:-translate-y-1 transition-all shadow-xl min-w-[200px]" onClick={handleClear}>
                         🗑 Limpar Tudo
                       </button>
-                      <button className="flex items-center gap-2 px-8 py-4 bg-red-950/30 border border-red-900/30 text-red-400 font-bold rounded-2xl hover:bg-red-900/20 transition-all" onClick={handleRevealAll}>
+                      <button className="flex items-center justify-center gap-3 px-10 py-5 bg-rose-950/20 border border-rose-900/30 text-rose-400 font-bold rounded-[1.5rem] hover:bg-rose-900/30 hover:-translate-y-1 transition-all min-w-[200px]" onClick={handleRevealAll}>
                         👁 Revelar Tudo
                       </button>
                     </div>
