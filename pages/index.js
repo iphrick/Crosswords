@@ -226,7 +226,11 @@ export default function Home() {
     handleSolved, handleHint, handleClear, handleRevealAll,
     feedback,
     modals: {
-      setLoginOpen, setRegisterOpen, setRankingOpen, setContactOpen, setAvatarOpen,
+      setLoginOpen: () => setLoginOpen(true),
+      setRegisterOpen: () => setRegisterOpen(true),
+      setRankingOpen: () => setRankingOpen(true),
+      setContactOpen: () => setContactOpen(true),
+      setAvatarOpen: () => setAvatarOpen(true),
       SUBJECTS
     }
   };
