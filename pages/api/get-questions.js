@@ -32,7 +32,18 @@ export default async function handler(req, res) {
     let all = [];
     snap.forEach(d => all.push(d.data()));
 
-    const available = all.filter(q => !previous_words.includes(q.answer));
+    const available = all.filter(q => {
+      // Filtra palavras já usadas
+      if (previous_words.includes(q.answer)) return false;
+      
+      // Filtra questões redundantes (onde a pista contém a resposta)
+      const sanitizedQuestion = (q.question || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toUpperCase();
+      const sanitizedAnswer = (q.answer || '').toUpperCase();
+      if (sanitizedQuestion.includes(sanitizedAnswer)) return false;
+      
+      return true;
+    });
+
     const selected  = shuffleArray(available).slice(0, num);
 
     if (selected.length === 0)

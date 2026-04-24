@@ -123,14 +123,33 @@ export default function CrosswordBoard({ placedWords, onSolved, avatarUrl }) {
 
   const handleKeyDown = (e, x, y) => {
     if (e.key === 'Backspace' && !userAnswers[getCellKey(x, y)]) {
-      e.preventDefault(); moveToPrevCell(x, y);
+      e.preventDefault(); 
+      moveToPrevCell(x, y);
     } else if (['ArrowRight', 'ArrowLeft', 'ArrowDown', 'ArrowUp'].includes(e.key)) {
+      e.preventDefault();
       const dx = e.key === 'ArrowRight' ? 1 : e.key === 'ArrowLeft' ? -1 : 0;
       const dy = e.key === 'ArrowDown' ? 1 : e.key === 'ArrowUp' ? -1 : 0;
-      inputRefs.current[`${x + dx},${y + dy}`]?.focus();
+      
+      // Procura a próxima célula válida naquela direção (até 20 células de distância)
+      let nextX = x + dx;
+      let nextY = y + dy;
+      let found = false;
+      for (let i = 0; i < 20; i++) {
+        if (gridMap[`${nextX},${nextY}`]) {
+          found = true;
+          break;
+        }
+        nextX += dx;
+        nextY += dy;
+      }
+      
+      if (found) {
+        inputRefs.current[`${nextX},${nextY}`]?.focus();
+      }
     } else if (e.key === 'Tab') {
       e.preventDefault();
-      const nextIndex = (activeWordIndex + 1) % placedWords.length;
+      const step = e.shiftKey ? -1 : 1;
+      const nextIndex = (activeWordIndex + step + placedWords.length) % placedWords.length;
       selectWord(placedWords[nextIndex]);
     }
   };

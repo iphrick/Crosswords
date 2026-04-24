@@ -38,6 +38,12 @@ const STEPS = [
     targetId: 'hint-btn',
     title: '❤️ Sistema de Dicas',
     text: 'Se travar em uma questão, use seus corações para revelar uma letra. Use com estratégia!',
+  },
+  {
+    id: 'step-keyboard',
+    targetId: 'crossword-grid',
+    title: '⌨️ Atalhos de Teclado',
+    text: 'Navegue rapidamente! Use TAB para pular entre palavras e as teclas de seta (← ↑ → ↓) para mover-se entre as células.',
   }
 ];
 
