@@ -39,12 +39,13 @@ Instruções:
 2. Nível ${level}: quanto maior, mais específicos os termos.
 3. Pergunta clara e concisa baseada estritamente no texto da lei.
 4. Resposta: uma única palavra, 2-10 letras, sem acentos, espaços ou hífens.
+5. **CRÍTICO**: A PERGUNTA NUNCA DEVE CONTER A PALAVRA DA RESPOSTA. Use sinônimos, definições ou referências indiretas.
 ${avoidClause}
 6. Formato de saída: lista de "PERGUNTA|RESPOSTA". Nenhum texto extra.
 
-Exemplo:
-Recurso contra decisão de juiz de primeiro grau|APELACAO
-Garantia constitucional contra prisão ilegal|HABEASCORPUS
+Exemplo Correto:
+Recurso contra decisão de juiz de primeiro grau|APELACAO (Certo)
+O que é uma APELACAO?|APELACAO (ERRADO - contém a resposta)
   `.trim();
 }
 
@@ -57,6 +58,11 @@ function parseResponse(text) {
       const [question, rawAnswer] = line.split('|');
       if (!question || !rawAnswer) return null;
       const answer = sanitizeAnswer(rawAnswer);
+      
+      // Validação: A pergunta não pode conter a resposta
+      const sanitizedQuestion = question.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toUpperCase();
+      if (sanitizedQuestion.includes(answer)) return null;
+
       if (answer.length >= 2 && answer.length <= 10 && /^[A-Z]+$/.test(answer)) {
         return { question: question.trim(), answer };
       }

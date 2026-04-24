@@ -72,31 +72,29 @@ export default function CrosswordTooltipPortal({ targetRef, text, visible }) {
           initial={{ 
             opacity: 0, 
             scale: 0.9, 
-            y: coords.position === 'top' ? 20 : -20, 
+            y: coords.position === 'top' ? '-80%' : '80%', 
             x: '-50%' 
           }}
           animate={{ 
             opacity: 1, 
             scale: 1, 
-            y: coords.position === 'top' ? -15 : 15, // Offset real do balão em relação ao ponto de ancoragem
+            y: coords.position === 'top' ? 'calc(-100% - 25px)' : '25px', 
             x: '-50%' 
           }}
           exit={{ 
             opacity: 0, 
             scale: 0.9, 
-            y: coords.position === 'top' ? 20 : -20, 
+            y: coords.position === 'top' ? '-80%' : '80%', 
             x: '-50%' 
           }}
           transition={{ type: 'spring', damping: 25, stiffness: 300 }}
           style={{
             position: 'absolute',
-            top: coords.position === 'top' ? coords.top : coords.top, // O ponto de ancoragem é o topo ou base da célula
+            top: coords.top, 
             left: coords.left,
-            zIndex: 99999,
+            zIndex: 999999,
             pointerEvents: 'none',
             transformOrigin: coords.position === 'top' ? 'bottom center' : 'top center',
-            // Se estiver no topo, sobe 100% da própria altura
-            translate: coords.position === 'top' ? '0 -100%' : '0 0'
           }}
         >
           <div style={{
