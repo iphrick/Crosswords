@@ -38,9 +38,16 @@ export default function LoginModal({ visible, onClose }) {
       confirmRef.current = await sendPhoneCode(phone);
       setStep('code');
     } catch (err) {
-      setError(err.code === 'auth/invalid-phone-number'
-        ? 'Número inválido. Use +55 11 99999-9999.'
-        : 'Falha ao enviar código.');
+      console.error("Erro no envio de SMS:", err);
+      if (err.code === 'auth/invalid-phone-number') {
+        setError('Número inválido. Use +55 11 99999-9999.');
+      } else if (err.code === 'auth/too-many-requests') {
+        setError('Muitas tentativas. Tente novamente mais tarde.');
+      } else if (err.code === 'auth/captcha-check-failed') {
+        setError('Falha na verificação do Captcha. Tente novamente.');
+      } else {
+        setError('Falha ao enviar código. Verifique sua conexão e o número.');
+      }
     } finally {
       setLoading(false);
     }

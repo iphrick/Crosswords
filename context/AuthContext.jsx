@@ -63,17 +63,48 @@ export function AuthProvider({ children }) {
     await signOut(auth);
   }
 
-  function setupRecaptcha(containerId) {
-    if (!window.recaptchaVerifier) {
-      window.recaptchaVerifier = new RecaptchaVerifier(auth, containerId, { size: 'invisible' });
-    }
-    return window.recaptchaVerifier;
-  }
-
   async function sendPhoneCode(phone) {
-    const verifier = setupRecaptcha('recaptcha-container');
-    const result   = await signInWithPhoneNumber(auth, phone, verifier);
-    return result; // store confirmationResult in component
+    // Sanitize phone number (remove spaces, hyphens, parentheses)
+    const cleanPhone = phone.replace(/\s+/g, '').replace(/-/g, '').replace(/\(/g, '').replace(/\)/g, '');
+    
+    // Ensure recaptcha-container exists before initializing
+    if (!document.getElementById('recaptcha-container')) {
+      throw new Error('Container do ReCAPTCHA não encontrado.');
+    }
+
+    // Always clear existing verifier if any, to avoid stale references to removed DOM elements
+    if (window.recaptchaVerifier) {
+      try {
+        window.recaptchaVerifier.clear();
+      } catch (e) {
+        console.warn("Erro ao limpar verifier:", e);
+      }
+      window.recaptchaVerifier = null;
+    }
+
+    try {
+      window.recaptchaVerifier = new RecaptchaVerifier(auth, 'recaptcha-container', {
+        size: 'invisible',
+        callback: () => {
+          // ReCAPTCHA solved
+        },
+        'expired-callback': () => {
+          // Response expired. Ask user to solve reCAPTCHA again.
+          if (window.recaptchaVerifier) window.recaptchaVerifier.clear();
+          window.recaptchaVerifier = null;
+        }
+      });
+
+      const result = await signInWithPhoneNumber(auth, cleanPhone, window.recaptchaVerifier);
+      return result;
+    } catch (error) {
+      // If error occurs, clear verifier to allow retry
+      if (window.recaptchaVerifier) {
+        window.recaptchaVerifier.clear();
+        window.recaptchaVerifier = null;
+      }
+      throw error;
+    }
   }
 
   // ---- GameState mutations ----
