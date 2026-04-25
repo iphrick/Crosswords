@@ -4,10 +4,12 @@ const nextConfig = {
   // Permite que o firebase-admin rode somente no servidor
   serverExternalPackages: ['firebase-admin', '@google/generative-ai'],
   images: {
-    domains: ['minotar.net'],
-  },
-  eslint: {
-    ignoreDuringBuilds: true,
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'minotar.net',
+      },
+    ],
   },
   typescript: {
     ignoreBuildErrors: true,
