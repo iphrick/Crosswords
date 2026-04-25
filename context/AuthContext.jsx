@@ -5,7 +5,6 @@ import {
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
   signOut,
-  RecaptchaVerifier,
   signInWithPhoneNumber,
 } from 'firebase/auth';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
@@ -79,6 +78,8 @@ export function AuthProvider({ children }) {
     }
 
     try {
+      const { RecaptchaVerifier } = await import('firebase/auth');
+      
       // If we already have a verifier, reuse it but ensure it's rendered
       if (!window.recaptchaVerifier) {
         window.recaptchaVerifier = new RecaptchaVerifier(auth, 'recaptcha-container', {

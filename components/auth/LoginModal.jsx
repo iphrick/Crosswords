@@ -1,6 +1,7 @@
 // components/auth/LoginModal.jsx
 import { useState, useRef } from 'react';
 import { useAuth } from '@/context/AuthContext';
+import { auth } from '@/lib/firebase-client';
 import styles from './Modal.module.css';
 
 export default function LoginModal({ visible, onClose }) {
@@ -16,21 +17,22 @@ export default function LoginModal({ visible, onClose }) {
 
   useEffect(() => {
     if (visible && tab === 'phone' && step === 'phone') {
-      // Small delay to ensure the DOM element is rendered
-      const timer = setTimeout(() => {
-        if (!window.recaptchaVerifier) {
-          try {
-            const { RecaptchaVerifier } = require('firebase/auth');
-            const { auth } = require('@/lib/firebase-client');
+      const initRecaptcha = async () => {
+        try {
+          const { RecaptchaVerifier } = await import('firebase/auth');
+          if (!window.recaptchaVerifier) {
             window.recaptchaVerifier = new RecaptchaVerifier(auth, 'recaptcha-container', {
               size: 'invisible',
               callback: () => {}
             });
-          } catch (err) {
-            console.error("Erro ao criar RecaptchaVerifier:", err);
+            await window.recaptchaVerifier.render();
           }
+        } catch (err) {
+          console.error("Erro ao criar RecaptchaVerifier:", err);
         }
-      }, 100);
+      };
+      
+      const timer = setTimeout(initRecaptcha, 100);
       return () => clearTimeout(timer);
     }
   }, [visible, tab, step]);
