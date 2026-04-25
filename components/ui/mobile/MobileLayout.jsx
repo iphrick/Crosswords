@@ -40,7 +40,6 @@ export default function MobileLayout({
         onRegisterClick={modals.setRegisterOpen}
         onRankingClick={modals.setRankingOpen}
         onContactClick={modals.setContactOpen}
-        onAvatarClick={modals.setAvatarOpen}
         onTutorialClick={modals.setTutorialOpen}
       />
 
@@ -82,8 +81,8 @@ export default function MobileLayout({
             {/* Mobile Header Stats */}
             <div className="flex items-center justify-between bg-slate-900 p-4 rounded-2xl border border-slate-800 shadow-lg">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-full bg-slate-800 border border-slate-700 overflow-hidden">
-                  <img src={gameState?.avatarUrl} alt="Avatar" className="w-full h-full object-cover" />
+                <div className="w-10 h-10 rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center">
+                  <span className="text-xl">🧑‍⚖️</span>
                 </div>
                 <div>
                   <p className="text-[10px] text-slate-500 uppercase font-black tracking-widest">Nível {gs.level}</p>

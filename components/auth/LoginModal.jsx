@@ -10,8 +10,30 @@ export default function LoginModal({ visible, onClose }) {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const confirmRef = useRef(null);
+  const recaptchaRef = useRef(null);
 
   if (!visible) return null;
+
+  useEffect(() => {
+    if (visible && tab === 'phone' && step === 'phone') {
+      // Small delay to ensure the DOM element is rendered
+      const timer = setTimeout(() => {
+        if (!window.recaptchaVerifier) {
+          try {
+            const { RecaptchaVerifier } = require('firebase/auth');
+            const { auth } = require('@/lib/firebase-client');
+            window.recaptchaVerifier = new RecaptchaVerifier(auth, 'recaptcha-container', {
+              size: 'invisible',
+              callback: () => {}
+            });
+          } catch (err) {
+            console.error("Erro ao criar RecaptchaVerifier:", err);
+          }
+        }
+      }, 100);
+      return () => clearTimeout(timer);
+    }
+  }, [visible, tab, step]);
 
   async function handleEmailLogin(e) {
     e.preventDefault();
@@ -95,7 +117,7 @@ export default function LoginModal({ visible, onClose }) {
             <button type="submit" className="btn btn--primary" disabled={loading} style={{width:'100%'}}>
               {loading ? 'Enviando…' : 'Enviar Código'}
             </button>
-            <div id="recaptcha-container" />
+            <div ref={recaptchaRef} id="recaptcha-container" />
           </form>
         )}
 

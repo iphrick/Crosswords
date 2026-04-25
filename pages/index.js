@@ -11,7 +11,6 @@ import FeedbackOverlay from '@/components/notifications/FeedbackOverlay';
 import RankingToast from '@/components/notifications/RankingToast';
 import RankingModal from '@/components/game/RankingModal';
 import ContactModal from '@/components/layout/ContactModal';
-import AvatarSelector from '@/components/avatar/AvatarSelector';
 import OnboardingTutorial from '@/components/game/OnboardingTutorial';
 import UsernameModal from '@/components/auth/UsernameModal';
 
@@ -30,7 +29,6 @@ export default function Home() {
   const [registerOpen, setRegisterOpen] = useState(false);
   const [rankingOpen,  setRankingOpen]  = useState(false);
   const [contactOpen,  setContactOpen]  = useState(false);
-  const [avatarOpen,   setAvatarOpen]   = useState(false);
   const [showTutorial, setShowTutorial] = useState(false);
 
   const [subject,      setSubject]      = useState(SUBJECTS[0]);
@@ -115,13 +113,9 @@ export default function Home() {
   // ---- Effects ----
   useEffect(() => {
     if (user && !authLoading && gameState) {
-      if (!gameState.avatarId) {
-        setAvatarOpen(true);
-      } else {
-        const tutorialDone = localStorage.getItem('juriquest_tutorial_done');
-        if (tutorialDone !== 'true' && !showTutorial) {
-          setShowTutorial(true);
-        }
+      const tutorialDone = localStorage.getItem('juriquest_tutorial_done');
+      if (tutorialDone !== 'true' && !showTutorial) {
+        setShowTutorial(true);
       }
     }
   }, [user, authLoading, !!gameState?.avatarId]);
@@ -268,7 +262,6 @@ export default function Home() {
       setRegisterOpen: () => setRegisterOpen(true),
       setRankingOpen: () => setRankingOpen(true),
       setContactOpen: () => setContactOpen(true),
-      setAvatarOpen: () => setAvatarOpen(true),
       setTutorialOpen: () => setShowTutorial(true),
       SUBJECTS
     }
@@ -290,7 +283,6 @@ export default function Home() {
       <UsernameModal isOpen={!!user && !authLoading && gameState && !gameState.nickname} />
       <RankingModal  visible={rankingOpen}  onClose={() => setRankingOpen(false)} />
       <ContactModal  visible={contactOpen}  onClose={() => setContactOpen(false)} />
-      <AvatarSelector visible={avatarOpen}  onClose={() => setAvatarOpen(false)} />
       
       {showTutorial && <OnboardingTutorial onComplete={() => setShowTutorial(false)} />}
 

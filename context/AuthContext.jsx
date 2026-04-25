@@ -25,7 +25,7 @@ export function AuthProvider({ children }) {
     if (snap.exists()) {
       return snap.data();
     }
-    const initial = { email: u.email || null, subjects: {}, avatar: null, nickname: null };
+    const initial = { email: u.email || null, subjects: {}, nickname: null };
     await setDoc(ref, initial);
     return initial;
   }
@@ -65,42 +65,37 @@ export function AuthProvider({ children }) {
 
   async function sendPhoneCode(phone) {
     // Sanitize phone number (remove spaces, hyphens, parentheses)
-    const cleanPhone = phone.replace(/\s+/g, '').replace(/-/g, '').replace(/\(/g, '').replace(/\)/g, '');
+    let cleanPhone = phone.replace(/\s+/g, '').replace(/-/g, '').replace(/\(/g, '').replace(/\)/g, '');
     
+    // Ensure it starts with +
+    if (!cleanPhone.startsWith('+')) {
+      cleanPhone = '+' + cleanPhone;
+    }
+
     // Ensure recaptcha-container exists before initializing
-    if (!document.getElementById('recaptcha-container')) {
+    const container = document.getElementById('recaptcha-container');
+    if (!container) {
       throw new Error('Container do ReCAPTCHA não encontrado.');
     }
 
-    // Always clear existing verifier if any, to avoid stale references to removed DOM elements
-    if (window.recaptchaVerifier) {
-      try {
-        window.recaptchaVerifier.clear();
-      } catch (e) {
-        console.warn("Erro ao limpar verifier:", e);
-      }
-      window.recaptchaVerifier = null;
-    }
-
     try {
-      window.recaptchaVerifier = new RecaptchaVerifier(auth, 'recaptcha-container', {
-        size: 'invisible',
-        callback: () => {
-          // ReCAPTCHA solved
-        },
-        'expired-callback': () => {
-          // Response expired. Ask user to solve reCAPTCHA again.
-          if (window.recaptchaVerifier) window.recaptchaVerifier.clear();
-          window.recaptchaVerifier = null;
-        }
-      });
+      // If we already have a verifier, reuse it but ensure it's rendered
+      if (!window.recaptchaVerifier) {
+        window.recaptchaVerifier = new RecaptchaVerifier(auth, 'recaptcha-container', {
+          size: 'invisible'
+        });
+      }
+      
+      // Explicitly render to be safe
+      await window.recaptchaVerifier.render();
 
       const result = await signInWithPhoneNumber(auth, cleanPhone, window.recaptchaVerifier);
       return result;
     } catch (error) {
-      // If error occurs, clear verifier to allow retry
+      console.error("Firebase Phone Auth Error:", error);
+      // If error occurs, it might be because the verifier is stale
       if (window.recaptchaVerifier) {
-        window.recaptchaVerifier.clear();
+        try { window.recaptchaVerifier.clear(); } catch(e){}
         window.recaptchaVerifier = null;
       }
       throw error;

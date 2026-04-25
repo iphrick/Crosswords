@@ -3,13 +3,12 @@ import { useState } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import styles from './Header.module.css';
 
-export default function Header({ onLoginClick, onRegisterClick, onRankingClick, onContactClick, onAvatarClick, onTutorialClick }) {
+export default function Header({ onLoginClick, onRegisterClick, onRankingClick, onContactClick, onTutorialClick }) {
   const { user, gameState, logout } = useAuth();
   const [menuOpen, setMenuOpen]     = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
 
   const nickname    = gameState?.nickname;
-  const avatarUrl   = gameState?.avatarUrl;
   const profession  = gameState?.profession;
   const fallback    = user?.email ? user.email.split('@')[0] : user?.phoneNumber;
   const displayName = nickname || fallback || '';
@@ -59,11 +58,7 @@ export default function Header({ onLoginClick, onRegisterClick, onRankingClick, 
                 aria-expanded={userMenuOpen}
                 aria-label="Menu de usuário"
               >
-                {avatarUrl ? (
-                  <img src={avatarUrl} alt="Avatar" className="w-10 h-10 rounded-full border-2 border-emerald-500 shadow-lg object-cover" />
-                ) : (
-                  <span className="text-2xl">🧑‍⚖️</span>
-                )}
+                <span className="text-2xl">🧑‍⚖️</span>
                 <div className="flex flex-col items-start leading-tight ml-1">
                   <span className="text-base font-bold text-white tracking-tight">{displayName}</span>
                   {profession && <span className="text-[11px] text-emerald-400 uppercase font-extrabold tracking-wider">{profession}</span>}
@@ -73,13 +68,7 @@ export default function Header({ onLoginClick, onRegisterClick, onRankingClick, 
 
               {userMenuOpen && (
                 <div className={styles.dropdown}>
-                  <button 
-                    className="btn btn--secondary" 
-                    style={{width:'100%', justifyContent:'flex-start', marginBottom: '8px'}}
-                    onClick={() => { setUserMenuOpen(false); onAvatarClick(); }}
-                  >
-                    🎭 Alterar Avatar
-                  </button>
+
                   <button className="btn btn--danger" style={{width:'100%', justifyContent:'flex-start'}}
                     onClick={() => { setUserMenuOpen(false); logout(); }}>
                     Sair
