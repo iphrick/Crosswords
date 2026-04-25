@@ -110,7 +110,11 @@ export default async function handler(req, res) {
     
     await batch.commit();
 
-    return res.status(200).json({ message: `${data.length} perguntas salvas hierarquicamente para '${subject}' nível ${parsedLevel}.` });
+    return res.status(200).json({ 
+      success: true,
+      dataCount: data.length,
+      message: `${data.length} perguntas salvas com sucesso para '${subject}' nível ${parsedLevel}.` 
+    });
   } catch (e) {
     return res.status(500).json({ error: e.message });
   }

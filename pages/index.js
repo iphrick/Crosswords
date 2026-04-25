@@ -203,7 +203,8 @@ export default function Home() {
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || 'Erro desconhecido');
-      showFeedback(`✅ ${data.message}`, 'success', 8000);
+      const successMsg = data.message || data.msg || 'Questões geradas e salvas com sucesso!';
+      showFeedback(`✅ ${successMsg}`, 'success', 8000);
     } catch (err) {
       showFeedback(`❌ ${err.message}`, 'error', 8000);
     }
