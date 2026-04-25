@@ -3,7 +3,7 @@ import Head from 'next/head';
 import { useAuth } from '@/context/AuthContext';
 import { useGameState } from '@/hooks/useGameState';
 import { buildLayout } from '@/lib/crosswordEngine';
-import { SUBJECTS, SUCCESS_MESSAGES, randomFrom, rankingUpMsg, ADMIN_EMAIL, ADMIN_PHONE } from '@/lib/juriMessages';
+import { SUBJECTS, SUCCESS_MESSAGES, FAILURE_MESSAGES, randomFrom, rankingUpMsg, ADMIN_EMAIL, ADMIN_PHONE } from '@/lib/juriMessages';
 
 import LoginModal from '@/components/auth/LoginModal';
 import RegisterModal from '@/components/auth/RegisterModal';
@@ -87,6 +87,13 @@ export default function Home() {
   }, [hintCount, showFeedback]);
 
   // ---- Timer Logic ----
+  const handleTimerEnd = useCallback(() => {
+    setIsTimerRunning(false);
+    setGameVisible(false);
+    showOverlay('❌', randomFrom(FAILURE_MESSAGES), 'error');
+  }, [showOverlay]);
+
+  // ---- Effects ----
   useEffect(() => {
     let interval;
     if (isTimerRunning && timeLeft > 0) {
@@ -97,14 +104,7 @@ export default function Home() {
       handleTimerEnd();
     }
     return () => clearInterval(interval);
-  }, [isTimerRunning, timeLeft]);
-
-  const handleTimerEnd = () => {
-    setIsTimerRunning(false);
-    setGameVisible(false);
-    const { FAILURE_MESSAGES } = require('@/lib/juriMessages');
-    showOverlay('❌', randomFrom(FAILURE_MESSAGES), 'error');
-  };
+  }, [isTimerRunning, timeLeft, handleTimerEnd]);
 
   const getLevelDuration = (lvl) => {
     if (lvl <= 10) return 180; // 3 min
