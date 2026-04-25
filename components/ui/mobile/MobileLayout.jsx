@@ -88,6 +88,16 @@ export default function MobileLayout({
                   <p className="text-white font-bold">{gameState?.nickname || 'Estudante'}</p>
                 </div>
               </div>
+
+              {isTimerRunning && (
+                <div className="flex flex-col items-center">
+                  <p className="text-[10px] text-slate-500 uppercase font-black tracking-widest">Tempo</p>
+                  <p className={`font-black text-lg tabular-nums ${timeLeft < 30 ? 'text-red-500 animate-pulse' : 'text-[#c9a96e]'}`}>
+                    {Math.floor(timeLeft / 60)}:{String(timeLeft % 60).padStart(2, '0')}
+                  </p>
+                </div>
+              )}
+
               <div className="text-right">
                 <p className="text-[10px] text-emerald-500 uppercase font-black tracking-widest">Pontos</p>
                 <p className="text-white font-black text-xl">{gs.score}</p>

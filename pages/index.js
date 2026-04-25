@@ -45,6 +45,8 @@ export default function Home() {
   const [overlay,      setOverlay]      = useState({ visible: false, icon: '', message: '', type: 'neutral' });
   const [toast,        setToast]        = useState({ visible: false, icon: '', message: '', type: 'neutral' });
   const [failCounts,   setFailCounts]   = useState({});
+  const [timeLeft,     setTimeLeft]     = useState(0);
+  const [isTimerRunning, setIsTimerRunning] = useState(false);
 
   const gs = useGameState(subject);
 
@@ -84,6 +86,32 @@ export default function Home() {
     }
   }, [hintCount, showFeedback]);
 
+  // ---- Timer Logic ----
+  useEffect(() => {
+    let interval;
+    if (isTimerRunning && timeLeft > 0) {
+      interval = setInterval(() => {
+        setTimeLeft(prev => prev - 1);
+      }, 1000);
+    } else if (timeLeft === 0 && isTimerRunning) {
+      handleTimerEnd();
+    }
+    return () => clearInterval(interval);
+  }, [isTimerRunning, timeLeft]);
+
+  const handleTimerEnd = () => {
+    setIsTimerRunning(false);
+    setGameVisible(false);
+    const { FAILURE_MESSAGES } = require('@/lib/juriMessages');
+    showOverlay('❌', randomFrom(FAILURE_MESSAGES), 'error');
+  };
+
+  const getLevelDuration = (lvl) => {
+    if (lvl <= 10) return 180; // 3 min
+    if (lvl <= 20) return 120; // 2 min
+    return 90; // 1:30 min
+  };
+
   // ---- Effects ----
   useEffect(() => {
     if (user && !authLoading && gameState) {
@@ -105,6 +133,7 @@ export default function Home() {
     setLevelDone(false);
     setShowNextLvl(false);
     setGameVisible(false);
+    setIsTimerRunning(false);
     setFeedback({ msg: '', type: '' });
     await gs.setLevelCompleted(false);
 
@@ -123,6 +152,11 @@ export default function Home() {
 
       setPlacedWords(placed);
       setGameVisible(true);
+
+      // Inicia cronômetro após gerar nível com sucesso
+      const duration = getLevelDuration(gs.level);
+      setTimeLeft(duration);
+      setIsTimerRunning(true);
     } catch (err) {
       const msg = err.message?.includes('Nenhuma pergunta')
         ? '🚧 Fase em construção! Em breve adicionaremos novas perguntas aqui.'
@@ -135,6 +169,7 @@ export default function Home() {
 
   const handleSolved = useCallback(async () => {
     if (levelDone) return;
+    setIsTimerRunning(false);
     setLevelDone(true);
 
     if (revealUsed) {
@@ -244,9 +279,9 @@ export default function Home() {
       <Head><title>JuriQuest — O Desafio Jurídico</title></Head>
 
       {isMobile ? (
-        <MobileLayout {...sharedProps} />
+        <MobileLayout {...sharedProps} timeLeft={timeLeft} isTimerRunning={isTimerRunning} />
       ) : (
-        <DesktopLayout {...sharedProps} />
+        <DesktopLayout {...sharedProps} timeLeft={timeLeft} isTimerRunning={isTimerRunning} />
       )}
 
       {/* Shared Overlays & Modals */}

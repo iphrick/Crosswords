@@ -102,6 +102,15 @@ export default function DesktopLayout({
                     <p className="text-[10px] text-slate-500 font-black uppercase tracking-widest mb-1">Pontos</p>
                     <p className="text-2xl font-black text-white">{gs.score}</p>
                   </div>
+
+                  {isTimerRunning && (
+                    <div className="text-center border-l border-slate-800/50 pl-12 min-w-[120px]">
+                      <p className="text-[10px] text-slate-500 font-black uppercase tracking-widest mb-1">Tempo Restante</p>
+                      <p className={`text-2xl font-black tabular-nums ${timeLeft < 30 ? 'text-red-500 animate-pulse' : 'text-[#c9a96e]'}`}>
+                        {Math.floor(timeLeft / 60)}:{String(timeLeft % 60).padStart(2, '0')}
+                      </p>
+                    </div>
+                  )}
                   {gameVisible && !showNextLvl && (
                     <div className="text-center bg-slate-950/40 px-6 py-2 rounded-2xl border border-slate-800/50">
                       <p className="text-[10px] text-slate-500 font-black uppercase tracking-widest mb-1">Dicas (Corações)</p>
