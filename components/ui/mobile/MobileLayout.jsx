@@ -29,7 +29,9 @@ export default function MobileLayout({
   handleClear,
   handleRevealAll,
   modals,
-  feedback
+  feedback,
+  timeLeft,
+  isTimerRunning
 }) {
   return (
     <div className="min-h-screen bg-slate-950 text-slate-200 flex flex-col">
