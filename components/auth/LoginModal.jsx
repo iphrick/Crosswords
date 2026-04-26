@@ -1,5 +1,5 @@
 // components/auth/LoginModal.jsx
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { auth } from '@/lib/firebase-client';
 import styles from './Modal.module.css';
