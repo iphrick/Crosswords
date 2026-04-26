@@ -10,11 +10,13 @@ export default function CrosswordBoard({ placedWords, onSolved }) {
   const [activeWordIndex, setActiveWordIndex] = useState(null);
   const [activeCell, setActiveCell] = useState({ x: -1, y: -1 });
   const [direction, setDirection] = useState('across');
+  const [isMounted, setIsMounted] = useState(false);
 
   const inputRefs = useRef({});
   const [windowWidth, setWindowWidth] = useState(0);
 
   useEffect(() => {
+    setIsMounted(true);
     setWindowWidth(window.innerWidth);
     const handleResize = () => setWindowWidth(window.innerWidth);
     window.addEventListener('resize', handleResize);
@@ -217,6 +219,8 @@ export default function CrosswordBoard({ placedWords, onSolved }) {
   useEffect(() => {
     if (placedWords.length > 0 && activeWordIndex === null) selectWord(placedWords[0]);
   }, [placedWords]);
+
+  if (!isMounted) return <div className={styles.board} style={{ minHeight: '400px' }} />;
 
   return (
     <div className={styles.board}>
