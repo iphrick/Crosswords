@@ -118,7 +118,7 @@ export default function Home() {
         setShowTutorial(true);
       }
     }
-  }, [user, authLoading, !!gameState?.avatarId]);
+  }, [user, authLoading, gameState]);
 
   const handleGenerate = async () => {
     if (!user) return;

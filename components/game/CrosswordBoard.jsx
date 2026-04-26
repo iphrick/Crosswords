@@ -4,7 +4,7 @@ import { GRID_SIZE } from '@/lib/crosswordEngine';
 import CrosswordCell from './CrosswordCell';
 import styles from './CrosswordBoard.module.css';
 
-export default function CrosswordBoard({ placedWords, onSolved, avatarUrl }) {
+export default function CrosswordBoard({ placedWords, onSolved }) {
   const [userAnswers, setUserAnswers] = useState({});
   const [cellFeedback, setCellFeedback] = useState({});
   const [activeWordIndex, setActiveWordIndex] = useState(null);
@@ -12,6 +12,14 @@ export default function CrosswordBoard({ placedWords, onSolved, avatarUrl }) {
   const [direction, setDirection] = useState('across');
 
   const inputRefs = useRef({});
+  const [windowWidth, setWindowWidth] = useState(0);
+
+  useEffect(() => {
+    setWindowWidth(window.innerWidth);
+    const handleResize = () => setWindowWidth(window.innerWidth);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   const gridMap = useMemo(() => {
     const map = {};
@@ -226,8 +234,8 @@ export default function CrosswordBoard({ placedWords, onSolved, avatarUrl }) {
           <div 
             className={styles.grid}
             style={{ 
-              gridTemplateColumns: `repeat(${gridDimensions.cols}, ${window.innerWidth < 1280 ? '44px' : '52px'})`,
-              gridTemplateRows: `repeat(${gridDimensions.rows}, ${window.innerWidth < 1280 ? '44px' : '52px'})`
+              gridTemplateColumns: `repeat(${gridDimensions.cols}, ${windowWidth < 1280 ? '44px' : '52px'})`,
+              gridTemplateRows: `repeat(${gridDimensions.rows}, ${windowWidth < 1280 ? '44px' : '52px'})`
             }}
           >
 
@@ -258,7 +266,7 @@ export default function CrosswordBoard({ placedWords, onSolved, avatarUrl }) {
                     onFocus={() => {
               setActiveCell({ x, y });
               // Scroll into view on mobile to avoid keyboard overlap
-              if (window.innerWidth < 768) {
+              if (windowWidth < 768) {
                 inputRefs.current[key]?.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'center' });
               }
             }}
