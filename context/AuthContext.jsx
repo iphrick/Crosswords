@@ -5,7 +5,6 @@ import {
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
   signOut,
-  signInWithPhoneNumber,
 } from 'firebase/auth';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
 import { auth, db } from '@/lib/firebase-client';
@@ -73,46 +72,7 @@ export function AuthProvider({ children }) {
     await signOut(auth);
   }
 
-  async function sendPhoneCode(phone) {
-    // Sanitize phone number (remove spaces, hyphens, parentheses)
-    let cleanPhone = phone.replace(/\s+/g, '').replace(/-/g, '').replace(/\(/g, '').replace(/\)/g, '');
-    
-    // Ensure it starts with +
-    if (!cleanPhone.startsWith('+')) {
-      cleanPhone = '+' + cleanPhone;
-    }
 
-    // Ensure recaptcha-container exists before initializing
-    const container = document.getElementById('recaptcha-container');
-    if (!container) {
-      throw new Error('Container do ReCAPTCHA não encontrado.');
-    }
-
-    try {
-      const { RecaptchaVerifier } = await import('firebase/auth');
-      
-      // If we already have a verifier, reuse it but ensure it's rendered
-      if (!window.recaptchaVerifier) {
-        window.recaptchaVerifier = new RecaptchaVerifier(auth, 'recaptcha-container', {
-          size: 'invisible'
-        });
-      }
-      
-      // Explicitly render to be safe
-      await window.recaptchaVerifier.render();
-
-      const result = await signInWithPhoneNumber(auth, cleanPhone, window.recaptchaVerifier);
-      return result;
-    } catch (error) {
-      console.error("Firebase Phone Auth Error:", error);
-      // If error occurs, it might be because the verifier is stale
-      if (window.recaptchaVerifier) {
-        try { window.recaptchaVerifier.clear(); } catch(e){}
-        window.recaptchaVerifier = null;
-      }
-      throw error;
-    }
-  }
 
   // ---- GameState mutations ----
   function getSubjectState(subject) {
@@ -166,7 +126,6 @@ export function AuthProvider({ children }) {
     login,
     register,
     logout,
-    sendPhoneCode,
     updateGameState,
     getSubjectState,
     checkUsername,
