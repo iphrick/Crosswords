@@ -41,6 +41,7 @@ export default function DesktopLayout({
         onRankingClick={modals.setRankingOpen}
         onContactClick={modals.setContactOpen}
         onTutorialClick={modals.setTutorialOpen}
+        onAvatarClick={modals.setAvatarOpen}
       />
 
       <main className="app max-w-[1600px] mx-auto px-6 py-8">

@@ -23,7 +23,14 @@ export function AuthProvider({ children }) {
     if (snap.exists()) {
       return snap.data();
     }
-    const initial = { email: u.email || null, subjects: {}, nickname: null };
+    const initial = { 
+      email: u.email || null, 
+      subjects: {}, 
+      nickname: null,
+      avatarId: null,
+      avatarUrl: null,
+      profession: null
+    };
     await setDoc(ref, initial);
     return initial;
   }

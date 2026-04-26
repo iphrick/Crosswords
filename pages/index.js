@@ -12,7 +12,7 @@ import RankingToast from '@/components/notifications/RankingToast';
 import RankingModal from '@/components/game/RankingModal';
 import ContactModal from '@/components/layout/ContactModal';
 import OnboardingTutorial from '@/components/game/OnboardingTutorial';
-import UsernameModal from '@/components/auth/UsernameModal';
+import AvatarSelector from '@/components/avatar/AvatarSelector';
 
 import { useDevice } from '@/hooks/useDevice';
 import DesktopLayout from '@/components/ui/desktop/DesktopLayout';
@@ -30,6 +30,7 @@ export default function Home() {
   const [rankingOpen,  setRankingOpen]  = useState(false);
   const [contactOpen,  setContactOpen]  = useState(false);
   const [showTutorial, setShowTutorial] = useState(false);
+  const [avatarOpen,   setAvatarOpen]   = useState(false);
 
   const [subject,      setSubject]      = useState(SUBJECTS[0]);
   const [placedWords,  setPlacedWords]  = useState([]);
@@ -115,12 +116,17 @@ export default function Home() {
   useEffect(() => {
     setIsMounted(true);
     if (user && !authLoading && gameState) {
+      // Se não tem avatar, abre o seletor obrigatoriamente
+      if (!gameState.avatarId && !avatarOpen) {
+        setAvatarOpen(true);
+      }
+      
       const tutorialDone = localStorage.getItem('juriquest_tutorial_done');
-      if (tutorialDone !== 'true' && !showTutorial) {
+      if (tutorialDone !== 'true' && !showTutorial && gameState.avatarId) {
         setShowTutorial(true);
       }
     }
-  }, [user, authLoading, gameState]);
+  }, [user, authLoading, gameState, avatarOpen, showTutorial]);
 
   const handleGenerate = async () => {
     if (!user) return;
@@ -265,6 +271,7 @@ export default function Home() {
       setRankingOpen: () => setRankingOpen(true),
       setContactOpen: () => setContactOpen(true),
       setTutorialOpen: () => setShowTutorial(true),
+      setAvatarOpen: () => setAvatarOpen(true),
       SUBJECTS
     }
   };
@@ -282,11 +289,11 @@ export default function Home() {
       {/* Shared Overlays & Modals */}
       <LoginModal    visible={loginOpen}    onClose={() => setLoginOpen(false)} />
       <RegisterModal visible={registerOpen} onClose={() => setRegisterOpen(false)} />
-      <UsernameModal isOpen={!!user && !authLoading && gameState && !gameState.nickname} />
+      <AvatarSelector visible={avatarOpen}   onClose={() => setAvatarOpen(false)} />
       <RankingModal  visible={rankingOpen}  onClose={() => setRankingOpen(false)} />
       <ContactModal  visible={contactOpen}  onClose={() => setContactOpen(false)} />
       
-      {showTutorial && <OnboardingTutorial onComplete={() => setShowTutorial(false)} />}
+      {showTutorial && gameState?.avatarId && <OnboardingTutorial onComplete={() => setShowTutorial(false)} />}
 
       <FeedbackOverlay {...overlay} onClose={() => setOverlay(o => ({ ...o, visible: false }))} />
       <RankingToast {...toast} onDismiss={() => setToast(t => ({ ...t, visible: false }))} />

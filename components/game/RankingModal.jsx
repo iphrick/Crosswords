@@ -58,7 +58,11 @@ export default function RankingModal({ visible, onClose }) {
                           {idx + 1}º
                         </span>
                         <div style={{ margin: '0 12px', position: 'relative' }}>
-                          <span style={{ fontSize: '24px' }}>🧑‍⚖️</span>
+                          {user.avatarUrl ? (
+                            <img src={user.avatarUrl} alt="" style={{ width: '32px', height: '32px', borderRadius: '50%', objectCover: 'cover', border: '1px solid #334155' }} />
+                          ) : (
+                            <span style={{ fontSize: '24px' }}>🧑‍⚖️</span>
+                          )}
                         </div>
                         <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
                           <span style={{ fontWeight: 'bold', color: isMe ? '#fff' : '#cbd5e1', fontSize: '0.95rem' }}>
