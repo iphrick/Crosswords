@@ -168,8 +168,21 @@ export default function DesktopLayout({
 
             {gameVisible && (
               <div className="flex flex-row gap-10 items-start justify-center mt-12">
-
-
+                {/* Left Side: Avatar Card */}
+                {gameState?.avatarUrl && (
+                  <div className="sticky top-28 flex justify-center animate-in slide-in-from-left-8 duration-1000">
+                    <div className="bg-slate-900 border border-slate-800 rounded-2xl p-2 w-52 shadow-2xl">
+                      <div className="aspect-[2/3] relative rounded-xl overflow-hidden bg-slate-800 border border-slate-700 shadow-inner">
+                        <img src={gameState.avatarUrl} alt={gameState.profession} className="w-full h-full object-cover" />
+                        <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-transparent to-transparent opacity-80" />
+                        <div className="absolute bottom-0 left-0 right-0 p-3 text-center">
+                          <p className="text-white font-bold text-sm leading-tight mb-0.5">{gameState.profession}</p>
+                          <p className="text-[10px] text-emerald-400 uppercase font-extrabold tracking-widest">{gameState.nickname}</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
                 {/* Right Side: Crossword Board */}
                 <div id="crossword-grid" className="flex-1 max-w-5xl">
                   <CrosswordBoard placedWords={placedWords} onSolved={handleSolved} />
