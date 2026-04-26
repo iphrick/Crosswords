@@ -7,14 +7,14 @@ import { collection, query, orderBy, getDocs } from 'firebase/firestore';
 
 // Lucide Icons
 import { 
-  MessageSquareHeart, 
-  AlertTriangle, 
-  MessageSquare, 
-  ArrowLeft, 
-  Filter, 
-  CalendarClock,
+  MessageSquare,
+  Heart,
+  AlertTriangle,
+  ArrowLeft,
+  Filter,
+  Clock,
   User,
-  Inbox
+  Mail
 } from 'lucide-react';
 
 // Shadcn Components
@@ -96,7 +96,7 @@ export default function FeedbacksDashboard() {
         <nav className="flex justify-between items-center pb-6 border-b border-slate-800">
           <div className="flex items-center gap-3">
             <div className="p-2 bg-emerald-500/10 rounded-lg border border-emerald-500/20">
-              <Inbox className="w-6 h-6 text-emerald-400" />
+              <Mail className="w-6 h-6 text-emerald-400" />
             </div>
             <div>
               <h1 className="text-2xl font-black tracking-tight text-white">Central de Insights</h1>
@@ -122,7 +122,7 @@ export default function FeedbacksDashboard() {
 
           <Card className="bg-emerald-950/20 border-emerald-900/50 backdrop-blur-sm relative overflow-hidden">
             <div className="absolute top-0 right-0 p-4 opacity-10">
-              <MessageSquareHeart className="w-16 h-16 text-emerald-400" />
+              <Heart className="w-16 h-16 text-emerald-400" />
             </div>
             <CardHeader className="pb-2">
               <CardDescription className="text-emerald-400/80 font-medium">Elogios & Ideias</CardDescription>
@@ -163,7 +163,7 @@ export default function FeedbacksDashboard() {
               onClick={() => setSentimentFilter('positive')}
               className={sentimentFilter === 'positive' ? 'bg-emerald-600 hover:bg-emerald-500 text-white shadow-[0_0_15px_rgba(16,185,129,0.3)]' : 'text-slate-400 hover:text-emerald-400'}
             >
-              <MessageSquareHeart className="w-4 h-4 mr-2" /> Positivos
+              <Heart className="w-4 h-4 mr-2" /> Positivos
             </Button>
             <Button 
               variant={sentimentFilter === 'negative' ? 'default' : 'ghost'} 
@@ -176,7 +176,7 @@ export default function FeedbacksDashboard() {
           </div>
 
           <div className="flex items-center gap-3 w-full md:w-auto">
-            <CalendarClock className="w-4 h-4 text-slate-400 hidden sm:block" />
+            <Clock className="w-4 h-4 text-slate-400 hidden sm:block" />
             <Select value={sortOrder} onValueChange={setSortOrder}>
               <SelectTrigger className="w-full md:w-[180px] bg-slate-950 border-slate-700 text-slate-300 focus:ring-emerald-500">
                 <SelectValue placeholder="Ordenar por" />
@@ -204,7 +204,7 @@ export default function FeedbacksDashboard() {
                   <div className="flex justify-between items-center">
                     {fb.sentiment === 'positive' ? (
                       <Badge className="bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500/20 border border-emerald-500/20 px-3 py-1 gap-1">
-                        <MessageSquareHeart className="w-3 h-3" /> Elogio
+                        <Heart className="w-3 h-3" /> Elogio
                       </Badge>
                     ) : (
                       <Badge variant="destructive" className="bg-red-500/10 text-red-400 hover:bg-red-500/20 border border-red-500/20 px-3 py-1 gap-1">

@@ -45,6 +45,7 @@ export default function Home() {
   const [failCounts,   setFailCounts]   = useState({});
   const [timeLeft,     setTimeLeft]     = useState(0);
   const [isTimerRunning, setIsTimerRunning] = useState(false);
+  const [isMounted, setIsMounted] = useState(false);
 
   const gs = useGameState(subject);
 
@@ -112,6 +113,7 @@ export default function Home() {
 
   // ---- Effects ----
   useEffect(() => {
+    setIsMounted(true);
     if (user && !authLoading && gameState) {
       const tutorialDone = localStorage.getItem('juriquest_tutorial_done');
       if (tutorialDone !== 'true' && !showTutorial) {
@@ -243,7 +245,7 @@ export default function Home() {
     return Array.from({ length: MAX_HINTS }, (_, i) => i < hintCount ? '🤍' : '❤️').join('');
   };
 
-  if (authLoading || !isLoaded) {
+  if (!isMounted || authLoading || !isLoaded) {
     return (
       <div className="flex items-center justify-center min-h-screen bg-slate-950">
         <div className="loading"><div className="loading__spinner" /><span>Carregando JuriQuest…</span></div>
