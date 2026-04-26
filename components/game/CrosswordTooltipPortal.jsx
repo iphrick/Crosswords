@@ -92,7 +92,7 @@ export default function CrosswordTooltipPortal({ targetRef, text, visible }) {
             position: 'absolute',
             top: coords.top, 
             left: coords.left,
-            zIndex: 999999,
+            zIndex: 1000,
             pointerEvents: 'none',
             transformOrigin: coords.position === 'top' ? 'bottom center' : 'top center',
           }}
