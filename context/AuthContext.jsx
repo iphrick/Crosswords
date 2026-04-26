@@ -36,15 +36,26 @@ export function AuthProvider({ children }) {
   // ---- Auth state listener ----
   useEffect(() => {
     const unsub = onAuthStateChanged(auth, async (u) => {
-      if (u) {
-        const gs = await loadGameState(u);
-        setUser(u);
-        setGameState(gs);
-      } else {
-        setUser(null);
-        setGameState(null);
+      try {
+        if (u) {
+          const gs = await loadGameState(u);
+          setUser({
+            uid: u.uid,
+            email: u.email,
+            displayName: u.displayName,
+            phoneNumber: u.phoneNumber,
+            photoURL: u.photoURL
+          });
+          setGameState(gs);
+        } else {
+          setUser(null);
+          setGameState(null);
+        }
+      } catch (error) {
+        console.error("Auth state change error:", error);
+      } finally {
+        setLoading(false);
       }
-      setLoading(false);
     });
     return () => unsub();
   }, []);
