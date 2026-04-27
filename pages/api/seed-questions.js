@@ -7,7 +7,7 @@ const SEED_SECRET = process.env.SEED_SECRET;
 const MODEL_NAME  = 'gemini-1.5-flash';
 
 const genAI = API_KEY ? new GoogleGenerativeAI(API_KEY) : null;
-const model = genAI ? genAI.getGenerativeModel({ model: MODEL_NAME }) : null;
+const model = genAI ? genAI.getGenerativeModel({ model: MODEL_NAME }, { apiVersion: 'v1' }) : null;
 
 const SUBJECT_SOURCES = {
   'Direito Constitucional':           { name: 'Constituição Federal de 1988',                     url: 'https://www.planalto.gov.br/ccivil_03/constituicao/constituicao.htm' },
