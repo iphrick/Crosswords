@@ -4,7 +4,7 @@ import { db } from '@/lib/firebase-admin';
 
 const API_KEY     = process.env.GEMINI_API_KEY;
 const SEED_SECRET = process.env.SEED_SECRET;
-const MODEL_NAME  = 'gemini-2.0-flash';
+const MODEL_NAME  = 'gemini-2.0-flash-lite';
 
 const genAI = API_KEY ? new GoogleGenerativeAI(API_KEY) : null;
 const model = genAI ? genAI.getGenerativeModel({ model: MODEL_NAME }) : null;
