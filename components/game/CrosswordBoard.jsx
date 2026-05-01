@@ -225,6 +225,14 @@ export default function CrosswordBoard({ placedWords, onSolved }) {
   return (
     <div className={styles.board}>
       <div className={styles.gridWrapper}>
+        <div className="flex items-center justify-center gap-6 sm:gap-12 py-4 mb-4 bg-gradient-to-r from-transparent via-slate-800/40 to-transparent border-b border-slate-800/30">
+          {['⚖️', '🔨', '📜', '👨‍⚖️', '🏛️', '💼', '🖋️'].map((icon, i) => (
+            <span key={i} className="text-3xl filter drop-shadow-lg opacity-70 hover:opacity-100 hover:scale-125 hover:-translate-y-1 transition-all duration-300 cursor-default">
+              {icon}
+            </span>
+          ))}
+        </div>
+
         {activeWord && (
           <div className="hidden lg:flex items-center gap-4 bg-emerald-500/10 border border-emerald-500/30 p-3 rounded-xl mb-4 animate-in fade-in slide-in-from-top-2">
             <div className="bg-emerald-500 text-slate-900 font-extrabold px-3 py-1 rounded-lg text-sm">
