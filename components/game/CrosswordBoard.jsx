@@ -225,11 +225,25 @@ export default function CrosswordBoard({ placedWords, onSolved }) {
   return (
     <div className={styles.board}>
       <div className={styles.gridWrapper}>
-        <div className="flex items-center justify-center gap-6 sm:gap-12 py-4 mb-4 bg-gradient-to-r from-transparent via-slate-800/40 to-transparent border-b border-slate-800/30">
+        <div className="flex flex-wrap items-center justify-center gap-6 sm:gap-10 py-6 mb-4 bg-gradient-to-r from-transparent via-slate-800/50 to-transparent">
           {['⚖️', '🔨', '📜', '👨‍⚖️', '🏛️', '💼', '🖋️'].map((icon, i) => (
-            <span key={i} className="text-3xl filter drop-shadow-lg opacity-70 hover:opacity-100 hover:scale-125 hover:-translate-y-1 transition-all duration-300 cursor-default">
-              {icon}
-            </span>
+            <div key={i} className="relative group cursor-default">
+              {/* Outer glowing aura */}
+              <div className="absolute -inset-1 bg-gradient-to-r from-[#c9a96e] to-yellow-600 rounded-full blur-lg opacity-0 group-hover:opacity-50 transition-opacity duration-500"></div>
+              
+              {/* Realistic Coin-like Container */}
+              <div className="relative flex items-center justify-center w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-gradient-to-br from-slate-700 via-slate-800 to-slate-950 border-[2px] border-slate-600/50 shadow-[inset_0_2px_4px_rgba(255,255,255,0.2),0_10px_20px_rgba(0,0,0,0.6)] group-hover:shadow-[inset_0_4px_8px_rgba(255,255,255,0.3),0_15px_30px_rgba(201,169,110,0.4)] group-hover:border-[#c9a96e]/70 transform group-hover:-translate-y-2 transition-all duration-500 ease-out overflow-hidden">
+                
+                {/* Inner glass reflection */}
+                <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/5 to-white/20 rounded-full pointer-events-none"></div>
+
+                <span 
+                  className="text-4xl sm:text-5xl filter saturate-150 contrast-125 drop-shadow-[0_6px_6px_rgba(0,0,0,0.8)] transform group-hover:scale-110 transition-transform duration-500"
+                >
+                  {icon}
+                </span>
+              </div>
+            </div>
           ))}
         </div>
 
