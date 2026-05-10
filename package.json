@@ -33,6 +33,7 @@
     "typescript": "^6.0.3"
   },
   "devDependencies": {
+    "canvas": "^3.2.3",
     "eslint": "^9",
     "eslint-config-next": "16.2.4"
   }
