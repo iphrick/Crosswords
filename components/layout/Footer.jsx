@@ -5,8 +5,9 @@ export default function Footer() {
     <footer className="w-full pt-16 pb-32 mt-auto border-t border-slate-800 bg-slate-950/50 backdrop-blur-md">
       <div className="max-w-6xl mx-auto px-10 flex flex-col items-center text-center gap-16">
         
-        {/* Visual Keyboard Sketch */}
-        <div className="flex flex-col md:flex-row items-center gap-8">
+        {/* Visual Keyboard Sketch - Hidden on Mobile */}
+        <div className="hidden md:flex flex-col md:flex-row items-center gap-8">
+
           <div className="flex items-center gap-4">
             <div className="flex flex-col items-center gap-1">
               <div className="px-3 py-2 bg-slate-800 border-b-4 border-slate-900 rounded-lg text-[#c9a96e] font-black text-xs shadow-lg">TAB</div>

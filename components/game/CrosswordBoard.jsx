@@ -225,21 +225,14 @@ export default function CrosswordBoard({ placedWords, onSolved }) {
   return (
     <div className={styles.board}>
       <div className={styles.gridWrapper}>
-        <div className="flex flex-wrap items-center justify-center gap-6 sm:gap-10 py-6 mb-4 bg-gradient-to-r from-transparent via-slate-800/50 to-transparent">
+        <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-10 py-4 sm:py-6 mb-2 sm:mb-4 bg-gradient-to-r from-transparent via-slate-800/50 to-transparent">
           {['⚖️', '🔨', '📜', '👨‍⚖️', '🏛️', '💼', '🖋️'].map((icon, i) => (
             <div key={i} className="relative group cursor-default">
-              {/* Outer glowing aura */}
               <div className="absolute -inset-1 bg-gradient-to-r from-[#c9a96e] to-yellow-600 rounded-full blur-lg opacity-0 group-hover:opacity-50 transition-opacity duration-500"></div>
               
-              {/* Realistic Coin-like Container */}
-              <div className="relative flex items-center justify-center w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-gradient-to-br from-slate-700 via-slate-800 to-slate-950 border-[2px] border-slate-600/50 shadow-[inset_0_2px_4px_rgba(255,255,255,0.2),0_10px_20px_rgba(0,0,0,0.6)] group-hover:shadow-[inset_0_4px_8px_rgba(255,255,255,0.3),0_15px_30px_rgba(201,169,110,0.4)] group-hover:border-[#c9a96e]/70 transform group-hover:-translate-y-2 transition-all duration-500 ease-out overflow-hidden">
-                
-                {/* Inner glass reflection */}
+              <div className="relative flex items-center justify-center w-12 h-12 sm:w-20 sm:h-20 rounded-full bg-gradient-to-br from-slate-700 via-slate-800 to-slate-950 border-[2px] border-slate-600/50 shadow-[inset_0_2px_4px_rgba(255,255,255,0.2),0_10px_20px_rgba(0,0,0,0.6)] group-hover:shadow-[inset_0_4px_8px_rgba(255,255,255,0.3),0_15px_30px_rgba(201,169,110,0.4)] group-hover:border-[#c9a96e]/70 transform group-hover:-translate-y-2 transition-all duration-500 ease-out overflow-hidden">
                 <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/5 to-white/20 rounded-full pointer-events-none"></div>
-
-                <span 
-                  className="text-4xl sm:text-5xl filter saturate-150 contrast-125 drop-shadow-[0_6px_6px_rgba(0,0,0,0.8)] transform group-hover:scale-110 transition-transform duration-500"
-                >
+                <span className="text-2xl sm:text-5xl filter saturate-150 contrast-125 drop-shadow-[0_6px_6px_rgba(0,0,0,0.8)] transform group-hover:scale-110 transition-transform duration-500">
                   {icon}
                 </span>
               </div>
@@ -247,21 +240,29 @@ export default function CrosswordBoard({ placedWords, onSolved }) {
           ))}
         </div>
 
+        {/* Clue Display (Responsive) */}
         {activeWord && (
-          <div className="hidden lg:flex items-center gap-4 bg-emerald-500/10 border border-emerald-500/30 p-3 rounded-xl mb-4 animate-in fade-in slide-in-from-top-2">
-            <div className="bg-emerald-500 text-slate-900 font-extrabold px-3 py-1 rounded-lg text-sm">
+          <div className="flex items-center gap-3 sm:gap-4 bg-emerald-500/10 border border-emerald-500/30 p-3 sm:p-4 rounded-2xl mb-4 animate-in fade-in slide-in-from-top-2">
+            <div className="bg-emerald-500 text-slate-900 font-black px-2 sm:px-3 py-1 rounded-lg text-[10px] sm:text-sm whitespace-nowrap">
               {activeWord.number} {activeWord.direction === 'across' ? '→' : '↓'}
             </div>
-            <p className="text-emerald-100 font-medium text-lg leading-tight">{activeWord.clue}</p>
+            <p className="text-emerald-50 text-sm sm:text-lg font-bold leading-tight flex-1">
+              {activeWord.clue}
+            </p>
           </div>
         )}
 
         <div className={styles.gridScroll}>
+          {/* Scroll Indicator for Mobile */}
+          <div className="md:hidden absolute top-1/2 left-4 -translate-y-1/2 animate-pulse opacity-50 pointer-events-none">
+             <span className="text-slate-500 text-xs [writing-mode:vertical-lr] tracking-widest font-black">↔ DESLIZE</span>
+          </div>
+
           <div 
             className={styles.grid}
             style={{ 
-              gridTemplateColumns: `repeat(${gridDimensions.cols}, ${windowWidth < 1280 ? '44px' : '52px'})`,
-              gridTemplateRows: `repeat(${gridDimensions.rows}, ${windowWidth < 1280 ? '44px' : '52px'})`
+              gridTemplateColumns: `repeat(${gridDimensions.cols}, var(--cell-size))`,
+              gridTemplateRows: `repeat(${gridDimensions.rows}, var(--cell-size))`
             }}
           >
 
