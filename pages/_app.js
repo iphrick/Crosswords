@@ -1,7 +1,7 @@
 // pages/_app.js
 import { useEffect } from 'react';
 import { AuthProvider } from '@/context/AuthContext';
-import { ThemeProvider, useTheme } from '@/context/ThemeContext';
+import { ThemeProvider } from '@/context/ThemeContext';
 import '@/styles/globals.css';
 
 export default function App({ Component, pageProps }) {
@@ -15,21 +15,8 @@ export default function App({ Component, pageProps }) {
   return (
     <AuthProvider>
       <ThemeProvider>
-        <ThemeWrapper>
-          <Component {...pageProps} />
-        </ThemeWrapper>
+        <Component {...pageProps} />
       </ThemeProvider>
     </AuthProvider>
   );
 }
-
-function ThemeWrapper({ children }) {
-  const { currentTheme } = useTheme();
-  return (
-    <div className={`theme-${currentTheme}`} style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
-      {children}
-    </div>
-  );
-}
-
-
