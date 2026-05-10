@@ -15,9 +15,21 @@ export default function App({ Component, pageProps }) {
   return (
     <AuthProvider>
       <ThemeProvider>
-        <Component {...pageProps} />
+        <ThemeWrapper>
+          <Component {...pageProps} />
+        </ThemeWrapper>
       </ThemeProvider>
     </AuthProvider>
   );
 }
+
+function ThemeWrapper({ children }) {
+  const { currentTheme } = useTheme();
+  return (
+    <div className={`theme-${currentTheme}`} style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
+      {children}
+    </div>
+  );
+}
+
 
