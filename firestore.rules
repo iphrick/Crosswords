@@ -5,9 +5,18 @@ service cloud.firestore {
     match /users/{userId} {
       allow read, write: if request.auth != null && request.auth.uid == userId;
     }
+    // Permite leitura pública do ranking (todos os users)
+    match /users/{userId} {
+      allow read: if request.auth != null;
+    }
     // Permite que qualquer usuário autenticado leia as perguntas.
     match /questions/{questionId} {
       allow read: if request.auth != null;
+    }
+    // Configurações globais (tema) — leitura pública, escrita autenticada
+    match /settings/{settingId} {
+      allow read: if true;
+      allow write: if request.auth != null;
     }
   }
 }
