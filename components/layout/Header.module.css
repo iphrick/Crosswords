@@ -150,8 +150,20 @@
     font-size: 1.1rem;
   }
 
-  .avatarMenu { width: 100%; }
-  .avatarBtn  { width: 100%; justify-content: center; padding: 16px; }
-  .dropdown   { position: static; width: 100%; margin-top: var(--space-sm); }
+  .avatarMenu { 
+    width: 100%; 
+    margin-top: auto; 
+    padding-top: var(--space-xl);
+  }
+  .avatarBtn  { 
+    width: 100%; 
+    justify-content: flex-start; 
+    padding: 20px; 
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: 16px;
+  }
+  .dropdown   { position: static; width: 100%; margin-top: var(--space-sm); border-radius: 16px; }
+
   .avatarName { max-width: none; }
 }
