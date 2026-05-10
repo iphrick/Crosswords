@@ -34,7 +34,7 @@ export default function MobileLayout({
   isTimerRunning
 }) {
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-200 flex flex-col">
+    <div className="min-h-screen flex flex-col" style={{ backgroundColor: 'var(--color-bg)', color: 'var(--color-text)' }}>
       <Header
         onLoginClick={modals.setLoginOpen}
         onRegisterClick={modals.setRegisterOpen}
@@ -47,17 +47,17 @@ export default function MobileLayout({
       <main className="flex-1 flex flex-col p-4 pb-32">
         {!user ? (
           <div className="flex flex-col gap-8 pt-10">
-            <h1 className="text-4xl font-black text-white leading-tight">
-              Domine o Direito <span className="text-[#c9a96e]">jogando.</span>
+            <h1 className="text-4xl font-black leading-tight" style={{ color: 'var(--color-text)' }}>
+              Domine o Direito <span style={{ color: 'var(--color-accent)' }}>jogando.</span>
             </h1>
-            <p className="text-slate-400 text-lg">
+            <p style={{ color: 'var(--color-text-muted)' }} className="text-lg">
               Cruzadinhas jurídicas geradas por IA. Treine onde quiser.
             </p>
             <div className="flex flex-col gap-4">
-              <button className="w-full py-5 bg-[#c9a96e] text-slate-950 font-black rounded-2xl text-lg shadow-xl" onClick={() => modals.setRegisterOpen(true)}>
+              <button className="w-full py-5 font-black rounded-2xl text-lg shadow-xl" style={{ backgroundColor: 'var(--color-accent)', color: 'var(--color-bg)' }} onClick={() => modals.setRegisterOpen(true)}>
                 Começar Grátis
               </button>
-              <button className="w-full py-5 bg-slate-900 text-white font-bold rounded-2xl text-lg border border-slate-800" onClick={() => modals.setLoginOpen(true)}>
+              <button className="w-full py-5 font-bold rounded-2xl text-lg" style={{ backgroundColor: 'var(--color-surface)', color: 'var(--color-text)', border: '1px solid var(--color-border)' }} onClick={() => modals.setLoginOpen(true)}>
                 Já tenho conta
               </button>
             </div>
@@ -67,11 +67,11 @@ export default function MobileLayout({
                 { icon: '🤖', title: 'IA Generativa', desc: 'Perguntas únicas do Gemini.' },
                 { icon: '📱', title: 'Mobile First', desc: 'Interface 100% otimizada.' },
               ].map(f => (
-                <div key={f.title} className="bg-slate-900/50 p-6 rounded-2xl border border-slate-800/50 flex gap-4 items-center">
+                <div key={f.title} className="p-6 rounded-2xl flex gap-4 items-center" style={{ backgroundColor: 'var(--color-surface)', border: '1px solid var(--color-border)' }}>
                   <span className="text-3xl">{f.icon}</span>
                   <div>
-                    <h3 className="font-bold text-white">{f.title}</h3>
-                    <p className="text-sm text-slate-500">{f.desc}</p>
+                    <h3 className="font-bold" style={{ color: 'var(--color-text)' }}>{f.title}</h3>
+                    <p className="text-sm" style={{ color: 'var(--color-text-muted)' }}>{f.desc}</p>
                   </div>
                 </div>
               ))}
@@ -80,38 +80,39 @@ export default function MobileLayout({
         ) : (
           <div className="flex flex-col gap-6">
             {/* Mobile Header Stats */}
-            <div className="flex items-center justify-between bg-slate-900 p-4 rounded-2xl border border-slate-800 shadow-lg">
+            <div className="flex items-center justify-between p-4 rounded-2xl shadow-lg" style={{ backgroundColor: 'var(--color-surface)', border: '1px solid var(--color-border)' }}>
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center">
+                <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ backgroundColor: 'var(--color-surface-2)', border: '1px solid var(--color-border)' }}>
                   <span className="text-xl">🧑‍⚖️</span>
                 </div>
                 <div>
-                  <p className="text-[10px] text-slate-500 uppercase font-black tracking-widest">Nível {gs.level}</p>
-                  <p className="text-white font-bold">{gameState?.nickname || 'Estudante'}</p>
+                  <p className="text-[10px] uppercase font-black tracking-widest" style={{ color: 'var(--color-text-muted)' }}>Nível {gs.level}</p>
+                  <p className="font-bold" style={{ color: 'var(--color-text)' }}>{gameState?.nickname || 'Estudante'}</p>
                 </div>
               </div>
 
               {isTimerRunning && (
                 <div className="flex flex-col items-center">
-                  <p className="text-[10px] text-slate-500 uppercase font-black tracking-widest">Tempo</p>
-                  <p className={`font-black text-lg tabular-nums ${timeLeft < 30 ? 'text-red-500 animate-pulse' : 'text-[#c9a96e]'}`}>
+                  <p className="text-[10px] uppercase font-black tracking-widest" style={{ color: 'var(--color-text-muted)' }}>Tempo</p>
+                  <p className={`font-black text-lg tabular-nums ${timeLeft < 30 ? 'text-red-500 animate-pulse' : ''}`} style={timeLeft >= 30 ? { color: 'var(--color-accent)' } : {}}>
                     {Math.floor(timeLeft / 60)}:{String(timeLeft % 60).padStart(2, '0')}
                   </p>
                 </div>
               )}
 
               <div className="text-right">
-                <p className="text-[10px] text-emerald-500 uppercase font-black tracking-widest">Pontos</p>
-                <p className="text-white font-black text-xl">{gs.score}</p>
+                <p className="text-[10px] uppercase font-black tracking-widest" style={{ color: 'var(--color-correct)' }}>Pontos</p>
+                <p className="font-black text-xl" style={{ color: 'var(--color-text)' }}>{gs.score}</p>
               </div>
             </div>
 
             {/* Subject Selector */}
             <div className="flex flex-col gap-2">
-              <label className="text-xs font-bold text-slate-500 uppercase tracking-widest ml-1">Matéria Atual</label>
+              <label className="text-xs font-bold uppercase tracking-widest ml-1" style={{ color: 'var(--color-text-muted)' }}>Matéria Atual</label>
               <select
                 id="subject-select"
-                className="w-full bg-slate-900 border-2 border-slate-800 rounded-2xl p-4 text-white font-bold appearance-none focus:border-[#c9a96e] outline-none transition-all"
+                className="w-full rounded-2xl p-4 font-bold appearance-none outline-none transition-all"
+                style={{ backgroundColor: 'var(--color-surface)', border: '2px solid var(--color-border)', color: 'var(--color-text)' }}
                 value={subject}
                 onChange={e => setSubject(e.target.value)}
               >
@@ -124,7 +125,8 @@ export default function MobileLayout({
               {!showNextLvl ? (
                 <button
                   id="generate-btn"
-                  className="flex-1 py-4 bg-[#c9a96e] text-slate-950 font-black rounded-2xl shadow-lg active:scale-95 transition-transform"
+                  className="flex-1 py-4 font-black rounded-2xl shadow-lg active:scale-95 transition-transform"
+                  style={{ backgroundColor: 'var(--color-accent)', color: 'var(--color-bg)' }}
                   onClick={handleGenerate}
                   disabled={isLoading}
                 >
@@ -135,20 +137,20 @@ export default function MobileLayout({
                   Próximo Nível →
                 </button>
               )}
-              <button className="px-6 py-4 bg-slate-900 text-slate-400 font-bold rounded-2xl border border-slate-800" onClick={handleReset}>
+              <button className="px-6 py-4 font-bold rounded-2xl" style={{ backgroundColor: 'var(--color-surface)', color: 'var(--color-text-muted)', border: '1px solid var(--color-border)' }} onClick={handleReset}>
                 Reset
               </button>
             </div>
 
             {isLoading && (
               <div className="flex flex-col items-center gap-4 py-10">
-                <div className="w-12 h-12 border-4 border-[#c9a96e]/20 border-t-[#c9a96e] rounded-full animate-spin" />
-                <p className="text-slate-500 font-bold animate-pulse">Invocando Inteligência Artificial...</p>
+                <div className="w-12 h-12 rounded-full animate-spin" style={{ borderWidth: '4px', borderColor: 'var(--color-accent-dim)', borderTopColor: 'var(--color-accent)' }} />
+                <p className="font-bold animate-pulse" style={{ color: 'var(--color-text-muted)' }}>Invocando Inteligência Artificial...</p>
               </div>
             )}
 
             {feedback.msg && (
-              <div className="bg-red-500/10 border border-red-500/20 p-4 rounded-xl text-red-400 text-sm font-medium text-center">
+              <div className="p-4 rounded-xl text-sm font-medium text-center" style={{ backgroundColor: 'rgba(224,92,92,0.1)', border: '1px solid rgba(224,92,92,0.2)', color: 'var(--color-wrong)' }}>
                 {feedback.msg}
               </div>
             )}
@@ -158,28 +160,28 @@ export default function MobileLayout({
               <div className="flex flex-col gap-4 animate-in fade-in slide-in-from-bottom-4 duration-500">
                 <div className="flex justify-between items-center px-1">
                    <div className="flex items-center gap-2">
-                     <span className="text-xs font-bold text-slate-500">DICAS:</span>
+                     <span className="text-xs font-bold" style={{ color: 'var(--color-text-muted)' }}>DICAS:</span>
                      <span className="text-lg tracking-tighter">{renderHearts()}</span>
                    </div>
-                   <button onClick={handleAdminSeed} className="text-[10px] text-slate-600">v{gs.level}.0</button>
+                   <button onClick={handleAdminSeed} className="text-[10px]" style={{ color: 'var(--color-text-muted)' }}>v{gs.level}.0</button>
                 </div>
                 
-                <div id="crossword-grid" className="w-full bg-slate-900/30 rounded-3xl p-2 border border-slate-800/50">
+                <div id="crossword-grid" className="w-full rounded-3xl p-2" style={{ backgroundColor: 'var(--color-surface)', border: '1px solid var(--color-border)' }}>
                   <CrosswordBoard placedWords={placedWords} onSolved={handleSolved} />
                 </div>
 
                 <div className="grid grid-cols-3 gap-3 mt-2">
-                  <button id="hint-btn" className="flex flex-col items-center gap-1 p-4 bg-slate-900 rounded-2xl border border-slate-800 active:bg-slate-800" onClick={handleHint}>
+                  <button id="hint-btn" className="flex flex-col items-center gap-1 p-4 rounded-2xl active:opacity-80" style={{ backgroundColor: 'var(--color-surface)', border: '1px solid var(--color-border)' }} onClick={handleHint}>
                     <span className="text-xl">💡</span>
-                    <span className="text-[10px] font-black uppercase text-slate-400">Dica</span>
+                    <span className="text-[10px] font-black uppercase" style={{ color: 'var(--color-text-muted)' }}>Dica</span>
                   </button>
-                  <button className="flex flex-col items-center gap-1 p-4 bg-slate-900 rounded-2xl border border-slate-800 active:bg-slate-800" onClick={handleClear}>
+                  <button className="flex flex-col items-center gap-1 p-4 rounded-2xl active:opacity-80" style={{ backgroundColor: 'var(--color-surface)', border: '1px solid var(--color-border)' }} onClick={handleClear}>
                     <span className="text-xl">🗑️</span>
-                    <span className="text-[10px] font-black uppercase text-slate-400">Limpar</span>
+                    <span className="text-[10px] font-black uppercase" style={{ color: 'var(--color-text-muted)' }}>Limpar</span>
                   </button>
-                  <button className="flex flex-col items-center gap-1 p-4 bg-red-950/20 rounded-2xl border border-red-900/30 active:bg-red-900/40" onClick={handleRevealAll}>
+                  <button className="flex flex-col items-center gap-1 p-4 rounded-2xl active:opacity-80" style={{ backgroundColor: 'rgba(224,92,92,0.08)', border: '1px solid rgba(224,92,92,0.2)' }} onClick={handleRevealAll}>
                     <span className="text-xl">👁️</span>
-                    <span className="text-[10px] font-black uppercase text-red-400">Revelar</span>
+                    <span className="text-[10px] font-black uppercase" style={{ color: 'var(--color-wrong)' }}>Revelar</span>
                   </button>
                 </div>
               </div>

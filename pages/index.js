@@ -253,7 +253,7 @@ export default function Home() {
 
   if (!isMounted || authLoading || !isLoaded) {
     return (
-      <div className="flex items-center justify-center min-h-screen bg-slate-950">
+      <div className="flex items-center justify-center min-h-screen" style={{ backgroundColor: 'var(--color-bg)' }}>
         <div className="loading"><div className="loading__spinner" /><span>Carregando JuriQuest…</span></div>
       </div>
     );
