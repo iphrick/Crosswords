@@ -21,15 +21,20 @@ export function ThemeProvider({ children }) {
     const settingsRef = doc(db, 'settings', 'appearance');
     
     const unsub = onSnapshot(settingsRef, (snap) => {
+      console.log("Theme Snapshot received:", snap.data());
       if (snap.exists()) {
         const themeId = snap.data().activeTheme || 'default';
+        console.log("Setting theme to:", themeId);
         setCurrentTheme(themeId);
         document.documentElement.setAttribute('data-theme', themeId);
       } else {
-        // Initialize if not exists
+        console.log("No theme document found, initializing...");
         setDoc(settingsRef, { activeTheme: 'default' });
       }
+    }, (error) => {
+      console.error("Theme Snapshot error:", error);
     });
+
 
     return () => unsub();
   }, []);

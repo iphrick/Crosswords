@@ -38,15 +38,23 @@ export default function Header({ onLoginClick, onRegisterClick, onRankingClick, 
           <>
             {/* Admin Theme Selector */}
             {isAdmin && (
-              <div className="flex items-center gap-2 bg-slate-900/50 p-1 rounded-xl border border-slate-800">
+              <div className="flex items-center gap-2 bg-slate-900/50 p-1 rounded-xl border border-slate-800 shadow-inner">
                 <span className="text-[10px] font-black text-slate-500 uppercase ml-2 tracking-widest">Tema:</span>
                 <select 
-                  className="bg-transparent text-xs font-bold text-emerald-400 outline-none cursor-pointer p-1"
+                  className="bg-transparent text-xs font-black text-emerald-400 outline-none cursor-pointer p-1 pr-2"
                   value={currentTheme}
-                  onChange={(e) => updateGlobalTheme(e.target.value)}
+                  onChange={(e) => {
+                    console.log("Admin changing theme to:", e.target.value);
+                    updateGlobalTheme(e.target.value);
+                  }}
                 >
-                  {THEMES.map(t => <option key={t.id} value={t.id} className="bg-slate-900 text-white">{t.icon} {t.name}</option>)}
+                  {THEMES.map(t => (
+                    <option key={t.id} value={t.id} className="bg-slate-900 text-white">
+                      {t.icon} {t.name}
+                    </option>
+                  ))}
                 </select>
+                <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse mr-2" title={`Ativo: ${currentTheme}`}></div>
               </div>
             )}
 
