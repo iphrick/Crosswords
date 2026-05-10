@@ -2,6 +2,7 @@ import React from 'react';
 import dynamic from 'next/dynamic';
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
+import SubjectPicker from '@/components/ui/SubjectPicker';
 import styles from '@/styles/Home.module.css';
 
 const CrosswordBoard = dynamic(() => import('@/components/game/CrosswordBoard'), { ssr: false });
@@ -81,18 +82,9 @@ export default function DesktopLayout({
           <>
             <section className="backdrop-blur-xl p-6 rounded-[2rem] mb-12 shadow-2xl flex flex-wrap items-center justify-between gap-10" style={{ backgroundColor: 'var(--color-surface)', border: '1px solid var(--color-border)' }}>
               <div className="flex flex-wrap items-center gap-12">
-                {/* Subject Selector */}
+                {/* Subject Picker */}
                 <div className="space-y-2">
-                  <label className="text-[10px] font-black uppercase tracking-[0.2em] px-1" style={{ color: 'var(--color-text-muted)' }}>Matéria de Estudo</label>
-                  <select
-                    id="subject-select"
-                    className="rounded-2xl px-5 h-14 min-w-[280px] outline-none transition-all font-bold text-sm shadow-inner"
-                    style={{ backgroundColor: 'var(--color-bg)', border: '1px solid var(--color-border)', color: 'var(--color-text)' }}
-                    value={subject}
-                    onChange={e => { setSubject(e.target.value); }}
-                  >
-                    {modals.SUBJECTS.map(s => <option key={s} value={s}>{s}</option>)}
-                  </select>
+                  <SubjectPicker subject={subject} setSubject={setSubject} />
                 </div>
 
                 {/* Stats & Hearts */}

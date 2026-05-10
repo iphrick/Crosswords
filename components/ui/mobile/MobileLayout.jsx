@@ -2,6 +2,7 @@ import React from 'react';
 import dynamic from 'next/dynamic';
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
+import SubjectPicker from '@/components/ui/SubjectPicker';
 import styles from '@/styles/Home.module.css';
 
 const CrosswordBoard = dynamic(() => import('@/components/game/CrosswordBoard'), { ssr: false });
@@ -106,19 +107,8 @@ export default function MobileLayout({
               </div>
             </div>
 
-            {/* Subject Selector */}
-            <div className="flex flex-col gap-2">
-              <label className="text-xs font-bold uppercase tracking-widest ml-1" style={{ color: 'var(--color-text-muted)' }}>Matéria Atual</label>
-              <select
-                id="subject-select"
-                className="w-full rounded-2xl p-4 font-bold appearance-none outline-none transition-all"
-                style={{ backgroundColor: 'var(--color-surface)', border: '2px solid var(--color-border)', color: 'var(--color-text)' }}
-                value={subject}
-                onChange={e => setSubject(e.target.value)}
-              >
-                {modals.SUBJECTS.map(s => <option key={s} value={s}>{s}</option>)}
-              </select>
-            </div>
+            {/* Subject Picker */}
+            <SubjectPicker subject={subject} setSubject={setSubject} />
 
             {/* Actions */}
             <div className="flex gap-3">
