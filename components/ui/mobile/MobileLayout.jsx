@@ -79,67 +79,64 @@ export default function MobileLayout({
           </div>
         ) : (
           <div className="flex flex-col gap-6">
-            {/* Mobile Header Stats - Optimized */}
-            <div className="grid grid-cols-2 gap-3">
-              <div className="flex items-center gap-3 bg-slate-900 p-3 rounded-2xl border border-slate-800 shadow-md">
-                <div className="w-8 h-8 rounded-full bg-slate-800 flex items-center justify-center shrink-0">
-                  <span className="text-sm">🧑‍⚖️</span>
+            {/* Mobile Header Stats */}
+            <div className="flex items-center justify-between bg-slate-900 p-4 rounded-2xl border border-slate-800 shadow-lg">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center">
+                  <span className="text-xl">🧑‍⚖️</span>
                 </div>
-                <div className="overflow-hidden">
-                  <p className="text-[8px] text-slate-500 uppercase font-black tracking-tighter">Nível {gs.level}</p>
-                  <p className="text-white font-bold text-xs truncate">{gameState?.nickname || 'Estudante'}</p>
+                <div>
+                  <p className="text-[10px] text-slate-500 uppercase font-black tracking-widest">Nível {gs.level}</p>
+                  <p className="text-white font-bold">{gameState?.nickname || 'Estudante'}</p>
                 </div>
               </div>
 
-              <div className="flex items-center justify-between bg-slate-900 p-3 rounded-2xl border border-slate-800 shadow-md">
-                <div className="flex flex-col">
-                  <p className="text-[8px] text-emerald-500 uppercase font-black tracking-tighter">Pontos</p>
-                  <p className="text-white font-black text-sm">{gs.score}</p>
+              {isTimerRunning && (
+                <div className="flex flex-col items-center">
+                  <p className="text-[10px] text-slate-500 uppercase font-black tracking-widest">Tempo</p>
+                  <p className={`font-black text-lg tabular-nums ${timeLeft < 30 ? 'text-red-500 animate-pulse' : 'text-[#c9a96e]'}`}>
+                    {Math.floor(timeLeft / 60)}:{String(timeLeft % 60).padStart(2, '0')}
+                  </p>
                 </div>
-                {isTimerRunning && (
-                  <div className="text-right">
-                    <p className={`font-black text-sm tabular-nums ${timeLeft < 30 ? 'text-red-500 animate-pulse' : 'text-[#c9a96e]'}`}>
-                      {Math.floor(timeLeft / 60)}:{String(timeLeft % 60).padStart(2, '0')}
-                    </p>
-                  </div>
-                )}
+              )}
+
+              <div className="text-right">
+                <p className="text-[10px] text-emerald-500 uppercase font-black tracking-widest">Pontos</p>
+                <p className="text-white font-black text-xl">{gs.score}</p>
               </div>
             </div>
 
             {/* Subject Selector */}
-            <div className="flex flex-col gap-1.5">
-              <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest ml-1">Matéria Atual</label>
-              <div className="relative">
-                <select
-                  id="subject-select"
-                  className="w-full bg-slate-900 border-2 border-slate-800 rounded-2xl p-4 text-white font-bold appearance-none focus:border-[#c9a96e] outline-none transition-all pr-12"
-                  value={subject}
-                  onChange={e => setSubject(e.target.value)}
-                >
-                  {modals.SUBJECTS.map(s => <option key={s} value={s}>{s}</option>)}
-                </select>
-                <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-[#c9a96e]">▾</div>
-              </div>
+            <div className="flex flex-col gap-2">
+              <label className="text-xs font-bold text-slate-500 uppercase tracking-widest ml-1">Matéria Atual</label>
+              <select
+                id="subject-select"
+                className="w-full bg-slate-900 border-2 border-slate-800 rounded-2xl p-4 text-white font-bold appearance-none focus:border-[#c9a96e] outline-none transition-all"
+                value={subject}
+                onChange={e => setSubject(e.target.value)}
+              >
+                {modals.SUBJECTS.map(s => <option key={s} value={s}>{s}</option>)}
+              </select>
             </div>
 
             {/* Actions */}
-            <div className="flex flex-col sm:flex-row gap-3">
+            <div className="flex gap-3">
               {!showNextLvl ? (
                 <button
                   id="generate-btn"
-                  className="flex-1 py-4 bg-[#c9a96e] text-slate-950 font-black rounded-2xl shadow-lg active:scale-95 transition-transform text-base"
+                  className="flex-1 py-4 bg-[#c9a96e] text-slate-950 font-black rounded-2xl shadow-lg active:scale-95 transition-transform"
                   onClick={handleGenerate}
                   disabled={isLoading}
                 >
-                  {isLoading ? 'Invocando IA...' : `Iniciar Nível ${gs.level}`}
+                  {isLoading ? 'Gerando…' : `Iniciar Nível ${gs.level}`}
                 </button>
               ) : (
-                <button className="flex-1 py-4 bg-emerald-500 text-white font-black rounded-2xl shadow-lg animate-pulse text-base" onClick={handleNextLevel}>
+                <button className="flex-1 py-4 bg-emerald-500 text-white font-black rounded-2xl shadow-lg animate-pulse" onClick={handleNextLevel}>
                   Próximo Nível →
                 </button>
               )}
-              <button className="py-4 px-8 bg-slate-900 text-slate-400 font-bold rounded-2xl border border-slate-800 active:bg-slate-800" onClick={handleReset}>
-                Resetar
+              <button className="px-6 py-4 bg-slate-900 text-slate-400 font-bold rounded-2xl border border-slate-800" onClick={handleReset}>
+                Reset
               </button>
             </div>
 

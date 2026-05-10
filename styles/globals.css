@@ -287,7 +287,17 @@ body {
 @keyframes pulse      { 0%,100% { transform: scale(1); } 50% { transform: scale(1.05); } }
 @keyframes shimmer    { 0% { background-position: -200% 0; } 100% { background-position: 200% 0; } }
 
+/* =============================================
+   MOBILE GRID
+   ============================================= */
+@media (max-width: 480px) {
+  .grid__cell,
+  .grid__cell__input { width: 26px; height: 26px; }
+  .grid__cell__input { font-size: 16px; } /* prevent iOS zoom */
+}
+
 @theme inline {
+
 
   --radius-4xl:          calc(var(--radius) * 2.6);
   --font-sans:             var(--font-body);
