@@ -2,6 +2,7 @@
 import { useEffect } from 'react';
 import { AuthProvider } from '@/context/AuthContext';
 import { ThemeProvider } from '@/context/ThemeContext';
+import ThemeDecorations from '@/components/layout/ThemeDecorations';
 import '@/styles/globals.css';
 
 export default function App({ Component, pageProps }) {
@@ -15,8 +16,10 @@ export default function App({ Component, pageProps }) {
   return (
     <AuthProvider>
       <ThemeProvider>
+        <ThemeDecorations />
         <Component {...pageProps} />
       </ThemeProvider>
     </AuthProvider>
   );
 }
+
