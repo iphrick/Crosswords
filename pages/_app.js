@@ -1,6 +1,7 @@
 // pages/_app.js
 import { useEffect } from 'react';
 import { AuthProvider } from '@/context/AuthContext';
+import { ThemeProvider } from '@/context/ThemeContext';
 import '@/styles/globals.css';
 
 export default function App({ Component, pageProps }) {
@@ -13,7 +14,10 @@ export default function App({ Component, pageProps }) {
 
   return (
     <AuthProvider>
-      <Component {...pageProps} />
+      <ThemeProvider>
+        <Component {...pageProps} />
+      </ThemeProvider>
     </AuthProvider>
   );
 }
+

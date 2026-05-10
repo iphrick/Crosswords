@@ -1,10 +1,12 @@
 // components/layout/Header.jsx
 import { useState } from 'react';
 import { useAuth } from '@/context/AuthContext';
+import { useTheme } from '@/context/ThemeContext';
 import styles from './Header.module.css';
 
 export default function Header({ onLoginClick, onRegisterClick, onRankingClick, onContactClick, onTutorialClick, onAvatarClick }) {
   const { user, gameState, logout } = useAuth();
+  const { currentTheme, updateGlobalTheme, THEMES } = useTheme();
   const [menuOpen, setMenuOpen]     = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
 
@@ -34,6 +36,20 @@ export default function Header({ onLoginClick, onRegisterClick, onRankingClick, 
           </>
         ) : (
           <>
+            {/* Admin Theme Selector */}
+            {isAdmin && (
+              <div className="flex items-center gap-2 bg-slate-900/50 p-1 rounded-xl border border-slate-800">
+                <span className="text-[10px] font-black text-slate-500 uppercase ml-2 tracking-widest">Tema:</span>
+                <select 
+                  className="bg-transparent text-xs font-bold text-emerald-400 outline-none cursor-pointer p-1"
+                  value={currentTheme}
+                  onChange={(e) => updateGlobalTheme(e.target.value)}
+                >
+                  {THEMES.map(t => <option key={t.id} value={t.id} className="bg-slate-900 text-white">{t.icon} {t.name}</option>)}
+                </select>
+              </div>
+            )}
+
             <button id="ranking-modal-btn" className="btn btn--secondary" onClick={() => { onRankingClick(); setMenuOpen(false); }}>
               🏆 Ranking
             </button>
@@ -104,3 +120,4 @@ export default function Header({ onLoginClick, onRegisterClick, onRankingClick, 
     </header>
   );
 }
+
