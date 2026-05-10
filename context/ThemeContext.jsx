@@ -1,6 +1,6 @@
 // context/ThemeContext.jsx
 import { createContext, useContext, useEffect, useState } from 'react';
-import { doc, onSnapshot, setDoc, getDoc } from 'firebase/firestore';
+import { doc, onSnapshot, setDoc } from 'firebase/firestore';
 import { db } from '@/lib/firebase-client';
 
 const ThemeContext = createContext(null);
