@@ -79,7 +79,8 @@
    ============================================= */
 
 /* Copa do Mundo (Seleção Brasileira) */
-html[data-theme="world-cup"] {
+html[data-theme="world-cup"],
+body.theme-world-cup {
   --color-bg:          #004b23;
   --color-surface:     #006400;
   --color-surface-2:   #007200;
@@ -98,7 +99,8 @@ html[data-theme="world-cup"] {
 }
 
 /* Cyberpunk (Neon) */
-html[data-theme="cyberpunk"] {
+html[data-theme="cyberpunk"],
+body.theme-cyberpunk {
   --color-bg:          #0b0e14;
   --color-surface:     #151921;
   --color-surface-2:   #1c222d;
@@ -113,7 +115,8 @@ html[data-theme="cyberpunk"] {
 }
 
 /* Forest (Natural) */
-html[data-theme="forest"] {
+html[data-theme="forest"],
+body.theme-forest {
   --color-bg:          #1a2e1a;
   --color-surface:     #2d4a2d;
   --color-surface-2:   #3d613d;
@@ -128,7 +131,8 @@ html[data-theme="forest"] {
 }
 
 /* Royal (Elegant) */
-html[data-theme="royal"] {
+html[data-theme="royal"],
+body.theme-royal {
   --color-bg:          #0a0a2a;
   --color-surface:     #1a1a4a;
   --color-surface-2:   #2a2a6a;

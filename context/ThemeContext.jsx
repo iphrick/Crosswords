@@ -26,7 +26,14 @@ export function ThemeProvider({ children }) {
         const themeId = snap.data().activeTheme || 'default';
         console.log("Setting theme to:", themeId);
         setCurrentTheme(themeId);
+        
+        // Remove previous theme classes
+        document.body.classList.forEach(cls => {
+          if (cls.startsWith('theme-')) document.body.classList.remove(cls);
+        });
+        document.body.classList.add(`theme-${themeId}`);
         document.documentElement.setAttribute('data-theme', themeId);
+
       } else {
         console.log("No theme document found, initializing...");
         setDoc(settingsRef, { activeTheme: 'default' });
