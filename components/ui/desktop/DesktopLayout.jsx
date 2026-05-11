@@ -81,15 +81,18 @@ export default function DesktopLayout({
           </section>
         ) : (
           <>
-            <section className="backdrop-blur-xl p-6 rounded-[2rem] mb-12 shadow-2xl flex flex-wrap items-center justify-between gap-10" style={{ backgroundColor: 'var(--color-surface)', border: '1px solid var(--color-border)' }}>
+            <section className="backdrop-blur-xl p-6 sm:p-8 rounded-[2rem] mb-12 shadow-2xl flex flex-wrap items-center justify-center lg:justify-between gap-8 sm:gap-10 overflow-hidden" style={{ backgroundColor: 'var(--color-surface)', border: '1px solid var(--color-border)', boxSizing: 'border-box' }}>
               <div className="flex flex-wrap items-center gap-12">
                 {/* Subject Picker */}
                 <div className="space-y-2">
                   <SubjectPicker subject={subject} setSubject={setSubject} />
                 </div>
 
+                {/* Vertical Divider - Only visible on large screens when not wrapped */}
+                <div className="hidden xl:block w-px h-12 self-center opacity-20" style={{ backgroundColor: 'var(--color-border)' }} />
+
                 {/* Stats & Hearts */}
-                <div className="flex items-center gap-12 border-l pl-12" style={{ borderColor: 'var(--color-border)' }}>
+                <div className="flex items-center gap-12">
                   <div className="text-center">
                     <p className="text-[10px] font-black uppercase tracking-widest mb-1" style={{ color: 'var(--color-text-muted)' }}>Nível</p>
                     <p className="text-2xl font-black" style={{ color: 'var(--color-accent)' }}>{gs.level}</p>
