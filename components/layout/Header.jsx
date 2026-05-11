@@ -36,15 +36,14 @@ export default function Header({ onLoginClick, onRegisterClick, onRankingClick, 
           </>
         ) : (
           <>
-            {/* Admin Theme Selector */}
-            {isAdmin && (
+            {/* Theme Selector for Users */}
+            {user && (
               <div className="flex items-center gap-2 bg-slate-900/50 p-1 rounded-xl border border-slate-800 shadow-inner">
                 <span className="text-[10px] font-black text-slate-500 uppercase ml-2 tracking-widest">Tema:</span>
                 <select 
                   className="bg-transparent text-xs font-black text-emerald-400 outline-none cursor-pointer p-1 pr-2"
                   value={currentTheme}
                   onChange={(e) => {
-                    console.log("Admin changing theme to:", e.target.value);
                     updateGlobalTheme(e.target.value);
                   }}
                 >
