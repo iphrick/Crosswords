@@ -63,7 +63,7 @@ export default function SubjectPicker({ subject, setSubject }) {
                   ? 'var(--color-accent-dim)'
                   : 'var(--color-surface)',
                 cursor: 'pointer',
-                minWidth: '68px',
+                minWidth: '80px',
                 transition: 'border-color 180ms ease, background 180ms ease, transform 150ms ease, box-shadow 180ms ease',
                 transform: isActive ? 'translateY(-3px)' : 'translateY(0)',
                 boxShadow: isActive
@@ -111,14 +111,15 @@ export default function SubjectPicker({ subject, setSubject }) {
               {/* Label */}
               <span
                 style={{
-                  fontSize: '9px',
+                  fontSize: '8.5px',
                   fontWeight: 800,
-                  letterSpacing: '0.05em',
+                  letterSpacing: '0.02em',
                   textTransform: 'uppercase',
                   color: isActive ? 'var(--color-accent)' : 'var(--color-text-muted)',
                   textAlign: 'center',
-                  lineHeight: 1.2,
-                  maxWidth: '60px',
+                  lineHeight: 1.1,
+                  maxWidth: '74px',
+                  overflowWrap: 'anywhere',
                   transition: 'color 180ms ease',
                 }}
               >
