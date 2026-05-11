@@ -20,7 +20,7 @@ export default function SubjectPicker({ subject, setSubject }) {
           letterSpacing: '0.18em',
           textTransform: 'uppercase',
           color: 'var(--color-text-muted)',
-          paddingLeft: '0',
+          paddingLeft: '12px',
         }}
       >
         Matéria Atual
@@ -32,7 +32,8 @@ export default function SubjectPicker({ subject, setSubject }) {
           display: 'flex',
           gap: '10px',
           overflowX: 'auto',
-          paddingBottom: '6px',
+          paddingLeft: '12px',
+          paddingRight: '12px',
           scrollbarWidth: 'none',     /* Firefox */
           msOverflowStyle: 'none',    /* IE/Edge */
           border: 'none',
@@ -58,6 +59,7 @@ export default function SubjectPicker({ subject, setSubject }) {
                 gap: '6px',
                 padding: '10px 6px 8px',
                 borderRadius: '16px',
+                marginLeft: s === SUBJECTS[0] ? '4px' : '0',
                 border: isActive
                   ? '2px solid var(--color-accent)'
                   : '2px solid var(--color-border)',

@@ -82,7 +82,7 @@ export default function DesktopLayout({
         ) : (
           <>
             <section 
-              className="backdrop-blur-xl p-6 sm:p-8 rounded-[2.5rem] mb-12 shadow-2xl flex flex-wrap items-center justify-center lg:justify-between gap-8 sm:gap-10 overflow-hidden relative isolate" 
+              className="backdrop-blur-xl p-6 sm:p-10 rounded-[2.5rem] mb-12 shadow-2xl flex flex-wrap items-center justify-center lg:justify-between gap-8 sm:gap-10 overflow-hidden relative isolate" 
               style={{ 
                 backgroundColor: 'var(--color-surface)', 
                 boxSizing: 'border-box'
@@ -119,7 +119,7 @@ export default function DesktopLayout({
                     </div>
                   )}
                   {gameVisible && !showNextLvl && (
-                    <div className="text-center px-6 py-2 rounded-2xl" style={{ backgroundColor: 'var(--color-bg)', border: '1px solid var(--color-border)' }}>
+                    <div className="text-center px-8 py-3 rounded-2xl" style={{ backgroundColor: 'var(--color-bg)', border: '1px solid var(--color-border)' }}>
                       <p className="text-[10px] font-black uppercase tracking-widest mb-1" style={{ color: 'var(--color-text-muted)' }}>Dicas (Corações)</p>
                       <div className="text-xl flex gap-1 justify-center">{renderHearts()}</div>
                     </div>
