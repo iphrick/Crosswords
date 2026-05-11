@@ -7,7 +7,6 @@ import styles from './Header.module.css';
 export default function Header({ onLoginClick, onRegisterClick, onRankingClick, onContactClick, onTutorialClick, onAvatarClick }) {
   const { user, gameState, logout } = useAuth();
   const { currentTheme, updateGlobalTheme, THEMES } = useTheme();
-  const [menuOpen, setMenuOpen]     = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
 
   const nickname    = gameState?.nickname;
@@ -33,12 +32,6 @@ export default function Header({ onLoginClick, onRegisterClick, onRankingClick, 
           </nav>
         ) : (
           <div className={styles.menuContainer}>
-            {isAdmin && (
-              <a href="/admin/feedbacks" className={styles.adminBtn}>
-                <span className="hidden sm:inline">Painel Admin</span>
-                <span className="sm:hidden">⚙️</span>
-              </a>
-            )}
 
             <div className={styles.avatarMenu}>
               <button
@@ -91,20 +84,27 @@ export default function Header({ onLoginClick, onRegisterClick, onRankingClick, 
                     <span>Ranking Global</span>
                   </button>
 
-                  <button className={styles.dropdownItem} onClick={() => { setUserMenuOpen(false); onTutorialClick(); }}>
-                    <span className="text-lg">📖</span>
-                    <span>Como Jogar</span>
-                  </button>
-
                   <button className={styles.dropdownItem} onClick={() => { setUserMenuOpen(false); onAvatarClick(); }}>
                     <span className="text-lg">🎭</span>
                     <span>Identidade</span>
+                  </button>
+
+                  <button className={styles.dropdownItem} onClick={() => { setUserMenuOpen(false); onTutorialClick(); }}>
+                    <span className="text-lg">📖</span>
+                    <span>Instruções</span>
                   </button>
 
                   <button className={styles.dropdownItem} onClick={() => { setUserMenuOpen(false); onContactClick(); }}>
                     <span className="text-lg">💬</span>
                     <span>Suporte</span>
                   </button>
+
+                  {isAdmin && (
+                    <a href="/admin/feedbacks" className={styles.dropdownItem} onClick={() => setUserMenuOpen(false)}>
+                      <span className="text-lg">⚙️</span>
+                      <span>Admin</span>
+                    </a>
+                  )}
 
                   <div className={styles.dropdownDivider} />
 
