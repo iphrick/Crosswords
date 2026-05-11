@@ -24,106 +24,101 @@ export default function Header({ onLoginClick, onRegisterClick, onRankingClick, 
         <span className={styles.logoTitle}>JuriQuest</span>
       </a>
 
-      {/* Desktop nav */}
-      <nav className={`${styles.nav} ${menuOpen ? styles.open : ''}`} aria-label="Navegação principal">
+      {/* Navigation Actions */}
+      <div className={styles.actions}>
         {!user ? (
-          <>
-            <button id="login-modal-btn"    className="btn btn--secondary" onClick={() => { onLoginClick();    setMenuOpen(false); }}>Entrar</button>
-            <button id="register-modal-btn" className="btn btn--secondary" onClick={() => { onRegisterClick(); setMenuOpen(false); }}>Cadastrar</button>
-            <button id="ranking-modal-btn"  className="btn btn--secondary" onClick={() => { onRankingClick();  setMenuOpen(false); }}>Ranking</button>
-            <button id="tutorial-btn" className="btn btn--secondary" onClick={() => { onTutorialClick(); setMenuOpen(false); }}>Instruções</button>
-            <button id="contact-modal-btn"  className="btn btn--ghost" onClick={() => { onContactClick(); setMenuOpen(false); }}>Contato</button>
-          </>
+          <nav className={styles.nav}>
+            <button className="btn btn--secondary" onClick={onLoginClick}>Entrar</button>
+            <button className="btn btn--primary" onClick={onRegisterClick}>Cadastrar</button>
+          </nav>
         ) : (
-          <>
-            {/* Theme Selector for Users */}
-            {user && (
-              <div className="flex items-center gap-2 bg-slate-900/50 p-1 rounded-xl border border-slate-800 shadow-inner">
-                <span className="text-[10px] font-black text-slate-500 uppercase ml-2 tracking-widest">Tema:</span>
-                <select 
-                  className="bg-transparent text-xs font-black text-emerald-400 outline-none cursor-pointer p-1 pr-2"
-                  value={currentTheme}
-                  onChange={(e) => {
-                    updateGlobalTheme(e.target.value);
-                  }}
-                >
-                  {THEMES.map(t => (
-                    <option key={t.id} value={t.id} className="bg-slate-900 text-white">
-                      {t.icon} {t.name}
-                    </option>
-                  ))}
-                </select>
-                <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse mr-2" title={`Ativo: ${currentTheme}`}></div>
-              </div>
-            )}
-
-            <button id="ranking-modal-btn" className="btn btn--secondary" onClick={() => { onRankingClick(); setMenuOpen(false); }}>
-              🏆 Ranking
-            </button>
-            <button id="tutorial-btn" className="btn btn--secondary" onClick={() => { onTutorialClick(); setMenuOpen(false); }}>
-              📖 Instruções
-            </button>
-            <button id="contact-modal-btn" className="btn btn--ghost" onClick={() => { onContactClick(); setMenuOpen(false); }}>
-              Contato
-            </button>
-            
+          <div className={styles.menuContainer}>
             {isAdmin && (
-              <a href="/admin/feedbacks" className="btn btn--primary" style={{backgroundColor: '#10b981', color: 'white', borderColor: '#059669'}}>
-                ⚙️ Admin
+              <a href="/admin/feedbacks" className={styles.adminBtn}>
+                <span className="hidden sm:inline">Painel Admin</span>
+                <span className="sm:hidden">⚙️</span>
               </a>
             )}
 
-            {/* User dropdown */}
             <div className={styles.avatarMenu}>
               <button
-                className={styles.avatarBtn}
+                className={styles.menuTrigger}
                 onClick={() => setUserMenuOpen(o => !o)}
                 aria-expanded={userMenuOpen}
-                aria-label="Menu de usuário"
               >
-                {gameState?.avatarUrl ? (
-                  <img src={gameState.avatarUrl} alt="" className="w-9 h-9 rounded-full object-cover border border-slate-700" />
-                ) : (
-                  <span className="text-2xl">🧑‍⚖️</span>
-                )}
-                <div className="flex flex-col items-start leading-tight ml-1">
-                  <span className="text-base font-bold text-white tracking-tight">{displayName}</span>
-                  {profession && <span className="text-[11px] text-emerald-400 uppercase font-extrabold tracking-wider">{profession}</span>}
+                <div className={styles.avatarWrapper}>
+                  {gameState?.avatarUrl ? (
+                    <img src={gameState.avatarUrl} alt="" className={styles.avatarImg} />
+                  ) : (
+                    <span className="text-xl">🧑‍⚖️</span>
+                  )}
                 </div>
-                <span className={styles.avatarCaret}>▾</span>
+                <div className="hidden md:flex flex-col items-start leading-none gap-0.5">
+                  <span className={styles.triggerName}>{displayName}</span>
+                  {profession && <span className={styles.triggerSub}>{profession}</span>}
+                </div>
+                <span className={styles.caret}>{userMenuOpen ? '▴' : '▾'}</span>
               </button>
 
               {userMenuOpen && (
                 <div className={styles.dropdown}>
+                  <div className={styles.dropdownHeader}>
+                    <p className="text-[10px] uppercase font-black tracking-[0.2em] opacity-40 mb-1">Menu Principal</p>
+                  </div>
 
-                  <button className="btn btn--ghost" style={{width:'100%', justifyContent:'flex-start', marginBottom: '8px'}}
-                    onClick={() => { setUserMenuOpen(false); onTutorialClick(); }}>
-                    Instruções
+                  {/* Theme Selector inside Dropdown */}
+                  <div className={styles.dropdownSection}>
+                    <div className={styles.themeSelector}>
+                      <span className="text-[10px] font-black uppercase tracking-widest opacity-60">Tema</span>
+                      <select 
+                        className={styles.themeSelect}
+                        value={currentTheme}
+                        onChange={(e) => updateGlobalTheme(e.target.value)}
+                      >
+                        {THEMES.map(t => (
+                          <option key={t.id} value={t.id} className="bg-slate-950 text-white">
+                            {t.icon} {t.name}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                  </div>
+
+                  <div className={styles.dropdownDivider} />
+
+                  <button className={styles.dropdownItem} onClick={() => { setUserMenuOpen(false); onRankingClick(); }}>
+                    <span className="text-lg">🏆</span>
+                    <span>Ranking Global</span>
                   </button>
-                  <button className="btn btn--secondary" style={{width:'100%', justifyContent:'flex-start', marginBottom: '8px'}}
-                    onClick={() => { setUserMenuOpen(false); onAvatarClick(); }}>
-                    🎭 Identidade
+
+                  <button className={styles.dropdownItem} onClick={() => { setUserMenuOpen(false); onTutorialClick(); }}>
+                    <span className="text-lg">📖</span>
+                    <span>Como Jogar</span>
                   </button>
-                  <button className="btn btn--danger" style={{width:'100%', justifyContent:'flex-start'}}
-                    onClick={() => { setUserMenuOpen(false); logout(); }}>
-                    Sair
+
+                  <button className={styles.dropdownItem} onClick={() => { setUserMenuOpen(false); onAvatarClick(); }}>
+                    <span className="text-lg">🎭</span>
+                    <span>Identidade</span>
+                  </button>
+
+                  <button className={styles.dropdownItem} onClick={() => { setUserMenuOpen(false); onContactClick(); }}>
+                    <span className="text-lg">💬</span>
+                    <span>Suporte</span>
+                  </button>
+
+                  <div className={styles.dropdownDivider} />
+
+                  <button className={`${styles.dropdownItem} ${styles.logoutBtn}`} onClick={() => { setUserMenuOpen(false); logout(); }}>
+                    <span className="text-lg">🚪</span>
+                    <span>Sair da Conta</span>
                   </button>
                 </div>
               )}
             </div>
-          </>
+          </div>
         )}
-      </nav>
+      </div>
 
-      {/* Hamburger (mobile) */}
-      <button
-        className={`${styles.hamburger} ${menuOpen ? styles.active : ''}`}
-        onClick={() => setMenuOpen(o => !o)}
-        aria-label={menuOpen ? 'Fechar menu' : 'Abrir menu'}
-        aria-expanded={menuOpen}
-      >
-        <span /><span /><span />
-      </button>
     </header>
   );
 }
