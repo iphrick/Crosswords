@@ -46,7 +46,7 @@ export default function DesktopLayout({
         onAvatarClick={modals.setAvatarOpen}
       />
 
-      <main className="app max-w-[1600px] mx-auto px-6 py-8">
+      <main className="app max-w-[1320px] mx-auto px-6 py-8">
         {!user ? (
           <section className={styles.hero}>
             <div className={styles.heroContent}>
@@ -82,7 +82,7 @@ export default function DesktopLayout({
         ) : (
           <>
             <section 
-              className="backdrop-blur-xl p-6 sm:p-10 rounded-[2.5rem] mb-12 shadow-2xl flex flex-wrap items-center justify-center lg:justify-between gap-8 sm:gap-10 overflow-hidden relative isolate" 
+              className="backdrop-blur-xl p-5 sm:p-8 rounded-[2.5rem] mb-10 shadow-2xl flex flex-wrap items-center justify-center lg:justify-between gap-6 sm:gap-8 overflow-hidden relative isolate" 
               style={{ 
                 backgroundColor: 'var(--color-surface)', 
                 boxSizing: 'border-box'
@@ -90,36 +90,36 @@ export default function DesktopLayout({
             >
               {/* Pixel-perfect custom border to avoid browser artifacts */}
               <div className="absolute inset-0 rounded-[2.5rem] pointer-events-none z-10" style={{ border: '1px solid var(--color-border)', opacity: 0.8 }}></div>
-              <div className="flex flex-wrap items-center gap-12">
+              <div className="flex flex-wrap items-center gap-8">
                 {/* Subject Picker */}
                 <div className="space-y-2">
                   <SubjectPicker subject={subject} setSubject={setSubject} />
                 </div>
 
                 {/* Vertical Divider - Only visible on large screens when not wrapped */}
-                <div className="hidden xl:block w-px h-12 self-center opacity-20" style={{ backgroundColor: 'var(--color-border)' }} />
+                <div className="hidden xl:block w-px h-10 self-center opacity-20" style={{ backgroundColor: 'var(--color-border)' }} />
 
                 {/* Stats & Hearts */}
-                <div className="flex items-center gap-12">
+                <div className="flex items-center gap-8">
                   <div className="text-center">
                     <p className="text-[10px] font-black uppercase tracking-widest mb-1" style={{ color: 'var(--color-text-muted)' }}>Nível</p>
-                    <p className="text-2xl font-black" style={{ color: 'var(--color-accent)' }}>{gs.level}</p>
+                    <p className="text-xl font-black" style={{ color: 'var(--color-accent)' }}>{gs.level}</p>
                   </div>
                   <div className="text-center">
                     <p className="text-[10px] font-black uppercase tracking-widest mb-1" style={{ color: 'var(--color-text-muted)' }}>Pontos</p>
-                    <p className="text-2xl font-black" style={{ color: 'var(--color-text)' }}>{gs.score}</p>
+                    <p className="text-xl font-black" style={{ color: 'var(--color-text)' }}>{gs.score}</p>
                   </div>
 
                   {isTimerRunning && (
-                    <div className="text-center border-l pl-12 min-w-[120px]" style={{ borderColor: 'var(--color-border)' }}>
+                    <div className="text-center border-l pl-8 min-w-[100px]" style={{ borderColor: 'var(--color-border)' }}>
                       <p className="text-[10px] font-black uppercase tracking-widest mb-1" style={{ color: 'var(--color-text-muted)' }}>Tempo Restante</p>
-                      <p className={`text-2xl font-black tabular-nums ${timeLeft < 30 ? 'text-red-500 animate-pulse' : ''}`} style={timeLeft >= 30 ? { color: 'var(--color-accent)' } : {}}>
+                      <p className={`text-xl font-black tabular-nums ${timeLeft < 30 ? 'text-red-500 animate-pulse' : ''}`} style={timeLeft >= 30 ? { color: 'var(--color-accent)' } : {}}>
                         {Math.floor(timeLeft / 60)}:{String(timeLeft % 60).padStart(2, '0')}
                       </p>
                     </div>
                   )}
                   {gameVisible && !showNextLvl && (
-                    <div className="text-center px-8 py-3 rounded-2xl" style={{ backgroundColor: 'var(--color-bg)', border: '1px solid var(--color-border)' }}>
+                    <div className="text-center px-6 py-2 rounded-2xl" style={{ backgroundColor: 'var(--color-bg)', border: '1px solid var(--color-border)' }}>
                       <p className="text-[10px] font-black uppercase tracking-widest mb-1" style={{ color: 'var(--color-text-muted)' }}>Dicas (Corações)</p>
                       <div className="text-xl flex gap-1 justify-center">{renderHearts()}</div>
                     </div>
@@ -132,7 +132,7 @@ export default function DesktopLayout({
                 {!showNextLvl ? (
                   <button 
                     id="generate-btn" 
-                    className="px-10 h-14 font-black rounded-2xl transition-all transform hover:-translate-y-1 active:scale-95 shadow-xl flex items-center justify-center gap-3 min-w-[240px]" 
+                    className="px-8 h-12 font-black rounded-2xl transition-all transform hover:-translate-y-1 active:scale-95 shadow-xl flex items-center justify-center gap-3 min-w-[200px]" 
                     style={{ backgroundColor: 'var(--color-accent)', color: 'var(--color-bg)' }}
                     onClick={handleGenerate} 
                     disabled={isLoading}
@@ -144,15 +144,15 @@ export default function DesktopLayout({
                     )}
                   </button>
                 ) : (
-                  <button className="px-10 h-14 bg-emerald-600 text-white font-black rounded-2xl hover:bg-emerald-500 transition-all transform hover:-translate-y-1 active:scale-95 shadow-xl flex items-center justify-center gap-3 min-w-[240px]" onClick={handleNextLevel}>
+                  <button className="px-8 h-12 bg-emerald-600 text-white font-black rounded-2xl hover:bg-emerald-500 transition-all transform hover:-translate-y-1 active:scale-95 shadow-xl flex items-center justify-center gap-3 min-w-[200px]" onClick={handleNextLevel}>
                     Próximo Nível ➜
                   </button>
                 )}
-                <button className="px-8 h-14 font-bold rounded-2xl transition-all min-w-[140px] flex items-center justify-center" style={{ backgroundColor: 'var(--color-surface-2)', color: 'var(--color-text-muted)', border: '1px solid var(--color-border)' }} onClick={handleReset}>
+                <button className="px-6 h-12 font-bold rounded-2xl transition-all min-w-[120px] flex items-center justify-center" style={{ backgroundColor: 'var(--color-surface-2)', color: 'var(--color-text-muted)', border: '1px solid var(--color-border)' }} onClick={handleReset}>
                   Resetar
                 </button>
                 {isAdmin && (
-                  <button className="w-14 h-14 flex items-center justify-center rounded-2xl transition-all aspect-square" style={{ backgroundColor: 'rgba(224,92,92,0.08)', color: 'var(--color-wrong)', border: '1px solid rgba(224,92,92,0.2)' }} onClick={handleAdminSeed}>
+                  <button className="w-12 h-12 flex items-center justify-center rounded-2xl transition-all aspect-square" style={{ backgroundColor: 'rgba(224,92,92,0.08)', color: 'var(--color-wrong)', border: '1px solid rgba(224,92,92,0.2)' }} onClick={handleAdminSeed}>
                     ⚙️
                   </button>
                 )}
