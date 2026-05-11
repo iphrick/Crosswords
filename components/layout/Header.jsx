@@ -2,6 +2,7 @@
 import { useState } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { useTheme } from '@/context/ThemeContext';
+import Link from 'next/link';
 import styles from './Header.module.css';
 
 export default function Header({ onLoginClick, onRegisterClick, onRankingClick, onContactClick, onTutorialClick, onAvatarClick }) {
@@ -100,10 +101,10 @@ export default function Header({ onLoginClick, onRegisterClick, onRankingClick, 
                   </button>
 
                   {isAdmin && (
-                    <a href="/admin/feedbacks" className={styles.dropdownItem} onClick={() => setUserMenuOpen(false)}>
+                    <Link href="/admin" className={styles.dropdownItem} onClick={() => setUserMenuOpen(false)}>
                       <span className="text-lg">⚙️</span>
                       <span>Admin</span>
-                    </a>
+                    </Link>
                   )}
 
                   <div className={styles.dropdownDivider} />

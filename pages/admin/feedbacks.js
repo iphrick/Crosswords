@@ -14,7 +14,8 @@ import {
   Filter,
   Clock,
   User,
-  Mail
+  Mail,
+  Inbox
 } from 'lucide-react';
 
 // Shadcn Components
