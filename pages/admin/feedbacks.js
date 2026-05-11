@@ -86,157 +86,181 @@ export default function FeedbacksDashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-200 p-4 md:p-8 font-sans bg-[radial-gradient(ellipse_80%_80%_at_50%_-20%,rgba(16,185,129,0.1),rgba(255,255,255,0))]">
+    <div className="min-h-screen bg-slate-950 text-slate-200 p-6 md:p-10 font-sans selection:bg-emerald-500/30">
       <Head>
         <title>JuriQuest | Insights</title>
       </Head>
 
-      <div className="max-w-7xl mx-auto space-y-8">
+      {/* Modern Background Accents */}
+      <div className="fixed inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] rounded-full bg-emerald-500/5 blur-[120px]" />
+        <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] rounded-full bg-pink-500/5 blur-[120px]" />
+      </div>
+
+      <div className="max-w-[1320px] mx-auto space-y-10 relative z-10">
         
         {/* Superior Nav */}
-        <nav className="flex justify-between items-center pb-6 border-b border-slate-800">
-          <div className="flex items-center gap-3">
-            <div className="p-2 bg-emerald-500/10 rounded-lg border border-emerald-500/20">
-              <Mail className="w-6 h-6 text-emerald-400" />
+        <header className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 pb-8 border-b border-slate-800/60">
+          <div className="flex items-center gap-4">
+            <div className="w-14 h-14 bg-emerald-500/10 rounded-2xl border border-emerald-500/20 flex items-center justify-center shadow-[inset_0_1px_1px_rgba(255,255,255,0.1)]">
+              <Mail className="w-7 h-7 text-emerald-400" />
             </div>
             <div>
-              <h1 className="text-2xl font-black tracking-tight text-white">Central de Insights</h1>
-              <p className="text-sm text-slate-400">Visão analítica de experiência do usuário</p>
+              <h1 className="text-3xl font-black tracking-tight text-white mb-1">Central de Insights</h1>
+              <div className="flex items-center gap-2">
+                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                <p className="text-sm font-bold uppercase tracking-widest text-slate-500">Live Feedback Analytics</p>
+              </div>
             </div>
           </div>
-          <Button variant="outline" className="gap-2 bg-slate-900 border-slate-700 hover:bg-slate-800 hover:text-white" onClick={() => router.push('/')}>
-            <ArrowLeft className="w-4 h-4" /> Voltar ao Jogo
-          </Button>
-        </nav>
+          
+          <Link href="/">
+            <Button variant="outline" className="h-12 px-6 gap-2 bg-slate-900/50 border-slate-800 hover:bg-slate-800 hover:text-white rounded-xl transition-all hover:-translate-x-1">
+              <ArrowLeft className="w-4 h-4" /> Voltar ao Jogo
+            </Button>
+          </Link>
+        </header>
 
         {/* KPIs Row */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <Card className="bg-slate-900/50 border-slate-800 backdrop-blur-sm relative overflow-hidden">
-            <div className="absolute top-0 right-0 p-4 opacity-10">
-              <MessageSquare className="w-16 h-16" />
-            </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          <Card className="bg-slate-900/40 border-slate-800/60 backdrop-blur-md rounded-3xl overflow-hidden group hover:border-slate-700 transition-all">
             <CardHeader className="pb-2">
-              <CardDescription className="text-slate-400 font-medium">Total de Feedbacks</CardDescription>
-              <CardTitle className="text-4xl text-white">{total}</CardTitle>
+              <div className="flex justify-between items-start">
+                <CardDescription className="text-slate-400 font-bold uppercase tracking-widest text-[10px]">Volume Total</CardDescription>
+                <MessageSquare className="w-5 h-5 text-slate-600 group-hover:text-slate-400 transition-colors" />
+              </div>
+              <CardTitle className="text-5xl font-black text-white py-2">{total}</CardTitle>
             </CardHeader>
+            <div className="h-1 w-full bg-slate-800/50 mt-2">
+              <div className="h-full bg-slate-500 w-[100%]" />
+            </div>
           </Card>
 
-          <Card className="bg-emerald-950/20 border-emerald-900/50 backdrop-blur-sm relative overflow-hidden">
-            <div className="absolute top-0 right-0 p-4 opacity-10">
-              <Heart className="w-16 h-16 text-emerald-400" />
-            </div>
+          <Card className="bg-emerald-950/10 border-emerald-900/30 backdrop-blur-md rounded-3xl overflow-hidden group hover:border-emerald-800/50 transition-all">
             <CardHeader className="pb-2">
-              <CardDescription className="text-emerald-400/80 font-medium">Elogios & Ideias</CardDescription>
-              <CardTitle className="text-4xl text-emerald-400">{positives}</CardTitle>
+              <div className="flex justify-between items-start">
+                <CardDescription className="text-emerald-500/60 font-bold uppercase tracking-widest text-[10px]">Elogios & Ideias</CardDescription>
+                <Heart className="w-5 h-5 text-emerald-600 group-hover:text-emerald-400 transition-colors" />
+              </div>
+              <CardTitle className="text-5xl font-black text-emerald-400 py-2">{positives}</CardTitle>
             </CardHeader>
+            <div className="h-1 w-full bg-emerald-900/20 mt-2">
+              <div className="h-full bg-emerald-500" style={{ width: `${(positives/total)*100}%` }} />
+            </div>
           </Card>
 
-          <Card className="bg-red-950/20 border-red-900/50 backdrop-blur-sm relative overflow-hidden">
-            <div className="absolute top-0 right-0 p-4 opacity-10">
-              <AlertTriangle className="w-16 h-16 text-red-400" />
-            </div>
+          <Card className="bg-red-950/10 border-red-900/30 backdrop-blur-md rounded-3xl overflow-hidden group hover:border-red-800/50 transition-all">
             <CardHeader className="pb-2">
-              <CardDescription className="text-red-400/80 font-medium">Críticas & Reportes</CardDescription>
-              <CardTitle className="text-4xl text-red-400">{negatives}</CardTitle>
+              <div className="flex justify-between items-start">
+                <CardDescription className="text-red-500/60 font-bold uppercase tracking-widest text-[10px]">Críticas & Bugs</CardDescription>
+                <AlertTriangle className="w-5 h-5 text-red-600 group-hover:text-red-400 transition-colors" />
+              </div>
+              <CardTitle className="text-5xl font-black text-red-400 py-2">{negatives}</CardTitle>
             </CardHeader>
+            <div className="h-1 w-full bg-red-900/20 mt-2">
+              <div className="h-full bg-red-500" style={{ width: `${(negatives/total)*100}%` }} />
+            </div>
           </Card>
         </div>
 
         {/* Action Bar (Filters & Sorting) */}
-        <div className="flex flex-col md:flex-row gap-4 items-center justify-between bg-slate-900/80 p-3 rounded-2xl border border-slate-800 shadow-xl backdrop-blur-md">
-          <div className="flex flex-wrap items-center gap-2 w-full md:w-auto">
-            <div className="flex items-center gap-2 px-3 text-slate-400 border-r border-slate-700 mr-2">
-              <Filter className="w-4 h-4" />
-              <span className="text-sm font-medium">Filtrar:</span>
+        <div className="flex flex-col lg:flex-row gap-6 items-center justify-between bg-slate-900/40 p-4 rounded-[2rem] border border-slate-800/60 shadow-2xl backdrop-blur-xl">
+          <div className="flex flex-wrap items-center gap-3">
+            <div className="flex items-center gap-2 px-4 py-2 bg-slate-950/50 rounded-xl border border-slate-800/50">
+              <Filter className="w-4 h-4 text-slate-500" />
+              <span className="text-xs font-black uppercase tracking-widest text-slate-400">Filtrar por:</span>
             </div>
             
-            <Button 
-              variant={sentimentFilter === 'all' ? 'default' : 'ghost'} 
-              size="sm"
-              onClick={() => setSentimentFilter('all')}
-              className={sentimentFilter === 'all' ? 'bg-slate-700 hover:bg-slate-600 text-white' : 'text-slate-400 hover:text-white'}
-            >
-              Todos os {total}
-            </Button>
-            <Button 
-              variant={sentimentFilter === 'positive' ? 'default' : 'ghost'} 
-              size="sm"
-              onClick={() => setSentimentFilter('positive')}
-              className={sentimentFilter === 'positive' ? 'bg-emerald-600 hover:bg-emerald-500 text-white shadow-[0_0_15px_rgba(16,185,129,0.3)]' : 'text-slate-400 hover:text-emerald-400'}
-            >
-              <Heart className="w-4 h-4 mr-2" /> Positivos
-            </Button>
-            <Button 
-              variant={sentimentFilter === 'negative' ? 'default' : 'ghost'} 
-              size="sm"
-              onClick={() => setSentimentFilter('negative')}
-              className={sentimentFilter === 'negative' ? 'bg-red-600 hover:bg-red-500 text-white shadow-[0_0_15px_rgba(220,38,38,0.3)]' : 'text-slate-400 hover:text-red-400'}
-            >
-              <AlertTriangle className="w-4 h-4 mr-2" /> Críticas
-            </Button>
+            <div className="flex p-1 bg-slate-950/50 rounded-xl border border-slate-800/50">
+              <button 
+                onClick={() => setSentimentFilter('all')}
+                className={`px-4 py-2 rounded-lg text-xs font-bold transition-all ${sentimentFilter === 'all' ? 'bg-slate-800 text-white shadow-lg' : 'text-slate-500 hover:text-slate-300'}`}
+              >
+                Todos
+              </button>
+              <button 
+                onClick={() => setSentimentFilter('positive')}
+                className={`px-4 py-2 rounded-lg text-xs font-bold transition-all flex items-center gap-2 ${sentimentFilter === 'positive' ? 'bg-emerald-600 text-white shadow-lg' : 'text-slate-500 hover:text-emerald-400'}`}
+              >
+                <Heart className="w-3 h-3" /> Elogios
+              </button>
+              <button 
+                onClick={() => setSentimentFilter('negative')}
+                className={`px-4 py-2 rounded-lg text-xs font-bold transition-all flex items-center gap-2 ${sentimentFilter === 'negative' ? 'bg-red-600 text-white shadow-lg' : 'text-slate-500 hover:text-red-400'}`}
+              >
+                <AlertTriangle className="w-3 h-3" /> Críticas
+              </button>
+            </div>
           </div>
 
-          <div className="flex items-center gap-3 w-full md:w-auto">
-            <Clock className="w-4 h-4 text-slate-400 hidden sm:block" />
-            <Select value={sortOrder} onValueChange={setSortOrder}>
-              <SelectTrigger className="w-full md:w-[180px] bg-slate-950 border-slate-700 text-slate-300 focus:ring-emerald-500">
-                <SelectValue placeholder="Ordenar por" />
-              </SelectTrigger>
-              <SelectContent className="bg-slate-900 border-slate-700 text-slate-200">
-                <SelectItem value="desc" className="focus:bg-slate-800 focus:text-white cursor-pointer">Mais Recentes</SelectItem>
-                <SelectItem value="asc" className="focus:bg-slate-800 focus:text-white cursor-pointer">Mais Antigos</SelectItem>
-              </SelectContent>
-            </Select>
+          <div className="flex items-center gap-4 w-full lg:w-auto">
+            <div className="flex-1 lg:w-64">
+              <Select value={sortOrder} onValueChange={setSortOrder}>
+                <SelectTrigger className="w-full bg-slate-950/50 border-slate-800/60 text-slate-300 rounded-xl h-11 focus:ring-emerald-500">
+                  <div className="flex items-center gap-2 uppercase text-[10px] font-black tracking-widest opacity-60">
+                    <Clock className="w-3 h-3" /> Ordem:
+                  </div>
+                  <SelectValue placeholder="Ordenar por" />
+                </SelectTrigger>
+                <SelectContent className="bg-slate-900 border-slate-800 text-slate-200 rounded-xl overflow-hidden">
+                  <SelectItem value="desc" className="focus:bg-slate-800 focus:text-emerald-400 cursor-pointer py-3">Mais Recentes</SelectItem>
+                  <SelectItem value="asc" className="focus:bg-slate-800 focus:text-emerald-400 cursor-pointer py-3">Mais Antigos</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
           </div>
         </div>
 
         {/* Feedbacks Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
           {filteredFeedbacks.length === 0 ? (
-            <div className="col-span-full flex flex-col items-center justify-center p-16 text-center border-2 border-dashed border-slate-800 rounded-3xl bg-slate-900/30">
-              <Inbox className="w-16 h-16 text-slate-700 mb-4" />
-              <h3 className="text-xl font-medium text-slate-300">Caixa Vazia</h3>
-              <p className="text-slate-500 mt-2">Nenhum feedback corresponde a estes filtros no momento.</p>
+            <div className="col-span-full flex flex-col items-center justify-center p-24 text-center border-2 border-dashed border-slate-800/50 rounded-[3rem] bg-slate-900/20 backdrop-blur-sm">
+              <div className="w-20 h-20 bg-slate-800/30 rounded-full flex items-center justify-center mb-6">
+                <Inbox className="w-10 h-10 text-slate-600" />
+              </div>
+              <h3 className="text-2xl font-black text-slate-300 tracking-tight">Sem feedbacks no momento</h3>
+              <p className="text-slate-500 mt-2 max-w-sm mx-auto">Tudo limpo por aqui. Aguarde as próximas interações dos usuários.</p>
             </div>
           ) : (
             filteredFeedbacks.map(fb => (
-              <Card key={fb.id} className="flex flex-col bg-slate-900/60 border-slate-800 hover:border-slate-600 hover:shadow-2xl hover:shadow-black/50 transition-all duration-300 group">
-                <CardHeader className="pb-4 border-b border-slate-800/50">
-                  <div className="flex justify-between items-center">
+              <Card key={fb.id} className="flex flex-col bg-slate-900/40 border-slate-800/60 rounded-[2rem] hover:border-emerald-500/30 hover:shadow-[0_20px_50px_rgba(0,0,0,0.5)] transition-all duration-500 group relative isolate overflow-hidden">
+                <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 -z-10" />
+                
+                <CardHeader className="pb-4 pt-6 px-6">
+                  <div className="flex justify-between items-center mb-4">
                     {fb.sentiment === 'positive' ? (
-                      <Badge className="bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500/20 border border-emerald-500/20 px-3 py-1 gap-1">
-                        <Heart className="w-3 h-3" /> Elogio
+                      <Badge className="bg-emerald-500/10 text-emerald-400 border-emerald-500/20 px-3 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest gap-2">
+                        <Heart className="w-3 h-3 fill-current" /> Elogio
                       </Badge>
                     ) : (
-                      <Badge variant="destructive" className="bg-red-500/10 text-red-400 hover:bg-red-500/20 border border-red-500/20 px-3 py-1 gap-1">
-                        <AlertTriangle className="w-3 h-3" /> Crítica
+                      <Badge variant="destructive" className="bg-red-500/10 text-red-400 border-red-500/20 px-3 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest gap-2">
+                        <AlertTriangle className="w-3 h-3 fill-current" /> Crítica
                       </Badge>
                     )}
-                    <span className="text-[11px] text-slate-500 font-medium tracking-wider uppercase">
+                    <div className="flex items-center gap-2 text-[10px] font-bold text-slate-500 uppercase tracking-tighter">
+                      <Clock className="w-3 h-3" />
                       {fb.createdAt instanceof Date 
-                        ? fb.createdAt.toLocaleDateString('pt-BR', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' }).replace(' de ', '/') 
+                        ? fb.createdAt.toLocaleDateString('pt-BR', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' }) 
                         : 'Desconhecida'}
-                    </span>
+                    </div>
                   </div>
                 </CardHeader>
                 
-                <CardContent className="flex-grow pt-5">
-                  <p className="text-[15px] leading-relaxed text-slate-300 whitespace-pre-wrap group-hover:text-slate-200 transition-colors">
+                <CardContent className="flex-grow px-7 pb-8 pt-2">
+                  <p className="text-[15px] leading-relaxed text-slate-300 font-medium italic">
                     "{fb.message}"
                   </p>
                 </CardContent>
 
-                <CardFooter className="pt-4 pb-4 border-t border-slate-800/50 bg-slate-950/30 flex-col items-start gap-2">
-                  <div className="flex items-center gap-2 w-full text-slate-400">
-                    <User className="w-4 h-4 text-slate-500 shrink-0" />
-                    <p className="text-xs font-medium truncate w-full">
-                      {fb.email}
-                    </p>
-                  </div>
-                  <div className="flex justify-between items-center w-full">
-                    <p className="text-[10px] text-slate-600 font-mono truncate w-full" title={fb.uid}>
-                      ID: {fb.uid}
-                    </p>
+                <CardFooter className="p-6 bg-slate-950/40 border-t border-slate-800/50 flex flex-col gap-3">
+                  <div className="flex items-center gap-3 w-full">
+                    <div className="w-8 h-8 rounded-lg bg-slate-800/50 flex items-center justify-center shrink-0 border border-slate-700/50">
+                      <User className="w-4 h-4 text-slate-400" />
+                    </div>
+                    <div className="flex flex-col min-w-0">
+                      <p className="text-xs font-black text-slate-300 truncate tracking-tight">{fb.email}</p>
+                      <p className="text-[9px] font-bold text-slate-500 uppercase tracking-widest truncate">User Account</p>
+                    </div>
                   </div>
                 </CardFooter>
               </Card>
