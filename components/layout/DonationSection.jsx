@@ -11,6 +11,7 @@ export default function DonationSection() {
     setTimeout(() => setCopied(false), 2000);
   };
 
+  return (
     <div className="w-full flex justify-center mt-12 mb-16 px-4 sm:px-6 animate-in fade-in slide-in-from-bottom-8 duration-1000">
       <div className="w-full max-w-5xl relative overflow-hidden rounded-[2.5rem] border border-white/10 shadow-2xl bg-slate-900/40 backdrop-blur-md p-8 sm:p-12 md:p-16 text-center">
         {/* Decorative Background */}
