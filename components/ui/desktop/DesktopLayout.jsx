@@ -81,7 +81,15 @@ export default function DesktopLayout({
           </section>
         ) : (
           <>
-            <section className="backdrop-blur-xl p-6 sm:p-8 rounded-[2rem] mb-12 shadow-2xl flex flex-wrap items-center justify-center lg:justify-between gap-8 sm:gap-10 overflow-hidden" style={{ backgroundColor: 'var(--color-surface)', border: '1px solid var(--color-border)', boxSizing: 'border-box' }}>
+            <section 
+              className="backdrop-blur-xl p-6 sm:p-8 rounded-[2.5rem] mb-12 shadow-2xl flex flex-wrap items-center justify-center lg:justify-between gap-8 sm:gap-10 overflow-hidden relative isolate" 
+              style={{ 
+                backgroundColor: 'var(--color-surface)', 
+                boxSizing: 'border-box'
+              }}
+            >
+              {/* Pixel-perfect custom border to avoid browser artifacts */}
+              <div className="absolute inset-0 rounded-[2.5rem] pointer-events-none z-10" style={{ border: '1px solid var(--color-border)', opacity: 0.8 }}></div>
               <div className="flex flex-wrap items-center gap-12">
                 {/* Subject Picker */}
                 <div className="space-y-2">

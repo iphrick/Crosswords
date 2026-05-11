@@ -20,7 +20,7 @@ export default function SubjectPicker({ subject, setSubject }) {
           letterSpacing: '0.18em',
           textTransform: 'uppercase',
           color: 'var(--color-text-muted)',
-          paddingLeft: '2px',
+          paddingLeft: '0',
         }}
       >
         Matéria Atual
@@ -35,6 +35,8 @@ export default function SubjectPicker({ subject, setSubject }) {
           paddingBottom: '6px',
           scrollbarWidth: 'none',     /* Firefox */
           msOverflowStyle: 'none',    /* IE/Edge */
+          border: 'none',
+          outline: 'none',
         }}
         className="subject-picker-row"
       >
