@@ -242,14 +242,14 @@ export default function CrosswordBoard({ placedWords, onSolved }) {
   return (
     <div className={styles.board}>
       <div className={styles.gridWrapper}>
-        <div className="flex flex-wrap items-center justify-center gap-6 sm:gap-10 py-6 mb-4" style={{ background: 'linear-gradient(to right, transparent, var(--color-surface-2), transparent)' }}>
+        <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-6 md:gap-10 py-4 sm:py-6 mb-4" style={{ background: 'linear-gradient(to right, transparent, var(--color-surface-2), transparent)' }}>
           {themeIcons.map((icon, i) => (
             <div key={i} className="relative group cursor-default">
               <div className="absolute -inset-1 rounded-full blur-lg opacity-0 group-hover:opacity-50 transition-opacity duration-500" style={{ background: `linear-gradient(to right, var(--color-accent), var(--color-accent))` }}></div>
               
-              <div className="relative flex items-center justify-center w-16 h-16 sm:w-20 sm:h-20 rounded-full border-[2px] shadow-[inset_0_2px_4px_rgba(255,255,255,0.2),0_10px_20px_rgba(0,0,0,0.6)] transform group-hover:-translate-y-2 transition-all duration-500 ease-out overflow-hidden" style={{ background: `linear-gradient(to bottom right, var(--color-surface-2), var(--color-surface), var(--color-bg))`, borderColor: 'var(--color-border)' }}>
+              <div className="relative flex items-center justify-center w-11 h-11 sm:w-16 md:w-20 rounded-full border-[2px] shadow-[inset_0_2px_4px_rgba(255,255,255,0.2),0_10px_20px_rgba(0,0,0,0.6)] transform group-hover:-translate-y-2 transition-all duration-500 ease-out overflow-hidden" style={{ background: `linear-gradient(to bottom right, var(--color-surface-2), var(--color-surface), var(--color-bg))`, borderColor: 'var(--color-border)' }}>
                 <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/5 to-white/20 rounded-full pointer-events-none"></div>
-                <span className="text-4xl sm:text-5xl filter saturate-150 contrast-125 drop-shadow-[0_6px_6px_rgba(0,0,0,0.8)] transform group-hover:scale-110 transition-transform duration-500">
+                <span className="text-2xl sm:text-4xl md:text-5xl filter saturate-150 contrast-125 drop-shadow-[0_6px_6px_rgba(0,0,0,0.8)] transform group-hover:scale-110 transition-transform duration-500">
                   {icon}
                 </span>
               </div>
