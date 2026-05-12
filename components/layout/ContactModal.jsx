@@ -2,7 +2,6 @@ import { useState } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 import { db } from '@/lib/firebase-client';
-import styles from '../auth/Modal.module.css';
 
 export default function ContactModal({ visible, onClose }) {
   const { user } = useAuth();
@@ -97,15 +96,11 @@ export default function ContactModal({ visible, onClose }) {
         console.groupEnd();
       }
 
-      // Check for specific Firestore/Network errors
       const errorMsg = error.code === 'permission-denied' 
         ? 'Acesso negado. Por favor, faça login novamente.'
         : 'Ops! Tivemos um problema técnico. Por favor, tente novamente em alguns instantes.';
 
-      setFeedbackMsg({ 
-        text: errorMsg, 
-        type: 'error' 
-      });
+      setFeedbackMsg({ text: errorMsg, type: 'error' });
 
     } finally {
       setLoading(false);
@@ -113,100 +108,231 @@ export default function ContactModal({ visible, onClose }) {
   };
 
   return (
-    <div className={styles.backdrop} onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}>
-      <div className={`${styles.modal} bg-[#0e1117] border border-slate-800 p-0 overflow-hidden flex flex-col`} role="dialog" aria-modal="true" style={{ maxWidth: '480px' }}>
-        
-        {/* Header Section */}
-        <div className="p-6 pb-0 relative">
-          <button className="absolute right-6 top-6 text-slate-500 hover:text-white transition-colors text-2xl leading-none" onClick={onClose} aria-label="Fechar">×</button>
-          <h2 className="text-2xl font-bold text-white tracking-tight">Contato & Apoio</h2>
-          <p className="text-slate-400 text-sm mt-1">Fale conosco ou ajude o projeto a crescer.</p>
+    <div 
+      onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}
+      style={{
+        position: 'fixed', inset: 0, zIndex: 200000,
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
+        background: 'rgba(2, 6, 14, 0.80)',
+        backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)',
+        padding: '16px',
+        animation: 'fadeIn 0.2s ease'
+      }}
+    >
+      <div
+        role="dialog"
+        aria-modal="true"
+        style={{
+          background: '#080c14',
+          border: '1px solid rgba(255,255,255,0.06)',
+          borderRadius: '28px',
+          width: '100%',
+          maxWidth: '480px',
+          maxHeight: '90vh',
+          overflowY: 'auto',
+          display: 'flex',
+          flexDirection: 'column',
+          animation: 'slideUp 0.3s cubic-bezier(0.34, 1.56, 0.64, 1)',
+          boxShadow: '0 40px 100px rgba(0,0,0,0.7), 0 0 0 1px rgba(255,255,255,0.03) inset',
+        }}
+      >
+        {/* ── Header ── */}
+        <div style={{ padding: '28px 28px 0', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <h2 style={{ margin: 0, fontSize: '22px', fontWeight: 800, color: '#fff', letterSpacing: '-0.02em', fontFamily: 'Inter, system-ui, sans-serif' }}>
+            Contato & Apoio
+          </h2>
+          <button
+            onClick={onClose}
+            aria-label="Fechar"
+            style={{
+              background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.06)',
+              borderRadius: '12px', width: '36px', height: '36px',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              color: 'rgba(255,255,255,0.35)', fontSize: '18px', cursor: 'pointer',
+              transition: 'all 0.2s'
+            }}
+            onMouseEnter={e => { e.currentTarget.style.background = 'rgba(255,255,255,0.08)'; e.currentTarget.style.color = '#fff'; }}
+            onMouseLeave={e => { e.currentTarget.style.background = 'rgba(255,255,255,0.04)'; e.currentTarget.style.color = 'rgba(255,255,255,0.35)'; }}
+          >
+            ×
+          </button>
         </div>
 
-        {/* Minimalist Tabs */}
-        <div className="px-6 mt-6">
-          <div className="flex bg-slate-900/50 rounded-xl p-1 border border-slate-800">
+        {/* ── Subtitle ── */}
+        <p style={{ margin: 0, padding: '8px 28px 0', fontSize: '13px', color: 'rgba(255,255,255,0.40)', fontFamily: 'Inter, system-ui, sans-serif', textAlign: 'center', lineHeight: 1.5 }}>
+          Fale conosco ou ajude o projeto a crescer.
+        </p>
+
+        {/* ── Pill Tabs ── */}
+        <div style={{ padding: '20px 28px 0' }}>
+          <div style={{
+            display: 'flex', gap: '4px', padding: '4px',
+            background: 'rgba(255,255,255,0.03)', borderRadius: '16px',
+            border: '1px solid rgba(255,255,255,0.05)'
+          }}>
             <button
               onClick={() => setActiveTab('feedback')}
-              className={`flex-1 py-2 text-sm font-semibold rounded-lg transition-all duration-300 ${activeTab === 'feedback' ? 'bg-slate-800 text-white shadow-lg' : 'text-slate-500 hover:text-slate-300'}`}
+              style={{
+                flex: 1, padding: '10px 0', fontSize: '13px', fontWeight: 700,
+                fontFamily: 'Inter, system-ui, sans-serif', borderRadius: '12px',
+                border: 'none', cursor: 'pointer', transition: 'all 0.3s',
+                background: activeTab === 'feedback' ? 'rgba(255,255,255,0.08)' : 'transparent',
+                color: activeTab === 'feedback' ? '#fff' : 'rgba(255,255,255,0.30)',
+                boxShadow: activeTab === 'feedback' ? '0 2px 12px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.06)' : 'none'
+              }}
             >
               Feedback
             </button>
             <button
               onClick={() => setActiveTab('donate')}
-              className={`flex-1 py-2 text-sm font-semibold rounded-lg transition-all duration-300 ${activeTab === 'donate' ? 'bg-[#c9a96e] text-slate-950 shadow-lg' : 'text-slate-500 hover:text-slate-300'}`}
+              style={{
+                flex: 1, padding: '10px 0', fontSize: '13px', fontWeight: 700,
+                fontFamily: 'Inter, system-ui, sans-serif', borderRadius: '12px',
+                border: 'none', cursor: 'pointer', transition: 'all 0.3s',
+                background: activeTab === 'donate' ? '#c9a96e' : 'transparent',
+                color: activeTab === 'donate' ? '#080c14' : 'rgba(255,255,255,0.30)',
+                boxShadow: activeTab === 'donate' ? '0 4px 20px rgba(201,169,110,0.25)' : 'none'
+              }}
             >
               Apoiar o Projeto
             </button>
           </div>
         </div>
 
-        <div className="p-6">
+        {/* ── Content ── */}
+        <div style={{ padding: '24px 28px 28px', display: 'flex', flexDirection: 'column', gap: '24px' }}>
+
           {activeTab === 'feedback' && (
-            <div className="animate-in fade-in slide-in-from-bottom-2 duration-500">
-              {/* Email Support Card */}
-              <div className="bg-slate-900/40 p-4 rounded-xl mb-6 border border-slate-800/50 flex items-center justify-between">
-                <div className="flex flex-col">
-                  <span className="text-[10px] uppercase font-extrabold text-slate-500 tracking-wider mb-1">Suporte via E-mail</span>
-                  <span className="text-sm font-medium text-blue-400 font-mono">playJuriQuest@gmail.com</span>
+            <>
+              {/* Email Support */}
+              <div style={{
+                display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                background: 'rgba(255,255,255,0.025)', borderRadius: '16px',
+                border: '1px solid rgba(255,255,255,0.05)', padding: '16px 20px'
+              }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                  <span style={{ fontSize: '10px', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.12em', color: 'rgba(255,255,255,0.30)', fontFamily: 'Inter, system-ui, sans-serif' }}>
+                    Suporte via E-mail
+                  </span>
+                  <span style={{ fontSize: '13px', fontWeight: 500, color: '#6ba3f7', fontFamily: 'ui-monospace, monospace' }}>
+                    playJuriQuest@gmail.com
+                  </span>
                 </div>
                 <button
                   onClick={handleCopyEmail}
-                  className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-xs font-bold text-slate-200 rounded-lg transition-all border border-slate-700"
+                  style={{
+                    padding: '8px 16px', fontSize: '11px', fontWeight: 700,
+                    fontFamily: 'Inter, system-ui, sans-serif',
+                    background: copiedEmail ? 'rgba(16,185,129,0.15)' : 'rgba(255,255,255,0.06)',
+                    color: copiedEmail ? '#34d399' : 'rgba(255,255,255,0.6)',
+                    border: `1px solid ${copiedEmail ? 'rgba(16,185,129,0.3)' : 'rgba(255,255,255,0.08)'}`,
+                    borderRadius: '10px', cursor: 'pointer', transition: 'all 0.2s',
+                    whiteSpace: 'nowrap'
+                  }}
                 >
-                  {copiedEmail ? 'Copiado!' : 'Copiar'}
+                  {copiedEmail ? '✓ Copiado' : 'Copiar'}
                 </button>
               </div>
 
-              <form onSubmit={handleSubmit} className="space-y-5">
-                <div className="mb-2">
-                  <label className="text-[10px] uppercase font-extrabold text-slate-500 tracking-wider block mb-4">Qual o seu feedback?</label>
-                  <div className="flex gap-4">
+              {/* Feedback Form */}
+              <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+                
+                {/* Sentiment Selection */}
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                  <label style={{ fontSize: '10px', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.12em', color: 'rgba(255,255,255,0.30)', fontFamily: 'Inter, system-ui, sans-serif', textAlign: 'center' }}>
+                    Qual o seu feedback?
+                  </label>
+                  <div style={{ display: 'flex', gap: '12px' }}>
                     <button
                       type="button"
                       onClick={() => setSentiment('positive')}
-                      className={`flex-1 py-3 px-4 rounded-xl border flex items-center justify-center gap-3 transition-all ${sentiment === 'positive'
-                        ? 'bg-emerald-500/10 border-emerald-500/50 text-emerald-400 ring-1 ring-emerald-500/30'
-                        : 'bg-slate-900/50 border-slate-800 text-slate-500 hover:border-slate-700'
-                        }`}
+                      style={{
+                        flex: 1, padding: '14px 12px', borderRadius: '14px',
+                        display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px',
+                        cursor: 'pointer', transition: 'all 0.25s', border: 'none',
+                        background: sentiment === 'positive' ? 'rgba(16,185,129,0.08)' : 'rgba(255,255,255,0.025)',
+                        outline: sentiment === 'positive' ? '1px solid rgba(16,185,129,0.35)' : '1px solid rgba(255,255,255,0.06)',
+                      }}
                     >
-                      <span className={`w-3 h-3 rounded-full ${sentiment === 'positive' ? 'bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.8)]' : 'bg-slate-700'}`}></span>
-                      <span className="text-sm font-bold">Elogio / Ideia</span>
+                      <span style={{
+                        width: '10px', height: '10px', borderRadius: '50%',
+                        background: sentiment === 'positive' ? '#10b981' : 'rgba(255,255,255,0.12)',
+                        boxShadow: sentiment === 'positive' ? '0 0 12px rgba(16,185,129,0.7)' : 'none',
+                        transition: 'all 0.25s'
+                      }} />
+                      <span style={{ fontSize: '13px', fontWeight: 700, fontFamily: 'Inter, system-ui, sans-serif', color: sentiment === 'positive' ? '#34d399' : 'rgba(255,255,255,0.30)' }}>
+                        Elogio / Ideia
+                      </span>
                     </button>
-                    
+
                     <button
                       type="button"
                       onClick={() => setSentiment('negative')}
-                      className={`flex-1 py-3 px-4 rounded-xl border flex items-center justify-center gap-3 transition-all ${sentiment === 'negative'
-                        ? 'bg-rose-500/10 border-rose-500/50 text-rose-400 ring-1 ring-rose-500/30'
-                        : 'bg-slate-900/50 border-slate-800 text-slate-500 hover:border-slate-700'
-                        }`}
+                      style={{
+                        flex: 1, padding: '14px 12px', borderRadius: '14px',
+                        display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px',
+                        cursor: 'pointer', transition: 'all 0.25s', border: 'none',
+                        background: sentiment === 'negative' ? 'rgba(244,63,94,0.08)' : 'rgba(255,255,255,0.025)',
+                        outline: sentiment === 'negative' ? '1px solid rgba(244,63,94,0.35)' : '1px solid rgba(255,255,255,0.06)',
+                      }}
                     >
-                      <span className={`w-3 h-3 rounded-full ${sentiment === 'negative' ? 'bg-rose-500 shadow-[0_0_8px_rgba(244,63,94,0.8)]' : 'bg-slate-700'}`}></span>
-                      <span className="text-sm font-bold">Crítica / Erro</span>
+                      <span style={{
+                        width: '10px', height: '10px', borderRadius: '50%',
+                        background: sentiment === 'negative' ? '#f43f5e' : 'rgba(255,255,255,0.12)',
+                        boxShadow: sentiment === 'negative' ? '0 0 12px rgba(244,63,94,0.7)' : 'none',
+                        transition: 'all 0.25s'
+                      }} />
+                      <span style={{ fontSize: '13px', fontWeight: 700, fontFamily: 'Inter, system-ui, sans-serif', color: sentiment === 'negative' ? '#fb7185' : 'rgba(255,255,255,0.30)' }}>
+                        Crítica / Erro
+                      </span>
                     </button>
                   </div>
                 </div>
 
-                <div className="relative group mt-2">
-                  <textarea
-                    rows={5}
-                    value={message}
-                    onChange={(e) => setMessage(e.target.value)}
-                    placeholder="Conte-nos o que você achou do JuriQuest..."
-                    className="w-full bg-slate-900/50 border border-slate-800 rounded-xl p-4 text-slate-200 placeholder-slate-600 focus:outline-none focus:border-[#c9a96e]/50 focus:ring-1 focus:ring-[#c9a96e]/20 transition-all text-sm resize-none"
-                    required
-                  ></textarea>
-                </div>
+                {/* Textarea */}
+                <textarea
+                  rows={5}
+                  value={message}
+                  onChange={(e) => setMessage(e.target.value)}
+                  placeholder="Conte-nos o que você achou do JuriQuest..."
+                  required
+                  style={{
+                    width: '100%', boxSizing: 'border-box', resize: 'none',
+                    background: 'rgba(255,255,255,0.025)',
+                    border: '1px solid rgba(255,255,255,0.06)',
+                    borderRadius: '16px', padding: '18px 20px',
+                    color: 'rgba(255,255,255,0.85)', fontSize: '14px', lineHeight: 1.6,
+                    fontFamily: 'Inter, system-ui, sans-serif',
+                    transition: 'border-color 0.2s, box-shadow 0.2s',
+                    outline: 'none'
+                  }}
+                  onFocus={e => { e.target.style.borderColor = 'rgba(201,169,110,0.4)'; e.target.style.boxShadow = '0 0 0 3px rgba(201,169,110,0.08)'; }}
+                  onBlur={e => { e.target.style.borderColor = 'rgba(255,255,255,0.06)'; e.target.style.boxShadow = 'none'; }}
+                />
 
+                {/* Status Message */}
                 {feedbackMsg.text && (
-                  <div className={`p-4 rounded-xl text-xs font-bold text-center animate-in zoom-in-95 flex flex-col gap-3 ${feedbackMsg.type === 'success' ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 'bg-rose-500/10 text-rose-400 border border-rose-500/20'}`}>
+                  <div style={{
+                    padding: '14px 18px', borderRadius: '14px',
+                    display: 'flex', flexDirection: 'column', gap: '10px', alignItems: 'center',
+                    fontSize: '12px', fontWeight: 700, textAlign: 'center',
+                    fontFamily: 'Inter, system-ui, sans-serif',
+                    background: feedbackMsg.type === 'success' ? 'rgba(16,185,129,0.08)' : 'rgba(244,63,94,0.08)',
+                    color: feedbackMsg.type === 'success' ? '#34d399' : '#fb7185',
+                    border: `1px solid ${feedbackMsg.type === 'success' ? 'rgba(16,185,129,0.2)' : 'rgba(244,63,94,0.2)'}`
+                  }}>
                     <span>{feedbackMsg.text}</span>
                     {feedbackMsg.type === 'error' && (
-                      <button 
-                        type="button" 
+                      <button
+                        type="button"
                         onClick={() => handleSubmit()}
-                        className="bg-rose-500/20 hover:bg-rose-500/30 text-rose-400 py-2 px-4 rounded-lg transition-all border border-rose-500/30 mx-auto"
+                        style={{
+                          background: 'rgba(244,63,94,0.12)', color: '#fb7185',
+                          border: '1px solid rgba(244,63,94,0.25)', borderRadius: '10px',
+                          padding: '8px 20px', fontSize: '11px', fontWeight: 700,
+                          fontFamily: 'Inter, system-ui, sans-serif', cursor: 'pointer',
+                          transition: 'all 0.2s'
+                        }}
                       >
                         Tentar Novamente
                       </button>
@@ -214,61 +340,120 @@ export default function ContactModal({ visible, onClose }) {
                   </div>
                 )}
 
+                {/* Submit Button */}
                 <button
                   type="submit"
                   disabled={loading || !message.trim()}
-                  className="w-full py-4 bg-[#c9a96e] hover:bg-[#d4b47a] disabled:opacity-30 disabled:cursor-not-allowed text-slate-950 font-extrabold rounded-xl transition-all shadow-xl shadow-[#c9a96e]/5 flex items-center justify-center gap-2 mt-4"
+                  style={{
+                    width: '100%', padding: '16px 0', fontSize: '14px', fontWeight: 800,
+                    fontFamily: 'Inter, system-ui, sans-serif',
+                    background: loading || !message.trim() ? 'rgba(201,169,110,0.15)' : 'linear-gradient(135deg, #c9a96e, #b8944f)',
+                    color: loading || !message.trim() ? 'rgba(201,169,110,0.4)' : '#080c14',
+                    border: 'none', borderRadius: '16px', cursor: loading || !message.trim() ? 'not-allowed' : 'pointer',
+                    transition: 'all 0.3s',
+                    boxShadow: loading || !message.trim() ? 'none' : '0 6px 24px rgba(201,169,110,0.2)',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px',
+                    letterSpacing: '-0.01em'
+                  }}
                 >
                   {loading ? (
-                    <span className="flex items-center gap-2">
-                      <div className="w-4 h-4 border-2 border-slate-950/30 border-t-slate-950 rounded-full animate-spin"></div>
+                    <span style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      <span style={{
+                        width: '16px', height: '16px', border: '2px solid rgba(8,12,20,0.2)',
+                        borderTopColor: '#080c14', borderRadius: '50%',
+                        animation: 'spin 0.6s linear infinite', display: 'inline-block'
+                      }} />
                       Enviando...
                     </span>
                   ) : 'Enviar para os Desenvolvedores'}
                 </button>
               </form>
-            </div>
+            </>
           )}
 
           {activeTab === 'donate' && (
-            <div className="animate-in fade-in slide-in-from-bottom-2 duration-500 flex flex-col items-center">
-              <div className="w-full bg-slate-900/30 border border-slate-800/50 rounded-3xl p-8 mb-6 flex flex-col items-center text-center">
-                <h3 className="text-xl sm:text-2xl font-black text-white tracking-tight mb-3">Apoie o Desenvolvimento</h3>
-                <p className="text-sm text-slate-400 leading-relaxed max-w-[320px] mb-8 font-medium">
-                  Sua contribuição ajuda a manter os servidores ativos e a trazer novas cruzadinhas jurídicas todos os dias para a comunidade.
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '24px' }}>
+              {/* Donation Card */}
+              <div style={{
+                width: '100%', background: 'rgba(255,255,255,0.02)',
+                border: '1px solid rgba(255,255,255,0.05)', borderRadius: '24px',
+                padding: '32px 24px', display: 'flex', flexDirection: 'column',
+                alignItems: 'center', textAlign: 'center'
+              }}>
+                <h3 style={{ margin: '0 0 8px', fontSize: '20px', fontWeight: 800, color: '#fff', letterSpacing: '-0.02em', fontFamily: 'Inter, system-ui, sans-serif' }}>
+                  Apoie o Desenvolvimento
+                </h3>
+                <p style={{ margin: '0 0 28px', fontSize: '13px', color: 'rgba(255,255,255,0.40)', lineHeight: 1.6, maxWidth: '300px', fontFamily: 'Inter, system-ui, sans-serif' }}>
+                  Sua contribuição ajuda a manter os servidores ativos e a trazer novas cruzadinhas jurídicas todos os dias.
                 </p>
 
-                <div className="relative p-5 bg-white rounded-[2.5rem] shadow-[0_20px_60px_rgba(0,0,0,0.4)] mt-4">
-                  <img src={PIX_QR_CODE_IMG} alt="QR Code do PIX" className="w-44 h-44 sm:w-52 sm:h-52 object-contain rounded-2xl" />
-                  <div className="absolute -bottom-3 -right-3 bg-[#c9a96e] text-slate-950 text-[10px] font-black px-4 py-2 rounded-full shadow-2xl border-2 border-[#0e1117] z-10">
+                <div style={{ position: 'relative', padding: '20px', background: '#fff', borderRadius: '24px', boxShadow: '0 20px 60px rgba(0,0,0,0.5)' }}>
+                  <img src={PIX_QR_CODE_IMG} alt="QR Code do PIX" style={{ width: '180px', height: '180px', objectFit: 'contain', borderRadius: '12px', display: 'block' }} />
+                  <div style={{
+                    position: 'absolute', bottom: '-10px', right: '-10px',
+                    background: '#c9a96e', color: '#080c14',
+                    fontSize: '9px', fontWeight: 900, letterSpacing: '0.1em',
+                    padding: '6px 14px', borderRadius: '20px',
+                    boxShadow: '0 4px 16px rgba(201,169,110,0.3)',
+                    border: '3px solid #080c14', fontFamily: 'Inter, system-ui, sans-serif'
+                  }}>
                     PIX SEGURO
                   </div>
                 </div>
               </div>
 
-              <div className="w-full space-y-4">
-                <label className="text-[10px] uppercase font-black text-slate-500 tracking-[0.25em] block text-center">Pix Copia e Cola</label>
-                <div className="flex flex-col sm:flex-row bg-slate-950 border border-slate-800 rounded-2xl overflow-hidden p-1.5 gap-1.5">
+              {/* PIX Copy */}
+              <div style={{ width: '100%', display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                <label style={{ fontSize: '10px', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.2em', color: 'rgba(255,255,255,0.25)', textAlign: 'center', fontFamily: 'Inter, system-ui, sans-serif' }}>
+                  Pix Copia e Cola
+                </label>
+                <div style={{
+                  display: 'flex', background: 'rgba(255,255,255,0.025)',
+                  border: '1px solid rgba(255,255,255,0.06)', borderRadius: '14px',
+                  padding: '4px', gap: '4px', alignItems: 'stretch'
+                }}>
                   <input
                     type="text"
                     readOnly
                     value={PIX_CHAVE_COPIA_COLA}
-                    className="bg-transparent text-slate-400 text-xs px-5 py-4 flex-1 focus:outline-none truncate font-mono"
+                    style={{
+                      flex: 1, background: 'transparent', border: 'none', outline: 'none',
+                      color: 'rgba(255,255,255,0.35)', fontSize: '11px', padding: '12px 16px',
+                      fontFamily: 'ui-monospace, monospace', minWidth: 0
+                    }}
                   />
                   <button
                     onClick={handleCopyPix}
-                    className="bg-[#c9a96e] hover:bg-[#d4b47a] text-slate-950 px-8 py-4 text-xs font-black transition-all rounded-xl shadow-lg whitespace-nowrap"
+                    style={{
+                      background: copiedPix ? 'rgba(16,185,129,0.15)' : '#c9a96e',
+                      color: copiedPix ? '#34d399' : '#080c14',
+                      border: copiedPix ? '1px solid rgba(16,185,129,0.3)' : 'none',
+                      padding: '12px 24px', fontSize: '11px', fontWeight: 800,
+                      fontFamily: 'Inter, system-ui, sans-serif',
+                      borderRadius: '10px', cursor: 'pointer', transition: 'all 0.2s',
+                      whiteSpace: 'nowrap',
+                      boxShadow: copiedPix ? 'none' : '0 2px 12px rgba(201,169,110,0.2)'
+                    }}
                   >
                     {copiedPix ? '✓ Copiado' : 'Copiar Chave'}
                   </button>
                 </div>
               </div>
-              
-              <p className="mt-10 text-[10px] text-slate-600 font-bold tracking-[0.2em] uppercase">JuriQuest • Feito por e para Advogados</p>
+
+              <p style={{ margin: '8px 0 0', fontSize: '10px', color: 'rgba(255,255,255,0.15)', fontWeight: 700, letterSpacing: '0.15em', textTransform: 'uppercase', fontFamily: 'Inter, system-ui, sans-serif' }}>
+                JuriQuest • Feito por e para Advogados
+              </p>
             </div>
           )}
         </div>
       </div>
+
+      {/* Keyframes */}
+      <style jsx global>{`
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(24px) scale(0.96); } to { opacity: 1; transform: translateY(0) scale(1); } }
+        @keyframes spin { to { transform: rotate(360deg); } }
+      `}</style>
     </div>
   );
 }
