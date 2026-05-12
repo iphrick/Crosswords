@@ -39,29 +39,74 @@ export default function ContactModal({ visible, onClose }) {
   };
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    if (!message.trim()) return;
+    if (e) e.preventDefault();
+    
+    // 1. Payload Sanitization & Validation
+    const sanitizedMessage = message.trim();
+    if (!sanitizedMessage) return;
+
+    // 2. Auth Verification
+    if (!user && !confirm('Você está enviando como anônimo. Deseja continuar?')) {
+      return;
+    }
 
     setLoading(true);
     setFeedbackMsg({ text: '', type: '' });
 
+    // 3. Debugging Logs (Development Only)
+    const isDev = process.env.NODE_ENV === 'development';
+    if (isDev) {
+      console.group('🚀 [JuriQuest Debug] - Feedback Submission');
+      console.log('Step 1: Auth Check...', user ? 'Authenticated' : 'Anonymous');
+      console.log('Step 2: Payload Serialization...', { sentiment, message: sanitizedMessage, timestamp: new Date().toISOString() });
+    }
+
     try {
+      if (isDev) console.log('Step 3: Server Request (Firestore)...');
+
+      // 4. Request Logic
       await addDoc(collection(db, 'feedbacks'), {
         uid: user?.uid || 'anonymous',
         email: user?.email || 'Anônimo',
         sentiment,
-        message: message.trim(),
-        createdAt: serverTimestamp()
+        message: sanitizedMessage,
+        createdAt: serverTimestamp(),
+        deviceInfo: {
+          platform: navigator.platform,
+          userAgent: navigator.userAgent
+        }
       });
+
+      if (isDev) {
+        console.log('✅ Step 4: Server Response: Success');
+        console.groupEnd();
+      }
+
       setFeedbackMsg({ text: 'Feedback enviado com sucesso! Obrigado.', type: 'success' });
       setMessage('');
+      
       setTimeout(() => {
         onClose();
         setFeedbackMsg({ text: '', type: '' });
       }, 2500);
+
     } catch (error) {
-      console.error("Erro ao enviar feedback:", error);
-      setFeedbackMsg({ text: 'Erro ao enviar. Tente novamente mais tarde.', type: 'error' });
+      // 5. Error Categorization & Handling
+      if (isDev) {
+        console.error('❌ Step 4: Server Response: FAILED', error);
+        console.groupEnd();
+      }
+
+      // Check for specific Firestore/Network errors
+      const errorMsg = error.code === 'permission-denied' 
+        ? 'Acesso negado. Por favor, faça login novamente.'
+        : 'Ops! Tivemos um problema técnico. Por favor, tente novamente em alguns instantes.';
+
+      setFeedbackMsg({ 
+        text: errorMsg, 
+        type: 'error' 
+      });
+
     } finally {
       setLoading(false);
     }
@@ -155,8 +200,17 @@ export default function ContactModal({ visible, onClose }) {
                 </div>
 
                 {feedbackMsg.text && (
-                  <div className={`p-3 rounded-lg text-xs font-bold text-center animate-in zoom-in-95 ${feedbackMsg.type === 'success' ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 'bg-rose-500/10 text-rose-400 border border-rose-500/20'}`}>
-                    {feedbackMsg.text}
+                  <div className={`p-4 rounded-xl text-xs font-bold text-center animate-in zoom-in-95 flex flex-col gap-3 ${feedbackMsg.type === 'success' ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 'bg-rose-500/10 text-rose-400 border border-rose-500/20'}`}>
+                    <span>{feedbackMsg.text}</span>
+                    {feedbackMsg.type === 'error' && (
+                      <button 
+                        type="button" 
+                        onClick={() => handleSubmit()}
+                        className="bg-rose-500/20 hover:bg-rose-500/30 text-rose-400 py-2 px-4 rounded-lg transition-all border border-rose-500/30 mx-auto"
+                      >
+                        Tentar Novamente
+                      </button>
+                    )}
                   </div>
                 )}
 
