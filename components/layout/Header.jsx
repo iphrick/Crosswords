@@ -33,7 +33,7 @@ export default function Header({ onLoginClick, onRegisterClick, onRankingClick, 
           </nav>
         ) : (
           <div className={styles.menuContainer}>
-
+            <span className={styles.menuLabel}>Menu Principal</span>
             <div className={styles.avatarMenu}>
               <button
                 className={styles.menuTrigger}

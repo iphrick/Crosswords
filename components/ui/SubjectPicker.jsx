@@ -11,28 +11,31 @@ export default function SubjectPicker({ subject, setSubject }) {
         position: 'relative',
         display: 'flex',
         flexDirection: 'column',
-        paddingTop: '8px', // Space for the floating label
+        paddingTop: '12px', // Espaço real para a label flutuar
+        overflow: 'visible', // Garante que a label não seja cortada
       }}
     >
       <label
         style={{
           position: 'absolute',
-          top: '-6px',
-          left: '16px',
+          top: '12px', // Alinhado exatamente com o início do card abaixo
+          left: '24px', // Alinhamento interno moderno
+          transform: 'translateY(-50%)', // Centraliza verticalmente sobre a borda
           fontSize: '9px',
           fontWeight: 900,
           letterSpacing: '0.2em',
           textTransform: 'uppercase',
           color: 'var(--color-text-muted)',
-          backgroundColor: 'var(--color-surface)',
-          padding: '0 8px',
+          backgroundColor: 'var(--color-surface)', // Background sólido para esconder a borda
+          padding: '0 10px',
           zIndex: 20,
           borderRadius: '4px',
           whiteSpace: 'nowrap',
           fontFamily: 'Inter, system-ui, sans-serif',
-          display: 'flex',
+          display: 'inline-flex',
           alignItems: 'center',
-          height: '14px'
+          height: '16px',
+          pointerEvents: 'none', // Não interfere nos cliques do card
         }}
       >
         Matéria Atual
@@ -44,13 +47,15 @@ export default function SubjectPicker({ subject, setSubject }) {
           display: 'flex',
           gap: '12px',
           overflowX: 'auto',
-          padding: '20px 16px 16px',
+          padding: '24px 16px 16px', // Padding superior maior para afastar conteúdo da label
           borderRadius: '24px',
           border: '1px solid var(--color-border)',
           background: 'rgba(255,255,255,0.01)',
           scrollbarWidth: 'none',
           msOverflowStyle: 'none',
           outline: 'none',
+          position: 'relative',
+          zIndex: 1, // Abaixo da label
         }}
         className="subject-picker-row"
       >
