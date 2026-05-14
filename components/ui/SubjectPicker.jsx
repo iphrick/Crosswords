@@ -8,35 +8,48 @@ export default function SubjectPicker({ subject, setSubject }) {
   return (
     <div
       style={{
+        position: 'relative',
         display: 'flex',
         flexDirection: 'column',
-        gap: '10px',
+        paddingTop: '8px', // Space for the floating label
       }}
     >
       <label
         style={{
-          fontSize: '10px',
+          position: 'absolute',
+          top: '-6px',
+          left: '16px',
+          fontSize: '9px',
           fontWeight: 900,
-          letterSpacing: '0.18em',
+          letterSpacing: '0.2em',
           textTransform: 'uppercase',
           color: 'var(--color-text-muted)',
-          paddingLeft: '12px',
+          backgroundColor: 'var(--color-surface)',
+          padding: '0 8px',
+          zIndex: 20,
+          borderRadius: '4px',
+          whiteSpace: 'nowrap',
+          fontFamily: 'Inter, system-ui, sans-serif',
+          display: 'flex',
+          alignItems: 'center',
+          height: '14px'
         }}
       >
         Matéria Atual
       </label>
 
-      {/* Scrollable pill row */}
+      {/* Scrollable pill row container with border */}
       <div
         style={{
           display: 'flex',
-          gap: '10px',
+          gap: '12px',
           overflowX: 'auto',
-          paddingLeft: '16px',
-          paddingRight: '16px',
-          scrollbarWidth: 'none',     /* Firefox */
-          msOverflowStyle: 'none',    /* IE/Edge */
-          border: 'none',
+          padding: '20px 16px 16px',
+          borderRadius: '24px',
+          border: '1px solid var(--color-border)',
+          background: 'rgba(255,255,255,0.01)',
+          scrollbarWidth: 'none',
+          msOverflowStyle: 'none',
           outline: 'none',
         }}
         className="subject-picker-row"
