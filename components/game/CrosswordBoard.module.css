@@ -241,3 +241,37 @@
     font-size: 1.1rem;
   }
 }
+
+/* DESKTOP SPECIFIC CLEANUP */
+@media (min-width: 1024px) {
+  .gridWrapper {
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+  }
+
+  .grid {
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+  }
+
+  .gridScroll {
+    padding: 40px !important;
+  }
+
+  .highlightedCell {
+    background: rgba(201, 169, 110, 0.04) !important; /* Quase invisível no desktop */
+  }
+
+  .clueIndicator {
+    box-shadow: none !important;
+    border-color: rgba(201, 169, 110, 0.3) !important;
+  }
+
+  .cell {
+    background: var(--color-surface) !important; /* Fundo sólido e limpo */
+    border: 1px solid var(--color-border) !important;
+  }
+}
