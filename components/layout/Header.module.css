@@ -56,14 +56,15 @@
   font-weight: 800;
   letter-spacing: 0.3em;
   text-transform: uppercase;
-  color: var(--color-text);
-  opacity: 0.3;
-  margin-right: 4px;
+  color: var(--color-accent); /* Cyan neon discreto */
+  opacity: 0.6; /* Aumentada a visibilidade */
+  margin-right: 6px;
   white-space: nowrap;
   pointer-events: none;
   user-select: none;
   display: inline-flex;
   align-items: center;
+  text-shadow: 0 0 10px rgba(201, 169, 110, 0.2); /* Brilho sutil */
 }
 
 @media (max-width: 900px) {
