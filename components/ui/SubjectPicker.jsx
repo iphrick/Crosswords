@@ -32,8 +32,8 @@ export default function SubjectPicker({ subject, setSubject }) {
           display: 'flex',
           gap: '10px',
           overflowX: 'auto',
-          paddingLeft: '12px',
-          paddingRight: '12px',
+          paddingLeft: '16px',
+          paddingRight: '16px',
           scrollbarWidth: 'none',     /* Firefox */
           msOverflowStyle: 'none',    /* IE/Edge */
           border: 'none',
