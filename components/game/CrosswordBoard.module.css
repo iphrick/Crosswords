@@ -32,21 +32,22 @@
 .gridScroll {
   width: 100%;
   overflow: auto;
-  padding: 80px 120px; /* Restaurado para Desktop */
+  padding: 80px 120px; 
   display: flex;
-  justify-content: center; /* Restaurado para Desktop */
+  justify-content: center;
   scrollbar-width: thin;
   scrollbar-color: var(--color-accent) var(--color-bg);
 }
 
 .grid {
   display: grid;
-  background: var(--color-bg);
+  background: transparent; /* Removido background escuro que causava rastro */
   border: 2px solid var(--color-border);
   border-radius: 8px;
   position: relative;
   width: fit-content;
   height: fit-content;
+  overflow: hidden; /* Garante que as células não vazem a borda arredondada */
 }
 
 /* CELLS */
@@ -70,8 +71,8 @@
 }
 
 .blocked {
-  background: #0f172a;
-  border-color: transparent;
+  background: #080c14 !important; /* Cor sólida e escura para células bloqueadas */
+  border-color: rgba(255, 255, 255, 0.03) !important;
 }
 
 .cellNumber {
@@ -189,7 +190,7 @@
 
 @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-/* MOBILE OPTIMIZATIONS (MANTIDAS COMO ESTAVAM) */
+/* MOBILE OPTIMIZATIONS */
 @media (max-width: 768px) {
   .gridWrapper {
     padding: 12px;
@@ -201,13 +202,13 @@
 
   .gridScroll {
     padding: 20px 5px;
-    display: block; /* Garante que não corte à esquerda */
+    display: block; 
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
   }
 
   .grid {
-    margin: 0 auto; /* Centraliza no mobile */
+    margin: 0 auto; 
     width: max-content;
   }
 
@@ -239,39 +240,5 @@
   }
   .input {
     font-size: 1.1rem;
-  }
-}
-
-/* DESKTOP SPECIFIC CLEANUP */
-@media (min-width: 1024px) {
-  .gridWrapper {
-    background: transparent !important;
-    border: none !important;
-    box-shadow: none !important;
-    padding: 0 !important;
-  }
-
-  .grid {
-    background: transparent !important;
-    border: none !important;
-    box-shadow: none !important;
-  }
-
-  .gridScroll {
-    padding: 40px !important;
-  }
-
-  .highlightedCell {
-    background: rgba(201, 169, 110, 0.04) !important; /* Quase invisível no desktop */
-  }
-
-  .clueIndicator {
-    box-shadow: none !important;
-    border-color: rgba(201, 169, 110, 0.3) !important;
-  }
-
-  .cell {
-    background: var(--color-surface) !important; /* Fundo sólido e limpo */
-    border: 1px solid var(--color-border) !important;
   }
 }
