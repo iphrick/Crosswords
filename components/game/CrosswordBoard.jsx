@@ -271,8 +271,8 @@ export default function CrosswordBoard({ placedWords, onSolved }) {
           <div 
             className={styles.grid}
             style={{ 
-              gridTemplateColumns: `repeat(${gridDimensions.cols}, ${windowWidth < 1280 ? '44px' : '52px'})`,
-              gridTemplateRows: `repeat(${gridDimensions.rows}, ${windowWidth < 1280 ? '44px' : '52px'})`
+              gridTemplateColumns: `repeat(${gridDimensions.cols}, var(--cell-size, 44px))`,
+              gridTemplateRows: `repeat(${gridDimensions.rows}, var(--cell-size, 44px))`
             }}
           >
 
