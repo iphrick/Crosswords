@@ -4,34 +4,39 @@
   display: flex;
   flex-direction: column;
   align-items: center;
+  gap: var(--space-xl);
   width: 100%;
   animation: fadeIn 0.3s ease;
-  overflow: visible;
 }
 
 .gridWrapper {
   display: flex;
   flex-direction: column;
+  gap: var(--space-lg);
   width: 100%;
   max-width: 1200px;
+  padding: 20px;
   background: var(--color-surface);
-  border-radius: 2.5rem;
+  border-radius: var(--radius-lg);
   border: 1px solid var(--color-border);
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
   position: relative;
-  overflow: hidden;
+}
+
+@media (min-width: 1024px) {
+  .gridWrapper {
+    width: 90%;
+  }
 }
 
 .gridScroll {
   width: 100%;
-  overflow-x: auto;
-  overflow-y: hidden;
-  padding: 40px 10px;
-  display: block; /* Importante para evitar clipping à esquerda no overflow */
+  overflow: auto;
+  padding: 80px 120px; /* Restaurado para Desktop */
+  display: flex;
+  justify-content: center; /* Restaurado para Desktop */
   scrollbar-width: thin;
   scrollbar-color: var(--color-accent) var(--color-bg);
-  -webkit-overflow-scrolling: touch;
-  box-sizing: border-box;
 }
 
 .grid {
@@ -40,15 +45,14 @@
   border: 2px solid var(--color-border);
   border-radius: 8px;
   position: relative;
-  width: max-content;
-  margin: 0 auto; /* Centraliza se couber, scrolla se não */
-  box-sizing: border-box;
+  width: fit-content;
+  height: fit-content;
 }
 
 /* CELLS */
 .cell {
   position: relative;
-  --cell-size: clamp(30px, 8.5vw, 44px);
+  --cell-size: 44px;
   width: var(--cell-size);
   height: var(--cell-size);
   background: var(--color-surface);
@@ -83,9 +87,9 @@
 
 .directionTip {
   position: absolute;
-  bottom: 1px;
-  right: 2px;
-  font-size: 10px;
+  bottom: 2px;
+  right: 3px;
+  font-size: 12px;
   color: var(--color-accent);
   opacity: 0.6;
   font-weight: 900;
@@ -99,7 +103,7 @@
   background: transparent;
   border: none;
   text-align: center;
-  font-size: 1.4rem;
+  font-size: 1.5rem;
   font-weight: 700;
   color: var(--color-text);
   text-transform: uppercase;
@@ -107,36 +111,6 @@
   outline: none;
   z-index: 5;
   transition: transform 0.1s ease;
-}
-
-@media (max-width: 768px) {
-  .gridWrapper {
-    border: none;
-    background: transparent;
-    box-shadow: none;
-  }
-  
-  .gridScroll {
-    padding: 20px 5px;
-  }
-
-  .input {
-    font-size: 1.2rem;
-  }
-
-  .clueIndicator {
-    font-size: 10px;
-    padding: 1px 4px;
-  }
-}
-
-@media (max-width: 380px) {
-  .cell {
-    --cell-size: clamp(28px, 10vw, 34px);
-  }
-  .input {
-    font-size: 1.1rem;
-  }
 }
 
 .input:focus {
@@ -153,6 +127,7 @@
   background: rgba(201, 169, 110, 0.08);
 }
 
+/* Feedback colors */
 .correct { color: #10b981 !important; }
 .wrong   { color: #ef4444 !important; }
 .revealed { color: #8b5cf6 !important; }
@@ -212,7 +187,57 @@
   margin-top: var(--space-md);
 }
 
-@keyframes fadeIn { 
-  from { opacity: 0; transform: translateY(10px); } 
-  to { opacity: 1; transform: translateY(0); } 
+@keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+/* MOBILE OPTIMIZATIONS (MANTIDAS COMO ESTAVAM) */
+@media (max-width: 768px) {
+  .gridWrapper {
+    padding: 12px;
+    border-radius: 2rem;
+    background: transparent;
+    border: none;
+    box-shadow: none;
+  }
+
+  .gridScroll {
+    padding: 20px 5px;
+    display: block; /* Garante que não corte à esquerda */
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .grid {
+    margin: 0 auto; /* Centraliza no mobile */
+    width: max-content;
+  }
+
+  .cell {
+    --cell-size: clamp(30px, 8.5vw, 44px);
+    width: var(--cell-size);
+    height: var(--cell-size);
+  }
+
+  .input {
+    font-size: 1.2rem;
+  }
+
+  .clueIndicator {
+    font-size: 10px;
+    padding: 1px 4px;
+  }
+
+  .directionTip {
+    font-size: 9px;
+    bottom: 1px;
+    right: 2px;
+  }
+}
+
+@media (max-width: 380px) {
+  .cell {
+    --cell-size: clamp(28px, 10vw, 34px);
+  }
+  .input {
+    font-size: 1.1rem;
+  }
 }
